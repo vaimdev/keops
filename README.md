@@ -12,6 +12,6 @@ The commercial license allows developers to build new apps/modules, under any re
 Community modules can be licensed under:
 AGPL, GPL, LGPL, Apache, MIT, BSD, and another compatible open source license.
 
-Commercial modules can be licensed under any desired license. (Observing and respecting use of community modules licenses)
+Commercial modules must observing and respecting use of community modules licenses.
 
 Enjoy creating powerfull business apps.
