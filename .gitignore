@@ -1,0 +1,6 @@
+*.class
+*.pyc
+*.pyo
+.svn
+__pycache__
+_svn
