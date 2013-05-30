@@ -4,3 +4,7 @@
 .svn
 __pycache__
 _svn
+.idea
+/.pydevproject
+
+/.project
