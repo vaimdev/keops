@@ -1,0 +1,21 @@
+{% extends "keops/base.html" %}
+
+{% block startup_script %}
+    <script src="{{ STATIC_URL }}keops/js/forms.js"></script>
+    <script src="{{ STATIC_URL }}keops/js/datacontrols.js"></script>
+<script>
+(function() {
+keops.siteName = '{{ site_name }}';
+keops.menuName = '{{ menu.name }}';
+keops.menu = {{ sub_menu|safe }};
+keops.msgs.loading = '{{ _('loading...')|capfirst }}';
+keops.htmlMenu = "<ul>{% for item in main_menu %}<il><a href='../{{ item.pk }}'>{{ item.name }}</a></il>{% endfor %}</ul>";
+})();
+Ext.onReady(function() {
+Ext.getCmp('app-menu').update(keops.htmlMenu);
+});
+</script>
+{% endblock %}
+{% block content %}
+<img src="/static/keops/images/logo.png" id="app-logo" />
+{% endblock %}

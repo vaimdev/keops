@@ -1,0 +1,22 @@
+<%
+from django.conf import settings
+%>
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href="${STATIC_URL}js/ext-4.2.0.663/resources/css/ext-all-neptune.css" rel="stylesheet" />
+		<link href="${STATIC_URL}orun/css/orun.css" rel="stylesheet">
+		<script src="${STATIC_URL}admin/js/jquery.min.js"></script>
+		% if settings.DEBUG:
+		<script src="${STATIC_URL}js/ext-4.2.0.663/ext-all-debug.js"></script>
+		% else:
+		<script src="${STATIC_URL}js/ext-4.2.0.663/ext-all.js"></script>
+		% endif
+		<script src="${STATIC_URL}admin/js/datacontrols.js"></script>
+	<%block name="scripts"></%block>
+	</head>
+	<body onresize="resizeBody()">
+		<%block name="mainheader"><div id="main-header"></div></%block>
+		<%block name="page"></%block>
+	</body>
+</html>

@@ -1,0 +1,170 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-09-17 18:05-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "active"
+msgstr "ativo"
+
+msgid "enabled"
+msgstr "habilitado"
+
+#: .\localization.py:7
+msgid "name"
+msgstr "nome"
+
+msgid "full name"
+msgstr "nome completo"
+
+msgid "description"
+msgstr "descrição"
+
+#: .\localization.py:8
+msgid "code"
+msgstr "código"
+
+#: .\localization.py:12
+msgid "country"
+msgstr "país"
+
+msgid "administration"
+msgstr "administração"
+
+msgid "system"
+msgstr "sistema"
+
+msgid "security"
+msgstr "segurança"
+
+msgid "users"
+msgstr "usuários"
+
+msgid "groups"
+msgstr "grupos"
+
+msgid "configurations"
+msgstr "configurações"
+
+msgid "company"
+msgstr "empresa"
+
+msgid "models"
+msgstr "modelos"
+
+msgid "menu item"
+msgstr "item do menu"
+
+msgid "menu items"
+msgstr "itens do menu"
+
+msgid "form actions"
+msgstr "ações de formulários"
+
+msgid "report actions"
+msgstr "ações de relatórios"
+
+msgid "administrators"
+msgstr "administradores"
+
+msgid "system administrators"
+msgstr "administradores do sistema"
+
+msgid "action"
+msgstr "ação"
+
+msgid "actions"
+msgstr "ações"
+
+msgid "sequence"
+msgstr "sequência"
+
+msgid "parent"
+msgstr "superior"
+
+msgid "group"
+msgstr "grupo"
+
+msgid "user"
+msgstr "usuário"
+
+msgid "report header 1"
+msgstr "1º cabeçalho de relatório"
+
+msgid "report header 2"
+msgstr "2º cabeçalho de relatório"
+
+msgid "report header 3"
+msgstr "3º cabeçalho de relatório"
+
+msgid "report header 4"
+msgstr "4º cabeçalho de relatório"
+
+msgid "report footer 1"
+msgstr "1º rodapé de relatório"
+
+msgid "report footer 2"
+msgstr "2º rodapé de relatório"
+
+msgid "report configuration"
+msgstr "configuração de relatórios"
+
+msgid "signature"
+msgstr "assinatura"
+
+msgid "e-mail signature"
+msgstr "assinatura de e-mail"
+
+msgid "change password on next logon"
+msgstr "alterar senha no próximo logon"
+
+msgid "forms"
+msgstr "formulários"
+
+msgid "reports"
+msgstr "relatórios"
+
+msgid "module"
+msgstr "módulo"
+
+msgid "modules"
+msgstr "módulos"
+
+msgid "authentication"
+msgstr "autenticação"
+
+msgid "image path"
+msgstr "caminho da imagem"
+
+msgid "view"
+msgstr "visão"
+
+msgid "views"
+msgstr "visões"
+
+msgid "format"
+msgstr "formato"
+
+msgid "definition"
+msgstr "definição"
+
+msgid "model"
+msgstr "modelo"
+
+msgid "field"
+msgstr "campo"
+
+msgid "fields"
+msgstr "campos"

@@ -1,0 +1,15 @@
+{% extends "orun/app.html" %}
+
+{% block "startup_script" %}
+<script>
+(function() {
+orun.siteName = '{{ site_name }}';
+orun.menuName = '{{ menu.name }}';
+orun.menu = {{ sub_menu|safe }};
+orun.htmlMenu = "<ul>{% for item in main_menu %}<il><a href='../{{ item.pk }}'>{{ item.name }}</a></il>{% endfor %}</ul>";
+})();
+Ext.onReady(function() {
+Ext.getCmp('app-menu').update(orun.htmlMenu);
+});
+</script>
+{% endblock %}
