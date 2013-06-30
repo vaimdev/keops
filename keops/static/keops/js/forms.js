@@ -57,7 +57,6 @@ Ext.define('Keops.form.ModelForm', {
         ]);
     },
 
-    
     setState: function (state) {
     	this._state = state;
     	if (state == 'read') read = true; else read = false;

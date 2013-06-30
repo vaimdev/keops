@@ -2,8 +2,9 @@
 
 {% block startup_script %}
     <script src="{{ STATIC_URL }}keops/js/forms.js"></script>
-    <script src="{{ STATIC_URL }}keops/js/datacontrols.js"></script>
+    <script src="{{ STATIC_URL }}keops/js/controls.js"></script>
 <script>
+Ext.Loader.setPath('Ext.ux', '/static/js/extjs/examples/ux');
 (function() {
 keops.siteName = '{{ site_name }}';
 keops.menuName = '{{ menu.name }}';
@@ -14,6 +15,10 @@ keops.htmlMenu = "<ul>{% for item in main_menu %}<il><a href='../{{ item.pk }}'>
 Ext.onReady(function() {
 Ext.getCmp('app-menu').update(keops.htmlMenu);
 });
+Ext.require([
+    'Ext.ux.form.MultiSelect',
+    'Ext.ux.form.ItemSelector'
+]);
 </script>
 {% endblock %}
 {% block content %}

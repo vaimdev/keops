@@ -18,7 +18,7 @@ __author__ = "Florian Leitner"
 
 class BigIntegerField(fields.IntegerField):
 
-    def db_type(self):
+    def db_type(self, connection=None):
         if settings.DATABASE_ENGINE == 'mysql':
             return "bigint"
         elif settings.DATABASE_ENGINE == 'oracle':

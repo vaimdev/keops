@@ -7,14 +7,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
 
-class Contact(models.Model):
-    name = models.CharField(_('name'), max_length=100, null=False)
-    email = models.EmailField('e-mail')
-    
-    class Meta:
-        abstract = True
-        verbose_name = _('contact')
-
 # User follow record
 class UserContent(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
@@ -24,7 +16,7 @@ class UserContent(models.Model):
     join_date = models.DateTimeField(_('date/time'), default=datetime.datetime.now())
 
     class Meta:
-        db_table = 'communication_user_content'
+        db_table = 'user_content'
 
 class UserContentComment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
@@ -43,7 +35,7 @@ class UserContentComment(models.Model):
                                 'be displayed instead.'))
 
     class Meta:
-        db_table = 'communication_user_content_comment'
+        db_table = 'user_content_comment'
 
 class UserMessage(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
@@ -54,4 +46,4 @@ class UserMessage(models.Model):
     todo = models.BooleanField(_('to do'))
 
     class Meta:
-        db_table = 'communication_user_message'
+        db_table = 'user_message'

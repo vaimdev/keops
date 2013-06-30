@@ -2,7 +2,6 @@
 import os
 import keops.settings
 
-# Auto register INSTALLED_APPS.
 def register_modules(prefix, path):
     lst = os.listdir(path)
     for s in lst:
@@ -14,4 +13,5 @@ def register_modules(prefix, path):
             except:
                 pass
 
+# Auto register modules on settings.INSTALLED_APPS
 register_modules('keops.modules', os.path.dirname(__file__))

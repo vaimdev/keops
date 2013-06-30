@@ -17,8 +17,7 @@ AUTH_USER_MODEL = 'base.User'
 LOGIN_URL = '/accounts/login'
 
 INSTALLED_APPS = ['keops', 'django.contrib.sessions', 'django.contrib.sites',
-    'django.contrib.contenttypes', 'django.contrib.auth', 'django.contrib.comments',
-    'django.contrib.messages']
+    'django.contrib.contenttypes', 'django.contrib.auth', 'django.contrib.messages']
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',

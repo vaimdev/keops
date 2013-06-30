@@ -53,7 +53,7 @@ def grid_column(name, field):
     return col
 
 def get_field(name, field):
-    d = {'fieldLabel': str(field.label), 'name': name} #, 'labelAlign': 'top'} # optional
+    d = {'columnWidth': .5, 'fieldLabel': str(field.label), 'name': name} #, 'labelAlign': 'top'} # optional
     d.update(get_xtype(field))
     if d['xtype'] == 'checkbox':
         d['fieldLabel'] = ''
