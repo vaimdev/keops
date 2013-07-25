@@ -239,15 +239,6 @@ a {
     font-size: 13px;
 }
 
-.x-grid-row-selected .x-grid-td {
-    border-style: solid;
-}
-
-.x-grid-row-focused .x-grid-td {
-    border-top: 1px solid #999999!important;
-    border-bottom: 1px solid #999999!important;
-}
-
 .x-btn-default-small {
     border-radius: 4px;
     padding: 3px 9px 3px 9px;
@@ -395,4 +386,8 @@ input[type=text]:focus {
 
 .x-accordion-layout-ct {
 	padding: 0;
+}
+
+.x-tree-node-text {
+	font-size: 13px;
 }

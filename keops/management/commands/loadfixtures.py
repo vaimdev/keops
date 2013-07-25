@@ -198,7 +198,6 @@ class Command(BaseCommand):
             open_method = self.compression_types[compression_format]
             try:
                 # Set default encoding for ms plat
-                print(full_path)
                 fixture = open_method(full_path, 'r', encoding=settings.DEFAULT_CHARSET) if open_method is open else open_method(full_path, 'r')
             except IOError:
                 if self.verbosity >= 2:

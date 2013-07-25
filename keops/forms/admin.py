@@ -90,7 +90,8 @@ class ModelAdmin(AbstractForm):
                 (models.AutoField, models.OneToOneField)) and getattr(f, 'custom_attrs', {}).get('visible', True)]
         if not self.list_display:
             self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not isinstance(f, 
-                (models.AutoField, models.OneToOneField)) and getattr(f, 'custom_attrs', {}).get('visible', True)]
+                (models.AutoField, models.OneToOneField, models.ManyToManyField)) and getattr(f, 'custom_attrs', {}).get('visible', True)]
+        print(self.fields)
 
         if not self.pages:
             pages = OrderedDict()
@@ -173,7 +174,7 @@ class ModelAdmin(AbstractForm):
 
     def list_view(self, request, **kwargs):
         self._prepare_form()
-        kwargs['items'] = json.dumps([extjs.grid_column(name, self.widgets[name]) for name in self.fields])
+        kwargs['items'] = json.dumps([extjs.grid_column(name, self.widgets[name]) for name in self.list_display])
         kwargs['fields'] = json.dumps(self.list_display)
         self._prepare_context(request, kwargs)
         return self.render(request, self.list_template, kwargs)
