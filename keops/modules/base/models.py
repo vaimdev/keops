@@ -68,7 +68,7 @@ class BaseModel(ModuleElement):
         verbose_name = _('model')
         
     def __str__(self):
-        return '%s.%s' % (self.content_type.app_label, self.content_type.model_name)
+        return '%s.%s' % (self.content_type.app_label, self.content_type.model)
         
 class Config(models.Model):
     update_URL = models.CharField(max_length=64, verbose_name=_('update URL'))

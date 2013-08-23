@@ -168,3 +168,9 @@ msgstr "campo"
 
 msgid "fields"
 msgstr "campos"
+
+msgid "Data Dictionary"
+msgstr "Dicionário de Dados"
+
+msgid "User Interface"
+msgstr "Interface do Usuário"

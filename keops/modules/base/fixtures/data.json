@@ -47,7 +47,7 @@
         "model": "base.menu",
         "id": "menu-sys-ui",
     	"fields" : {
-            "name": "{{ _('user interface')|capfirst }}",
+            "name": "{{ _('user interface') }}",
             "parent": ["menu-sys"],
             "sequence": 120
         }
@@ -136,7 +136,7 @@
         "model": "base.menu",
         "id": "menu-sys-datadict",
     	"fields" : {
-            "name": "{{ _('dictionary')|capfirst }}",
+            "name": "{{ _('Data Dictionary') }}",
             "parent": ["menu-sys"],
             "sequence": 170
         }

@@ -283,23 +283,8 @@ a {
     font-size: 13px;
 }
 
-.x-boundlist-item-over {
-	background-color: #eaeaea;
-    background-image: -moz-linear-gradient(#fafafa, #eaeaea);
-	background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
-	background-image: linear-gradient(#fafafa, #eaeaea);
-	background-repeat: repeat-x;
-    border-style: solid;
-    border-radius: 3px;
-}
-
-.x-grid-cell-inner {
-    line-height: 16px;
-}
-
 .app-header {
 	background-color: rgb(252, 252, 252);
-	/*border-bottom: solid 1px rgb(158, 158, 158);*/
 	text-shadow: 1px 1px white;
 }
 
@@ -389,5 +374,14 @@ input[type=text]:focus {
 }
 
 .x-tree-node-text {
+	font-size: 13px;
+}
+
+.x-column-header-text {
+	text-transform: uppercase;
+	font-size: 11px;
+}
+
+.x-header-text {
 	font-size: 13px;
 }
