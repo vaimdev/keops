@@ -1,10 +1,10 @@
+DEBUG = True
 
 SITE_ID = 1
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
-DEBUG = True
 USE_I18N = True
 USE_L10N = True
 
@@ -39,8 +39,10 @@ TEMPLATE_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-ROOT_URLCONF = 'keops.urls'
 
+TEMPLATE_LOADERS = ['keops.template.loaders.app_directories.Loader',]
+
+ROOT_URLCONF = 'keops.urls'
 
 LOGGING = {
     'version': 1,

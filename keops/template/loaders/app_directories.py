@@ -7,9 +7,8 @@ class Loader(app_directories.Loader):
 
     def load_template(self, template_name, template_dirs=None):
         if template_name.endswith('.mako'):
-            _prepare_mako()
             source, origin = self.load_template_source(template_name, template_dirs)
-            template = Template(source, lookup=self._lookup)
+            template = Template(source, lookup=self._get_lookup('mako'))
         else:
             template, origin = super(Loader, self).load_template(template_name, template_dirs)
         return template, origin
