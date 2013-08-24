@@ -91,7 +91,6 @@ class ModelAdmin(AbstractForm):
         if not self.list_display:
             self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not isinstance(f, 
                 (models.AutoField, models.OneToOneField, models.ManyToManyField)) and getattr(f, 'custom_attrs', {}).get('visible', True)]
-        print(self.fields)
 
         if not self.pages:
             pages = OrderedDict()
@@ -152,7 +151,8 @@ class ModelAdmin(AbstractForm):
     def _prepare_context(self, request, context):
         context.update({
             'model': self.model,
-            'json': json, 'extjs': extjs,
+            'json': json,
+            'extjs': extjs,
             'model_name': '%s.%s' % (self.model._meta.app_label, self.model._meta.model_name),
         })
         
