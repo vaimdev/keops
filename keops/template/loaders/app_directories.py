@@ -17,5 +17,6 @@ class Loader(app_directories.Loader):
         if not template_lang in Loader._lookup:
             if template_lang == 'mako':
                 from mako.lookup import TemplateLookup
-                Loader._lookup['mako'] = TemplateLookup(directories=app_directories.app_template_dirs[::-1], input_encoding='utf-8')
+                lookup = TemplateLookup(directories=app_directories.app_template_dirs[::-1], input_encoding='utf-8')
+            Loader._lookup[template_lang] = lookup
         return Loader._lookup[template_lang]

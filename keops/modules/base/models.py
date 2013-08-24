@@ -8,6 +8,13 @@ from keops.db import models
 
 from .auth import *
 
+class Config(models.Model):
+    log_actions = models.BooleanField(_('log actions'), help_text=_('Log all user actions'))
+    log_changes = models.BooleanField(_('log changes'), _('Log all user changes'))
+    
+    class Meta:
+        verbose_name = _('config')
+
 class ElementManager(models.Manager):
     def get_by_natural_key(self, id):
         """Filter id on ModelData table, and get the related content object."""
@@ -89,6 +96,7 @@ class View(ModuleElement):
     FORMATS = (
         ('django', 'Django template'),
         ('mako', 'Mako template'),
+        ('jinja', 'Jinja template'),
         ('xml', 'XML'),
         ('json', 'JSON'),
         ('yaml', 'YAML'),
@@ -342,3 +350,46 @@ class Default(models.Model):
         db_table = 'base_default'
         verbose_name = _('default field value')
         verbose_name_plural = _('default fields values')
+
+class Attribute(models.Model):
+    ATT_TYPE =(
+        ('text', _('Text')),
+        ('date', _('Date')),
+        ('time', _('Time')),
+        ('datetime', _('Date/Time')),
+        ('money', _('Money')),
+        ('integer', _('Integer')),
+        ('number', _('Number')),
+        ('float', _('Float')),
+        ('textarea', _('Text Area')),
+        ('choice', _('Choice')),
+        ('multiplechoice', _('Multiple Choices')),
+        ('foreignkey', _('Foreign Key')),
+        ('logical', _('Logical')),
+        ('image', _('Image')),
+        ('file', _('File')),
+    )
+    content_type = models.ForeignKey(ContentType)
+    name = models.CharField(_('attribute name'), max_length=64)
+    type = models.CharField(_('attribute type'), max_length=16, choices=ATT_TYPE)
+    widget_attrs = models.TextField(_('widget attributes'))
+    default_value = models.TextField(_('default value'), help_text=_('Default attribute value'))
+    trigger = models.TextField(_('attribute trigger'), help_text=_('Trigger attribute code'))
+    
+    class Meta:
+        db_table = 'base_attribute'
+
+class AttributeValue(models.Model):
+    attribute = models.ForeignKey(Attribute)
+    object_id = models.PositiveIntegerField()
+    text_value = models.CharField(max_length=1024)
+    texta_value = models.TextField()
+    logical_value = models.BooleanField()
+    file_value = models.FileField()
+    fk_value = models.PositiveIntegerField()
+    int_value = models.IntegerField()
+    decimal_value = models.MoneyField()
+    date_value = models.DateTimeField()
+    
+    class Meta:
+        db_table = 'base_attribute_value'
