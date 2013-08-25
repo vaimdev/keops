@@ -8,12 +8,12 @@ from keops.db import models
 
 from .auth import *
 
-class Config(models.Model):
-    log_actions = models.BooleanField(_('log actions'), help_text=_('Log all user actions'))
-    log_changes = models.BooleanField(_('log changes'), _('Log all user changes'))
+#class Config(models.Model):
+#    log_actions = models.BooleanField(_('log actions'), help_text=_('Log all user actions'))
+#    log_changes = models.BooleanField(_('log changes'), _('Log all user changes'))
     
-    class Meta:
-        verbose_name = _('config')
+#    class Meta:
+#        verbose_name = _('config')
 
 class ElementManager(models.Manager):
     def get_by_natural_key(self, id):
@@ -385,7 +385,7 @@ class AttributeValue(models.Model):
     text_value = models.CharField(max_length=1024)
     texta_value = models.TextField()
     logical_value = models.BooleanField()
-    file_value = models.FileField()
+    #file_value = models.FileField()
     fk_value = models.PositiveIntegerField()
     int_value = models.IntegerField()
     decimal_value = models.MoneyField()
