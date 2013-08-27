@@ -2,6 +2,7 @@
 import json
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
@@ -23,9 +24,9 @@ class ElementManager(models.Manager):
     def filter_by_user(self, user, **kwargs):
         return self.filter(**kwargs).filter(Q(groups__id__in=user.groups.all().values('id')) | Q(users=user))
 
-class Element(models.AbstractModel):
-    users = models.ManyToManyField('base.User', verbose_name=_('users'), page=_('Permissions'))
-    groups = models.ManyToManyField('auth.Group', verbose_name=_('groups'), page=_('Permissions'))
+class Element(models.Model):
+    users = models.ManyToManyField('base.User', verbose_name=_('users'))
+    groups = models.ManyToManyField('auth.Group', verbose_name=_('groups'))
     
     objects = ElementManager()
     
@@ -359,7 +360,6 @@ class Attribute(models.Model):
         ('datetime', _('Date/Time')),
         ('money', _('Money')),
         ('integer', _('Integer')),
-        ('number', _('Number')),
         ('float', _('Float')),
         ('textarea', _('Text Area')),
         ('choice', _('Choice')),
@@ -393,3 +393,29 @@ class AttributeValue(models.Model):
     
     class Meta:
         db_table = 'base_attribute_value'
+
+class ContentAuthor(models.Model):
+    """User/author content object log."""
+    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False)
+    object_id = models.PositiveIntegerField(_('object id'), null=False)
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('created by'), null=False, related_name='+')
+    created_on = models.DateTimeField(auto_now_add=True, verbose_name=_('created on'), null=False)
+    modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('modified by'), related_name='+')
+    modified_on = models.DateTimeField(auto_now=True, verbose_name=_('modified on'))
+
+    class Meta:
+        db_table = 'base_content_author'
+
+class UserLog(models.Model):
+    """User log record."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False, related_name='+')
+    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False)
+    object_id = models.PositiveIntegerField(_('object id'))
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    operation = models.CharField(max_length=64, null=False) # insert, update, delete, print...
+    description = models.TextField()
+    log_time = models.DateTimeField(_('date/time'), null=False, auto_now_add=True)
+
+    class Meta:
+        db_table = 'base_user_log'

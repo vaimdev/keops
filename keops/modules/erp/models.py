@@ -6,7 +6,7 @@ from keops.modules.base import models as base
 class Currency(models.Model):
     name = models.CharField(_('name'), max_length=32, null=False, unique=True)
     symbol = models.CharField(_('currency symbol'), max_length=10, null=False)
-    rouding = models.DecimalField(_('rounding'), default=0.01)
+    rounding = models.MoneyField(_('rounding'), default=0.01)
     active = models.BooleanField(_('active'))
     format = models.CharField(_('format'), max_length=16)
     
@@ -21,7 +21,7 @@ class CurrencyRate(models.Model):
     date = models.DateField(_('date'))
     currency = models.ForeignKey(Currency, verbose_name=_('currency'))
     currency_rate_type = models.ForeignKey(CurrencyRateType, verbose_name=_('rate type'))
-    rate = models.DecimalField(_('rate'))
+    rate = models.MoneyField(_('rate'))
     
     class Meta:
         db_table = 'base_currency_rate'

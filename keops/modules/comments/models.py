@@ -7,18 +7,19 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
 
-# User follow record
-class UserContent(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
+# User follow object
+class Follow(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False, related_name='+')
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    join_date = models.DateTimeField(_('date/time'), default=datetime.datetime.now())
+    join_date = models.DateTimeField(_('date/time'), auto_now_add=True, null=False)
 
     class Meta:
-        db_table = 'user_content'
+        db_table = 'comment_follow'
 
-class UserContentComment(models.Model):
+# User content comment
+class CommentContent(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
@@ -35,15 +36,16 @@ class UserContentComment(models.Model):
                                 'be displayed instead.'))
 
     class Meta:
-        db_table = 'user_content_comment'
+        db_table = 'comment_content'
 
-class UserMessage(models.Model):
+# User comment message
+class Message(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
     send_date = models.DateTimeField(_('date/time send'), default=datetime.datetime.now())
     message = models.TextField(_('comment'))
     read_date = models.DateTimeField(_('date/time read'))
     starred = models.BooleanField(_('starred'))
-    todo = models.BooleanField(_('to do'))
+    job = models.BooleanField(_('job'))
 
     class Meta:
-        db_table = 'user_message'
+        db_table = 'comment_message'
