@@ -6,12 +6,16 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
-
 from .auth import *
 
-#class Config(models.Model):
-#    log_actions = models.BooleanField(_('log actions'), help_text=_('Log all user actions'))
-#    log_changes = models.BooleanField(_('log changes'), _('Log all user changes'))
+#class Config1(models.Model):
+#    """
+#    Manages basic configuration attributes.
+#    log_actions: Log all user actions
+#    log_changes: Log all user changes on database log record (base.UserLog)
+#    """
+#    log_actions = models.BooleanField(_('log actions'), help_text=_('Log all user actions'), default=False)
+#    log_changes = models.BooleanField(_('log changes'), _('Log all user changes'), default=False)
     
 #    class Meta:
 #        verbose_name = _('config')
@@ -37,8 +41,8 @@ class Module(Element):
     author = models.CharField(_('author'), max_length=64)
     license_type = models.CharField(_('license'), max_length=64, help_text='Commercial, BSD, MIT, LGPL, GPL...')
     version = models.CharField(max_length=32, verbose_name=_('version'))
-    db_version = models.IntegerField(_('DB version'), help_text=_('Database version'), null=True)
-    last_update = models.IntegerField(_('last update'))
+    db_version = models.PositiveIntegerField(_('DB version'), help_text=_('Database version'), null=True)
+    last_update = models.PositiveIntegerField(_('last update'))
     icon = models.CharField(_('icon'), max_length=256)
     details = models.TextField(_('details'))
     dependencies = models.TextField(_('dependencies'))
@@ -371,7 +375,7 @@ class Attribute(models.Model):
     )
     content_type = models.ForeignKey(ContentType)
     name = models.CharField(_('attribute name'), max_length=64)
-    type = models.CharField(_('attribute type'), max_length=16, choices=ATT_TYPE)
+    att_type = models.CharField(_('attribute type'), max_length=16, choices=ATT_TYPE)
     widget_attrs = models.TextField(_('widget attributes'))
     default_value = models.TextField(_('default value'), help_text=_('Default attribute value'))
     trigger = models.TextField(_('attribute trigger'), help_text=_('Trigger attribute code'))
@@ -394,9 +398,9 @@ class AttributeValue(models.Model):
     class Meta:
         db_table = 'base_attribute_value'
 
-class ContentAuthor(models.Model):
+class UserContent(models.Model):
     """User/author content object log."""
-    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False)
+    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False, related_name='+')
     object_id = models.PositiveIntegerField(_('object id'), null=False)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('created by'), null=False, related_name='+')
@@ -405,17 +409,19 @@ class ContentAuthor(models.Model):
     modified_on = models.DateTimeField(auto_now=True, verbose_name=_('modified on'))
 
     class Meta:
-        db_table = 'base_content_author'
+        db_table = 'base_user_content'
 
 class UserLog(models.Model):
     """User log record."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False, related_name='+')
-    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False)
+    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False, related_name='+')
     object_id = models.PositiveIntegerField(_('object id'))
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    operation = models.CharField(max_length=64, null=False) # insert, update, delete, print...
+    operation = models.CharField(max_length=64, null=False) # create, read, update, delete, print...
     description = models.TextField()
     log_time = models.DateTimeField(_('date/time'), null=False, auto_now_add=True)
 
     class Meta:
         db_table = 'base_user_log'
+
+# TODO: Build dynamic Active Data Dictionary via database

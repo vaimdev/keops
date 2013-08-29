@@ -13,11 +13,17 @@ TEMPLATE_DIRS = []
 DATABASES = {'default': {}}
 DATABASE_ROUTERS = ['keops.routers.multidatabase.MultiDatabaseRouter']
 
-AUTH_USER_MODEL = 'base.User'
+#AUTH_USER_MODEL = 'base.User'
 LOGIN_URL = '/accounts/login'
 
-INSTALLED_APPS = ['keops', 'django.contrib.sessions', 'django.contrib.sites',
-    'django.contrib.contenttypes', 'django.contrib.auth', 'django.contrib.messages']
+INSTALLED_APPS = [
+    'keops',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.contenttypes',
+    #'django.contrib.auth',
+    'django.contrib.messages'
+]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',

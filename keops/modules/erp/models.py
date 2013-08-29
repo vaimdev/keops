@@ -8,7 +8,7 @@ class Currency(models.Model):
     symbol = models.CharField(_('currency symbol'), max_length=10, null=False)
     rounding = models.MoneyField(_('rounding'), default=0.01)
     active = models.BooleanField(_('active'))
-    format = models.CharField(_('format'), max_length=16)
+    display_format = models.CharField(_('display format'), max_length=16)
     
 class CurrencyRateType(models.Model):
     name = models.CharField(_('name'), max_length=64)
@@ -70,7 +70,7 @@ class Company(base.Element):
     phone = models.CharField(_('phone'), max_length=32)
     fax = models.CharField(_('fax'), max_length=32)
     web_site = models.URLField('web site')
-    info = models.TextField(_('additional informations'))
+    info = models.TextField(_('information'), help_text='Additional information')
 
 class State(models.Model):
     country = models.ForeignKey(Country, verbose_name=_('country'), null=False)
