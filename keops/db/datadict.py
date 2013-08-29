@@ -73,7 +73,7 @@ class Model(object):
     _setattr = models.Model.__setattr__
     _init = models.Model.__init__
 
-    # Optimize for commit only modified fields
+    # Optimization for commit only modified fields
     def __init__(self, *args, **kwargs):
         self.__modifiedfields__ = []
         Model._init(self, *args, **kwargs)
@@ -102,6 +102,8 @@ class Model(object):
         return r
 
     def save(self, *args, **kwargs):
+        if hasattr(self, '__modifiedfields__'):
+            kwargs.setdefault('update_fields', self.__modifiedfields__)
         if not hasattr(self.__class__, 'Extra'):
             return Model._save(self, *args, **kwargs)
         extra = self.__class__.Extra
@@ -139,7 +141,55 @@ class Model(object):
         self.__modifiedfields__ = []
         return r
 
-    # Log modified fields
+    # Path for performance optimization
+    def _save_table(self, raw=False, cls=None, force_insert=False,
+                    force_update=False, using=None, update_fields=None):
+        """
+        Does the heavy-lifting involved in saving. Updates or inserts the data
+        for a single table.
+        """
+        meta = cls._meta
+        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
+
+        if update_fields:
+            non_pks = [f for f in non_pks
+                       if f.name in update_fields or f.attname in update_fields]
+
+        pk_val = self._get_pk_val(meta)
+        pk_set = pk_val is not None
+        if not pk_set and force_update:
+            raise ValueError("Cannot force an update in save() with no primary key.")
+        updated = False
+        # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
+        if pk_set and not force_insert:
+            base_qs = cls._base_manager.using(using)
+            values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
+                      for f in non_pks]
+            updated = self._do_update(base_qs, using, pk_val, values, update_fields)
+            if force_update and not updated:
+                raise models.DatabaseError("Forced update did not affect any rows.")
+            if update_fields and not updated:
+                raise models.DatabaseError("Save with update_fields did not affect any rows.")
+        if not updated:
+            if meta.order_with_respect_to:
+                # If this is a model with an order_with_respect_to
+                # autopopulate the _order field
+                field = meta.order_with_respect_to
+                order_value = cls._base_manager.using(using).filter(
+                    **{field.name: getattr(self, field.attname)}).count()
+                self._order = order_value
+
+            fields = meta.local_concrete_fields
+            if not pk_set:
+                fields = [f for f in fields if not isinstance(f, models.AutoField) and ((update_fields and f.attname in update_fields) or not update_fields)]
+
+            update_pk = bool(meta.has_auto_field and not pk_set)
+            result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
+            if update_pk:
+                setattr(self, meta.pk.attname, result)
+        return updated
+
+    # Log modified fields to simplify performance optimization
     def __setattr__(self, key, value):
         if hasattr(self, 'pk') and hasattr(self, '__modifiedfields__') and not key in self.__modifiedfields__:
             if self.pk or (self.pk is None and not value is None):
@@ -149,4 +199,5 @@ class Model(object):
     models.Model.__init__ = __init__
     models.Model.delete = delete
     models.Model.save = save
+    models.Model._save_table = _save_table
     models.Model.__setattr__ = __setattr__
