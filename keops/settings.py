@@ -13,7 +13,7 @@ TEMPLATE_DIRS = []
 DATABASES = {'default': {}}
 DATABASE_ROUTERS = ['keops.routers.multidatabase.MultiDatabaseRouter']
 
-#AUTH_USER_MODEL = 'base.User'
+AUTH_USER_MODEL = 'base.User'
 LOGIN_URL = '/accounts/login'
 
 INSTALLED_APPS = [
@@ -21,14 +21,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.contenttypes',
-    #'django.contrib.auth',
+    'django.contrib.auth',
     'django.contrib.messages'
 ]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware', TODO: implements csrf on extjs
+    #'django.middleware.csrf.CsrfViewMiddleware', TODO: implement csrf on extjs
     'keops.middleware.threadlocal.ThreadLocalMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -82,7 +82,6 @@ LOGGING = {
         'django.db.backends': {
             'handlers': ['console'],
             'level': 'DEBUG',
-            'propagate': False,
         },
         'app': {
             'handlers': ['console'],

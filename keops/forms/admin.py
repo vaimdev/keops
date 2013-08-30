@@ -3,7 +3,7 @@ from collections import OrderedDict
 import json
 from django import forms
 from keops.forms import extjs
-from .forms import AbstractForm
+from .forms import View
 
 class FieldLine(object):
     def __init__(self, form, fields):
@@ -40,7 +40,7 @@ class TabPage(object):
         for name, fieldset in self.fieldsets:
             yield Fieldset(name, self.form, fieldset)
             
-class ModelAdmin(AbstractForm):
+class ModelAdmin(View):
     template = 'keops/forms/model_form.js'
     list_template = 'keops/forms/list_form.js'
     fields = ()
@@ -53,14 +53,13 @@ class ModelAdmin(AbstractForm):
     widgets = {}
     formfield_overrides = None
 
-    toolbar_options = ['can_create', 'can_read', 'can_update', 'can_delete', 'can_print', 'can_delete', 'can_search']
+    toolbar_actions = ['create', 'read', 'update', 'delete', 'print', 'delete', 'search']
 
     actions = []
     model = None
     title = None
     label = None
     help_text = ''
-    display_expression = None
 
     def __init__(self, admin=None):
         self.admin = admin
@@ -100,8 +99,8 @@ class ModelAdmin(AbstractForm):
                 continue
             if not self.pages:
                 attrs = getattr(field, 'custom_attrs', {})
-                page = pages.setdefault(str(attrs.get('page') or ''), OrderedDict())
-                fieldset = page.setdefault(str(attrs.get('fieldset') or ''), {'fields': []})
+                page = pages.setdefault(str(attrs.get('page', None) or ''), OrderedDict())
+                fieldset = page.setdefault(str(attrs.get('fieldset', None) or ''), {'fields': []})
                 fieldset['fields'].append(field.name)
 
         if not self.pages and pages:
@@ -116,15 +115,13 @@ class ModelAdmin(AbstractForm):
                     self.search_fields[i] = '%s__icontains' % f
         elif not self.search_fields or not self.display_expression:
             search_fields = ''
-            display_expr = ''
             for f in self.fields:
                 field = self.model._meta.get_field_by_name(f)[0]
                 if isinstance(field, models.CharField):
                     search_fields = ['%s__icontains']
-                    display_expr = [f]
                     break
             self.search_fields = self.search_fields or search_fields or (self.fields and [self.fields[0]]) or ()
-            self.display_expression = self.display_expression or display_expr or (self.fields and [self.fields[0]]) or None
+            #self.display_expression = self.display_expression or display_expr or (self.fields and [self.fields[0]]) or None
             
         self.title = self.title or self.model._meta.verbose_name_plural
         self.label = self.label or self.model._meta.verbose_name
@@ -142,7 +139,6 @@ class ModelAdmin(AbstractForm):
     def __iter__(self):
         self._prepare_form()
         for page, fieldsets in self.pages:
-            print(page)
             yield TabPage(page, self, fieldsets)
             
     def get_form(self, request):

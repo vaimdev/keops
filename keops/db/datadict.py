@@ -9,11 +9,14 @@ from keops.forms.admin import ModelAdmin
 dd_items = {
     # Extra attributes
     'display_expression': None,
+    'state_field': None, # main state field representation
     'field_groups': {
-        'editable_fields': [],
-        'printable_fields': [],
+        'edit_fields': [],
+        'print_fields': [],
         'search_fields': [],
+        'filter_fields': [],
     },
+
     # Events
     'after_insert': None,
     'after_update': None,
@@ -75,10 +78,10 @@ class Model(object):
 
     # Optimization for commit only modified fields
     def __init__(self, *args, **kwargs):
-        self.__modifiedfields__ = []
+        self._modified_fields = []
         Model._init(self, *args, **kwargs)
         if self.pk:
-            self.__modifiedfields__ = []
+            self._modified_fields = []
 
     def delete(self, *args, **kwargs):
         if not hasattr(self.__class__, 'Extra'):
@@ -98,12 +101,13 @@ class Model(object):
         if extra.after_change:
             extra.after_change(self, *args, **kwargs)
 
-        self.__modifiedfields__ = []
+        self._modified_fields = []
         return r
 
     def save(self, *args, **kwargs):
-        if hasattr(self, '__modifiedfields__'):
-            kwargs.setdefault('update_fields', self.__modifiedfields__)
+        if hasattr(self, '_modified_fields') and not kwargs.get('force_insert', None):
+            kwargs.setdefault('update_fields', self._modified_fields)
+        print(self.__class__.__name__, kwargs)
         if not hasattr(self.__class__, 'Extra'):
             return Model._save(self, *args, **kwargs)
         extra = self.__class__.Extra
@@ -138,8 +142,10 @@ class Model(object):
         if extra.after_change:
             extra.after_change(self, *args, **kwargs)
 
-        self.__modifiedfields__ = []
+        self._modified_fields = []
         return r
+
+    save.alters_data = True
 
     # Path for performance optimization
     def _save_table(self, raw=False, cls=None, force_insert=False,
@@ -191,9 +197,9 @@ class Model(object):
 
     # Log modified fields to simplify performance optimization
     def __setattr__(self, key, value):
-        if hasattr(self, 'pk') and hasattr(self, '__modifiedfields__') and not key in self.__modifiedfields__:
+        if hasattr(self, 'pk') and hasattr(self, '_modified_fields') and not key in self._modified_fields:
             if self.pk or (self.pk is None and not value is None):
-                self.__modifiedfields__.append(key)
+                self._modified_fields.append(key)
         Model._setattr(self, key, value)
 
     models.Model.__init__ = __init__

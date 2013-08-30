@@ -9,6 +9,7 @@ class Command(BaseCommand):
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
     )
+    help = "Forced drop and create a database. BE CAREFUL, THIS OPERATION CANNOT BE UNDONE!"
 
     def handle(self, *args, **options):
         from keops.db import scripts

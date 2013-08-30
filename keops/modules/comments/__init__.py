@@ -1,7 +1,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 
-info = {
+app_info = {
     'name': 'social',
     'description': _('Social network module'),
     'category': _('Communication'),

@@ -170,7 +170,7 @@ class Command(BaseCommand):
                     serialization_formats):
 
         from django.template import Context, Template
-        # TODO check translation necessary
+        # TODO check if translation is needed
         # Support for fixtures translation
         from django.utils import translation
         

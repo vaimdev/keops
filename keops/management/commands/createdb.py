@@ -9,9 +9,9 @@ class Command(BaseCommand):
         make_option('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
     )
-    help = "Create default database."
+    help = "Create a database."
 
     def handle(self, *args, **options):
-        from orun.db import scripts
+        from keops.db import scripts
         scripts.createdb(options['database'])
         scripts.syncdb(options['database'])

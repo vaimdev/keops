@@ -20,8 +20,6 @@ def _create_connection(database):
     elif db_engine == 'pyodbc':
         return backend.Database.connect("DRIVER={SQL Server Native Client 11.0};DATABASE=master;Server=%s;UID=%s;PWD=%s" % 
             (db_settings['HOST'], db_settings['USER'], db_settings['PASSWORD']))
-        #return backend.Database.connect("Provider=SQLNCLI11.1;Persist Security Info=False;Initial Catalog=master;Data Source=%s;User ID=%s;Password=%s" % 
-        #    (db_settings['HOST'], db_settings['USER'], db_settings['PASSWORD']))
     elif db_engine == 'oracle':
         import cx_Oracle
         conn = cx_Oracle.connect('SYSTEM', db_settings['PASSWORD'], 'localhost/master')
@@ -109,8 +107,8 @@ def install(app_name, database, demo=True):
         try:
             app = import_module(app_name)
             path = os.path.dirname(app.__file__)
-            if hasattr(app, 'info'):
-                info = app.info
+            if hasattr(app, 'app_info'):
+                info = app.app_info
             else:
                 info = { 'name': app.__name__, 'description': '', 'version': '0.1' }
             from keops.modules.base import models as base
@@ -155,7 +153,5 @@ def install(app_name, database, demo=True):
             print(e)
             traceback.print_exc()
 
-    #from orunerp.modules.base.install import install as base_install
-    #base_install()
     from django.conf import settings
     return install_app()

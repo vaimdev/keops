@@ -1,7 +1,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 
-info = {
+app_info = {
     'name': 'erp',
     'description': _('ERP base module'),
     'category': 'Business',

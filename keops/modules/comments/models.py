@@ -19,7 +19,7 @@ class Follow(models.Model):
         db_table = 'comment_follow'
 
 # User content comment
-class CommentContent(models.Model):
+class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
