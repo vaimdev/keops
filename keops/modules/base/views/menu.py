@@ -15,13 +15,13 @@ def index(request, menu_id):
     def get_sub_menu(item):
         return [{'text': m.name, 'leaf': m.menu_set.count() == 0, 'children': get_sub_menu(m), 'href': '#action=%d' % m.action.pk if m.action else '#'} for m in base.Menu.objects.filter(parent_id=item.pk)]
     
-    sub_menu = json.dumps([
-        {'xtype': 'treemenu',
-         'rootVisible': False,
-         'title': m.name,
-         'lines': False,
-         'useArrows': True,
-         'root': {'expanded': True, 'children': get_sub_menu(m)}} for m in menu])
+    sub_menu = json.dumps([{
+        'xtype': 'treemenu',
+        'rootVisible': False,
+        'title': m.name,
+        'lines': False,
+        'useArrows': True,
+        'root': {'expanded': True, 'children': get_sub_menu(m)}} for m in menu])
     
     return render(request, 'keops/app.html', {'main_menu': base.Menu.objects.filter(parent=None), 
         'sub_menu': sub_menu,

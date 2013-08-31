@@ -121,7 +121,6 @@ class ModelAdmin(View):
                     search_fields = ['%s__icontains']
                     break
             self.search_fields = self.search_fields or search_fields or (self.fields and [self.fields[0]]) or ()
-            #self.display_expression = self.display_expression or display_expr or (self.fields and [self.fields[0]]) or None
             
         self.title = self.title or self.model._meta.verbose_name_plural
         self.label = self.label or self.model._meta.verbose_name

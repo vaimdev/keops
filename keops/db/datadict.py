@@ -36,9 +36,25 @@ class ModelBase(object):
 
     def __new__(cls, name, bases, attrs):
         admin = attrs.pop('Admin', None)
+        meta = attrs.get('Meta', None)
+
+        # IMPORTANT!
+        # Force model proxy to allow add fields, this model inheritance
+        # is very important for any modular ERP based structure
+        proxy_fields = None
+        if meta and getattr(meta, 'proxy', None):
+            proxy_fields = [(f, attrs.pop(f)) for f in [attr for attr, v in attrs.items() if isinstance(v, models.Field)]]
+
         new_class = ModelBase._new(cls, name, bases, attrs)
+
         if not admin:
             admin = getattr(new_class, 'Admin', None)
+
+        # Add proxy fields
+        if proxy_fields:
+            for f in proxy_fields:
+                new_class.add_to_class(f[0], f[1])
+
         # Add Admin meta class to _admin model attribute
         new_class.add_to_class('_admin', ModelAdmin(admin))
 
@@ -50,6 +66,15 @@ class ModelBase(object):
         else:
             extra = type('Extra', (object,), dd_items.copy())
             new_class.add_to_class('Extra', extra)
+
+        # Auto detect display_expression
+        if extra.display_expression is None:
+            field = None
+            for f in new_class._meta.concrete_fields:
+                if isinstance(f, (models.CharField, models.ForeignKey)):
+                    field = f.name
+                    break
+            extra.display_expression = field
 
         # Convert display_expression to __str__ method
         if extra.display_expression:
@@ -63,6 +88,15 @@ class ModelBase(object):
                     exec(s % ' + " - " + '.join(['str(self.%s)' % s for s in extra.display_expression]), globals(), l)
                 m = l.get('__str__', m)
             setattr(new_class, '__str__', m)
+
+        # Auto detect state_field
+        if extra.state_field is None:
+            try:
+                f = new_class._meta.get_field('state')
+                if f.choices:
+                    extra.state_field = 'state'
+            except:
+                pass
 
         return new_class
 

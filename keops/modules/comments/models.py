@@ -7,19 +7,45 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
 
+# TODO: Implement full enterprise social network here
+
+# Comment enterprise social network group
+class Group(models.Model):
+    PRIVACY = (
+        ('public', _('Public')),
+        ('private', _('Private')),
+    )
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('owner'), null=False)
+    create_date = models.DateTimeField(auto_now_add=True, null=False)
+    name = models.CharField(_('name'), max_length=100, null=False, unique=True, help_text=_('Group name'))
+    description = models.TextField(_('description'))
+    email = models.EmailField()
+    privacy = models.CharField(max_length=16, choices=PRIVACY, default='public', null=False)
+    # TODO: add image field here
+
+    class Meta:
+        db_table = 'comment_group'
+
 # User follow object
 class Follow(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False, related_name='+')
+    """
+    Used to user follow any allowed content object.
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, related_name='+')
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     join_date = models.DateTimeField(_('date/time'), auto_now_add=True, null=False)
+    active = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'comment_follow'
 
 # User content comment
 class Comment(models.Model):
+    """
+    Provides user comment to any allowed content object.
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
@@ -40,6 +66,9 @@ class Comment(models.Model):
 
 # User comment message
 class Message(models.Model):
+    """
+    User message box.
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False)
     send_date = models.DateTimeField(_('date/time send'), default=datetime.datetime.now())
     message = models.TextField(_('comment'))

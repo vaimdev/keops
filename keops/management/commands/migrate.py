@@ -13,7 +13,7 @@ class Command(syncdb.Command):
         db = options.get('database')
         verbosity = options.get('verbosity')
 
-        # Bypass loaddata command on syncdb to load initial data for installed apps only
+        # Bypass loaddata command on migrate/syncdb to load initial data only for installed apps
         load_initial_data = options.get('load_initial_data')
         options['load_initial_data'] = False
         apps = []

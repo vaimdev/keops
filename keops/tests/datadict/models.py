@@ -54,4 +54,11 @@ class Student(Person):
     new_field = models.CharField()
 
     class Extra(Person.Extra):
-        display_expression = Person.Extra.display_expression + ('reference',)
+        display_expression = Person.Extra.display_expression + ('new_field',)
+
+class Partner(Person):
+    reference = models.BooleanField()
+
+    class Meta:
+        proxy = True
+        managed = True

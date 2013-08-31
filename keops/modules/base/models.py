@@ -7,22 +7,25 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
 from .auth import *
+from .lang import *
 
-#class Config1(models.Model):
-#    """
-#    Manages basic configuration attributes.
-#    log_actions: Log all user actions
-#    log_changes: Log all user changes on database log record (base.UserLog)
-#    """
-#    log_actions = models.BooleanField(_('log actions'), help_text=_('Log all user actions'), default=False)
-#    log_changes = models.BooleanField(_('log changes'), _('Log all user changes'), default=False)
+class Config(models.Model):
+    """
+    Manages general db configuration attributes.
+    log_actions: Log all user actions
+    log_changes: Log all user changes on database log record (base.UserLog)
+    """
+    log_actions = models.BooleanField(_('log actions'), help_text=_('Log all user actions'), default=False)
+    log_changes = models.BooleanField(_('log changes'), _('Log all user changes'), default=False)
     
-#    class Meta:
-#        verbose_name = _('config')
+    class Meta:
+        verbose_name = _('config')
 
 class ElementManager(models.Manager):
     def get_by_natural_key(self, id):
-        """Filter id on ModelData table, and get the related content object."""
+        """
+        Filter id on ModelData table, and get the related content object.
+        """
         return ModelData.objects.get(name=id).content_object
     
     def filter_by_user(self, user, **kwargs):
@@ -34,6 +37,31 @@ class Element(models.Model):
     
     objects = ElementManager()
     
+# Company/data context
+class Company(Element):
+    """
+    Company configuration model.
+    """
+    name = models.CharField(_('name'), max_length=128, help_text=_('Company name'), null=False)
+    parent = models.ForeignKey('self')
+    report_header = models.TextField(_('report header'))
+    report_footer = models.TextField(_('report footer'))
+    currency = models.ForeignKey('base.Currency', verbose_name=_('currency'))
+    zip = models.CharField(_('zip'), max_length=24)
+    country = models.ForeignKey('base.Country')
+    #logo = models.ImageField(_('Logo'))
+    email = models.EmailField('e-mail')
+    phone = models.CharField(_('phone'), max_length=64)
+    fax = models.CharField(_('fax'), max_length=64)
+    website = models.URLField('website')
+    comment = models.TextField(_('comments'), help_text=_('Company comments'))
+
+class CompanyModel(models.Model):
+    company = models.ForeignKey(Company, verbose_name=_('company'), null=False)
+
+    class Meta:
+        abstract = True
+
 class Module(Element):
     app_label = models.CharField(_('application label'), max_length=64, unique=True)
     name = models.CharField(_('name'), max_length=128, null=False, unique=True)
@@ -399,7 +427,9 @@ class AttributeValue(models.Model):
         db_table = 'base_attribute_value'
 
 class UserContent(models.Model):
-    """User/author content object log."""
+    """
+    User/author content object log.
+    """
     content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False, related_name='+')
     object_id = models.PositiveIntegerField(_('object id'), null=False)
     content_object = generic.GenericForeignKey('content_type', 'object_id')
@@ -412,7 +442,9 @@ class UserContent(models.Model):
         db_table = 'base_user_content'
 
 class UserLog(models.Model):
-    """User log record."""
+    """
+    User log record.
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False, related_name='+')
     content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False, related_name='+')
     object_id = models.PositiveIntegerField(_('object id'))
@@ -424,4 +456,17 @@ class UserLog(models.Model):
     class Meta:
         db_table = 'base_user_log'
 
+class Image(models.Model):
+    """
+    Image model.
+    """
+    format = models.CharField(max_length=10, null=False) # image file format
+    image = models.BinaryField(custom_attrs={'widget': 'imagefield'}, null=False)
+
+# Change django settings, and set base.image as default IMAGE_FIELD_MODEL
+settings.__dict__.setdefault('IMAGE_FIELD_MODEL', 'base.image')
+
 # TODO: Build dynamic Active Data Dictionary via database
+# TODO: Build a content translation structure
+# TODO: Build a module/app installer
+# TODO: Implement cron jobs
