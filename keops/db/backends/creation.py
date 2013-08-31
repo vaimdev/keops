@@ -11,15 +11,11 @@ class BaseDatabaseCreation(object):
             (list_of_sql, pending_references_dict)
         """
         opts = model._meta
-        if opts.proxy:
-            print('proxy local fields', opts.proxy, opts.local_fields)
         if not opts.proxy:
             return BaseDatabaseCreation._sql_create_model(self, model, style, known_models)
         elif not opts.managed or (opts.proxy and not opts.local_fields) or opts.swapped:
             return [], {}
 
-        print('proxy local fields', opts.local_fields)
-        final_output = []
         table_output = []
         pending_references = {}
         qn = self.connection.ops.quote_name
@@ -67,19 +63,19 @@ class BaseDatabaseCreation(object):
                     [style.SQL_FIELD(qn(opts.get_field(f).column))
                      for f in field_constraints]))
 
-        full_statement = [style.SQL_KEYWORD('ALTER TABLE') + ' ' +
-                          style.SQL_TABLE(qn(opts.db_table)) + ' ADD ']
+        full_statement = []
 
         for i, line in enumerate(table_output):  # Combine and add commas.
-            full_statement.append(
-                '    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
+            full_statement.append(style.SQL_KEYWORD('ALTER TABLE') + ' ' +
+                                  style.SQL_TABLE(qn(opts.db_table)) + ' ' +
+                                  '    ADD %s;' % line)
         if opts.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(
                 opts.db_tablespace)
             if tablespace_sql:
                 full_statement.append(tablespace_sql)
-        full_statement.append(';')
-        final_output.append('\n'.join(full_statement))
+        #full_statement.append(';')
+        final_output = full_statement
 
         if opts.has_auto_field:
             # Add any extra SQL needed to support auto-incrementing primary
@@ -90,7 +86,6 @@ class BaseDatabaseCreation(object):
             if autoinc_sql:
                 for stmt in autoinc_sql:
                     final_output.append(stmt)
-
         return final_output, pending_references
 
     creation.BaseDatabaseCreation.sql_create_model = sql_create_model

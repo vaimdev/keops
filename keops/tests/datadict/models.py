@@ -41,6 +41,9 @@ class Person(models.Model):
         def after_delete(self, *args, **kwargs):
             print('After delete -> %s - ID: %s' % (str(self), self.pk))
 
+    def __str__(self):
+        return str(self.last_name)
+
 class Author(Person):
     reference = models.CharField()
 
@@ -61,4 +64,11 @@ class Partner(Person):
 
     class Meta:
         proxy = True
-        managed = True
+
+# Very advanced model inheritance
+class Company(Partner):
+    address = models.TextField()
+    employee = models.ForeignKey(Person)
+
+    class Meta:
+        proxy = True

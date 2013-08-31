@@ -38,7 +38,7 @@ class ModelBase(object):
         admin = attrs.pop('Admin', None)
         meta = attrs.get('Meta', None)
 
-        # IMPORTANT!
+        # IMPORTANT
         # Force model proxy to allow add fields, this model inheritance
         # is very important for any modular ERP based structure
         proxy_fields = None
@@ -68,26 +68,13 @@ class ModelBase(object):
             new_class.add_to_class('Extra', extra)
 
         # Auto detect display_expression
-        if extra.display_expression is None:
+        if extra.display_expression is None and new_class.__str__ is models.Model.__str__:
             field = None
             for f in new_class._meta.concrete_fields:
                 if isinstance(f, (models.CharField, models.ForeignKey)):
                     field = f.name
                     break
             extra.display_expression = field
-
-        # Convert display_expression to __str__ method
-        if extra.display_expression:
-            m = models.Model.__str__
-            if m is new_class.__str__:
-                s = "def __str__(self):\n    return %s"
-                l = {}
-                if isinstance(extra.display_expression, str):
-                    exec(s % extra.display_expression, globals(), l)
-                elif isinstance(extra.display_expression, (tuple, list)):
-                    exec(s % ' + " - " + '.join(['str(self.%s)' % s for s in extra.display_expression]), globals(), l)
-                m = l.get('__str__', m)
-            setattr(new_class, '__str__', m)
 
         # Auto detect state_field
         if extra.state_field is None:
@@ -102,6 +89,11 @@ class ModelBase(object):
 
     models.base.ModelBase.__new__ = __new__
 
+def _find_field(cls, attname):
+    for f in cls._meta.fields:
+        if f.name == attname or f.attname == attname:
+            return f
+
 # Change Model.save method to trigger events
 class Model(object):
 
@@ -109,6 +101,7 @@ class Model(object):
     _save = models.Model.save
     _setattr = models.Model.__setattr__
     _init = models.Model.__init__
+    _str = models.Model.__str__
 
     # Optimization for commit only modified fields
     def __init__(self, *args, **kwargs):
@@ -231,13 +224,32 @@ class Model(object):
 
     # Log modified fields to simplify performance optimization
     def __setattr__(self, key, value):
-        if hasattr(self, 'pk') and hasattr(self, '_modified_fields') and not key in self._modified_fields:
-            if self.pk or (self.pk is None and not value is None):
-                self._modified_fields.append(key)
+        if hasattr(self, 'pk') and hasattr(self, '_modified_fields') and\
+                not key in self._modified_fields and\
+                (self.pk or (self.pk is None and not value is None)) and\
+                (_find_field(self.__class__, key)):
+            self._modified_fields.append(key)
         Model._setattr(self, key, value)
+
+    def __str__(self):
+        extra = self.__class__.Extra
+        if getattr(extra, 'display_expression', None):
+            s = "class _C():\n    def __str__(self):\n        return %s"
+            l = {}
+            if isinstance(extra.display_expression, str):
+                exec(s % extra.display_expression, globals(), l)
+            elif isinstance(extra.display_expression, (tuple, list)):
+                exec(s % ' + " - " + '.join(['str(self.%s)' % s for s in extra.display_expression]), globals(), l)
+            m = l.get('_C')
+            if m:
+                setattr(self.__class__, '__str__', m.__str__)
+        else:
+            setattr(self.__class__, '__str__', Model._str)
+        return self.__class__.__str__(self)
 
     models.Model.__init__ = __init__
     models.Model.delete = delete
     models.Model.save = save
     models.Model._save_table = _save_table
     models.Model.__setattr__ = __setattr__
+    models.Model.__str__ = __str__
