@@ -1,4 +1,5 @@
 # This module implements ADD (Active Data Dictionary) on Django default classes
+# Sorry! Monkey patch is the only way to do this for now
 
 from django.db import models
 from django import forms
@@ -87,6 +88,7 @@ class ModelBase(object):
 
         return new_class
 
+    # Monkey patch
     models.base.ModelBase.__new__ = __new__
 
 def _find_field(cls, attname):
@@ -247,6 +249,7 @@ class Model(object):
             setattr(self.__class__, '__str__', Model._str)
         return self.__class__.__str__(self)
 
+    # Monkey patch
     models.Model.__init__ = __init__
     models.Model.delete = delete
     models.Model.save = save

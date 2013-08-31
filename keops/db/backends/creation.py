@@ -1,7 +1,7 @@
 
 from django.db.backends import creation
 
-# Patch base database creation class, to improve create model proxy additional fields
+# Monkey patch base database creation class, to improve create model proxy additional fields
 class BaseDatabaseCreation(object):
     _sql_create_model = creation.BaseDatabaseCreation.sql_create_model
 
