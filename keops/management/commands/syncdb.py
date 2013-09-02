@@ -36,8 +36,8 @@ class Command(syncdb.Command):
                 fname = os.path.join(dname, 'fixtures', 'initial_data.json')
                 if os.path.isfile(fname):
                     fixtures.append(fname)
-                if hasattr(mod, '__info__'):
-                    fixtures += [os.path.join(dname, 'fixtures', f) for f in mod.__info__.get('fixtures', [])]
+                if hasattr(mod, 'app_info'):
+                    fixtures += [os.path.join(dname, 'fixtures', f) for f in mod.app_info.get('fixtures', [])]
 
             if fixtures:
                 if fname in fixtures:

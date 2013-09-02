@@ -11,25 +11,30 @@ def get_xtype(field):
         return {'xtype': 'checkbox', 'boxLabel': str(field.label)}
     elif isinstance(field, forms.ModelMultipleChoiceField):
         model = field.queryset.model
-        return {'xtype': 'itemselector',
-                'store': [[r.pk, str(r)] for r in field.queryset],
-                'imagePath': '/static/js/extjs/examples/ux/css/images/',
-                'msgTarget': 'side',
-                'valueField': 'id',
-                'displayField': 'text',
-                'fromTitle': _('Available'),
-                'toTitle': _('Selected'),
-                'storeUrl': reverse('keops.views.db.lookup'),
-                'storeModel': '%s.%s' % (model._meta.app_label, model._meta.model_name)}
+        return {
+            'xtype': 'itemselector',
+            'store': [[r.pk, str(r)] for r in field.queryset],
+            'imagePath': '/static/js/extjs/examples/ux/css/images/',
+            'msgTarget': 'side',
+            'valueField': 'id',
+            'displayField': 'text',
+            'labelAlign': 'top',
+            'labelStyle': 'margin-bottom: 5px',
+            'labelSeparator': ':',
+            'fromTitle': _('Available'),
+            'toTitle': _('Selected'),
+            'storeUrl': reverse('keops.views.db.lookup'),
+            'storeModel': '%s.%s' % (model._meta.app_label, model._meta.model_name)
+        }
     elif isinstance(field, forms.ModelChoiceField):
         model = field.queryset.model
         return {'xtype': 'kcombobox',
                 'storeUrl': reverse('keops.views.db.lookup'),
                 'storeModel': '%s.%s' % (model._meta.app_label, model._meta.model_name)}
     elif isinstance(field.widget, forms.widgets.Select):
-        return {'xtype': 'combobox', 'store': [c for c in field.widget.choices], 'forceSelection': True, 'minChars': 0}
+        return {'xtype': 'combobox', 'store': [[c[0], str(c[1])] for c in field.widget.choices], 'forceSelection': True, 'minChars': 0}
     elif isinstance(field, forms.IntegerField):
-        return {'xtype': 'numberfield', 'allowDecimals': False}
+        return {'xtype': 'numberfield', 'allowDecimals': False, 'baseBodyCls': 'x-form-small-field'}
     else:
         return {'xtype': 'textfield', 'maxLength': field.widget.attrs.get('maxlength'), 'enforceMaxLength': True}
 
@@ -53,10 +58,10 @@ def grid_column(name, field):
     return col
 
 def get_field(name, field):
-    d = {'columnWidth': .5, 'fieldLabel': str(field.label), 'name': name} #, 'labelAlign': 'top'} # optional
+    d = {'columnWidth': .5, 'fieldLabel': str(field.label), 'name': name, 'labelWidth': 140, 'labelSeparator': ''}#, 'labelAlign': 'top'} # optional
     d.update(get_xtype(field))
     if d['xtype'] == 'checkbox':
-        d['fieldLabel'] = ''
+        d['fieldLabel'] = ' '
     return d
 
 def get_form_fields(form):
@@ -74,11 +79,13 @@ def get_form_items(form):
     for page in form:
         if page.name:
             fieldsets = []
-            fsets = {'xtype': 'panel',
-                     'title': page.name,
-                     'items': fieldsets,
-                     'layout': 'column',
-                     'defaults': { 'padding': "5 8 8 8" }}
+            fsets = {
+                'xtype': 'panel',
+                 'title': page.name,
+                 'items': fieldsets,
+                 'layout': 'column',
+                 'defaults': { 'padding': "5 8 8 8" }
+            }
             pages.append(fsets)
         else:
             fieldsets = items

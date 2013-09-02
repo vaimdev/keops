@@ -13,7 +13,7 @@ TEMPLATE_DIRS = []
 DATABASES = {'default': {}}
 DATABASE_ROUTERS = ['keops.routers.multidatabase.MultiDatabaseRouter']
 
-AUTH_USER_MODEL = 'base.User'
+AUTH_USER_MODEL = 'base.user'
 LOGIN_URL = '/accounts/login'
 
 INSTALLED_APPS = [
@@ -81,7 +81,7 @@ LOGGING = {
         },
         'django.db.backends': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            #'level': 'DEBUG',
         },
         'app': {
             'handlers': ['console'],

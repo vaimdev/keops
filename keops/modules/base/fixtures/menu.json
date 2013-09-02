@@ -1,0 +1,164 @@
+[
+    {
+        "model": "base.menu",
+        "id": "menu-sys",
+    	"fields" : {
+            "name": "{{ _('system')|capfirst }}",
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-adm",
+    	"fields" : {
+            "name": "{{ _('administration')|capfirst }}",
+            "parent": ["menu-sys"],
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-config",
+    	"fields" : {
+            "name": "{{ _('configurations')|capfirst }}",
+            "parent": ["menu-sys-adm"],
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-company",
+    	"fields" : {
+            "name": "{{ _('company')|capfirst }}",
+            "parent": ["menu-sys-adm"],
+            "sequence": 110
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-auth",
+    	"fields" : {
+            "name": "{{ _('authentication')|capfirst }}",
+            "parent": ["menu-sys"],
+            "sequence": 110
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-ui",
+    	"fields" : {
+            "name": "{{ _('User Interface') }}",
+            "parent": ["menu-sys"],
+            "sequence": 120
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-menu",
+    	"fields" : {
+            "name": "{{ _('menu')|capfirst }}",
+            "parent": ["menu-sys-ui"],
+            "model": "base.menu",
+            "sequence": 130
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-forms",
+    	"fields" : {
+            "name": "{{ _('views')|capfirst }}",
+            "parent": ["menu-sys-ui"],
+            "model": "base.view",
+            "sequence": 140
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-reports",
+    	"fields" : {
+            "name": "{{ _('reports')|capfirst }}",
+            "parent": ["menu-sys-ui"],
+            "model": "base.report",
+            "sequence": 150
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-actions",
+    	"fields" : {
+            "name": "{{ _('actions')|capfirst }}",
+            "parent": ["menu-sys-ui"],
+            "model": "base.action",
+            "sequence": 160
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-form-actions",
+    	"fields" : {
+            "name": "{{ _('form actions')|capfirst }}",
+            "parent": ["menu-sys-actions"],
+            "model": "base.formaction",
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-report-actions",
+    	"fields" : {
+            "name": "{{ _('report actions')|capfirst }}",
+            "parent": ["menu-sys-actions"],
+            "model": "base.reportaction",
+            "sequence": 110
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-users",
+    	"fields" : {
+            "name": "{{ _('users')|capfirst }}",
+            "parent": ["menu-sys-auth"],
+            "model": "base.user",
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-groups",
+    	"fields" : {
+            "name": "{{ _('groups')|capfirst }}",
+            "parent": ["menu-sys-auth"],
+            "model": "auth.group",
+            "sequence": 110
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-datadict",
+    	"fields" : {
+            "name": "{{ _('Data Dictionary') }}",
+            "parent": ["menu-sys"],
+            "sequence": 170
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-module",
+    	"fields" : {
+            "name": "{{ _('modules')|capfirst }}",
+            "parent": ["menu-sys-datadict"],
+            "model": "base.module",
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-sys-model",
+    	"fields" : {
+			"name": "{{ _('models')|capfirst }}",
+			"parent": ["menu-sys-datadict"],
+			"model": "base.basemodel",
+			"sequence": 110
+        }
+    }
+]

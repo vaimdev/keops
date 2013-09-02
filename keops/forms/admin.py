@@ -41,7 +41,7 @@ class TabPage(object):
             yield Fieldset(name, self.form, fieldset)
             
 class ModelAdmin(View):
-    template = 'keops/forms/model_form.js'
+    template_name = 'keops/forms/model_form.js'
     list_template = 'keops/forms/list_form.js'
     fields = ()
     exclude = ()

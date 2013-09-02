@@ -110,43 +110,25 @@ def install(app_name, database, demo=True):
             if hasattr(app, 'app_info'):
                 info = app.app_info
             else:
-                info = { 'name': app.__name__, 'description': '', 'version': '0.1' }
+                info = { 'name': app_label, 'description': '', 'version': '0.1' }
             from keops.modules.base import models as base
             if base.Module.objects.using(database).filter(app_label=app_label):
                 print('Application "%s" already installed on database "%s".' % (app_label, database))
                 return
             else:
                 base.Module.objects.using(database).create(
+                    module_name=app_name,
+                    name=info['name'],
                     app_label=app_label,
-                    name=app_name,
                     description=info['description'],
                     version=info.get('version', None),
                     dependencies=info.get('dependencies'),
                     icon=info.get('icon'),
                     visible=info.get('visible'),
                     tooltip=info.get('tooltip', ''),
-                    db_version=info.get('db_version', 0)
+                    category=base.ModuleCategory.objects.get_category(info.get('category', None))
                 )
                 return True
-            # Auto register models
-            if os.path.isfile(os.path.join(path, 'models.py')) or\
-                os.path.isfile(os.path.join(path, 'models.pyc')):
-                try:
-                    pass
-                    #models = import_module(app_name + '.models')
-                    #base.BaseModel.register_models(models, module_id=mod.pk)
-                    #importer.load_fixtures(models, info.get('fixtures', []), mod.pk)
-                    #if demo:
-                    #    importer.load_files(models, info.get('files', []), info.get('demo', []), mod.pk)
-                except Exception as e:
-                    raise
-            #if os.path.isfile(os.path.join(path, 'install.py')) or\
-            #    os.path.isfile(os.path.join(path, 'install.pyc')):
-            #    install = import_module(app_name + '.install')
-            #    if hasattr(install, 'install'):
-            #        install.install()
-            #    if demo and hasattr(install, 'demo'):
-            #        install.demo()
         except Exception as e:
             raise
             import traceback

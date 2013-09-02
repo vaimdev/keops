@@ -6,6 +6,8 @@ Ext.define('Keops.view.MainView', {
         type: 'border'
     },
     minWidth: 960,
+    minHeight: 700,
+    autoScroll: true,
 
     initComponent: function() {
         var me = this;
@@ -39,22 +41,22 @@ Ext.define('Keops.view.MainView', {
                 {
                     xtype: 'panel',
                     region: 'north',
-                    height: 38,
-                    id: 'app-menu',
-                    bodyBorder: false,
-                    border: false,
-                    bodyCls: 'x-panel-header-default',
-                    title: ''
-                },
-                {
-                    xtype: 'panel',
-                    region: 'north',
                     baseCls: 'app-header',
                     html: '<div class="site-name">' + keops.siteName + '<span style="font-size: x-small; position: absolute; right: 5px;"><a href="http://www.katrid.com" target="_blank">katrid.com</a></span></div>',
                     id: 'app-header',
                     bodyPadding: '0 0 0 10',
                     title: ''
                 },
+                {
+                    xtype: 'panel',
+                    region: 'north',
+                    height: 38,
+                    id: 'app-menu',
+                    bodyBorder: false,
+                    border: false,
+                    bodyCls: 'x-panel-header-default',
+                    title: ''
+                }
             ]
         });
 

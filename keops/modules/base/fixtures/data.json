@@ -1,164 +1,154 @@
 [
     {
-        "model": "base.menu",
-        "id": "menu-sys",
+        "model": "base.modulecategory",
+        "id": "module-category-basic",
     	"fields" : {
-            "name": "{{ _('system')|capfirst }}",
+            "name": "{{ _('basic')|capfirst }}",
+            "visible": false
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-localization",
+    	"fields" : {
+            "name": "{{ _('localization')|capfirst }}",
+            "visible": false
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-crm",
+    	"fields" : {
+            "name": "{{ _('Customer Relationship Management') }}",
             "sequence": 100
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-adm",
+        "model": "base.modulecategory",
+        "id": "module-category-sales",
     	"fields" : {
-            "name": "{{ _('administration')|capfirst }}",
-            "parent": ["menu-sys"],
-            "sequence": 100
-        }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-sys-config",
-    	"fields" : {
-            "name": "{{ _('configurations')|capfirst }}",
-            "parent": ["menu-sys-adm"],
-            "sequence": 100
-        }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-sys-company",
-    	"fields" : {
-            "name": "{{ _('company')|capfirst }}",
-            "parent": ["menu-sys-adm"],
+            "name": "{{ _('sales')|capfirst }}",
             "sequence": 110
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-auth",
+        "model": "base.modulecategory",
+        "id": "module-category-project",
     	"fields" : {
-            "name": "{{ _('authentication')|capfirst }}",
-            "parent": ["menu-sys"],
-            "sequence": 110
-        }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-sys-ui",
-    	"fields" : {
-            "name": "{{ _('user interface') }}",
-            "parent": ["menu-sys"],
+            "name": "{{ _('project')|capfirst }}",
             "sequence": 120
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-menu",
+        "model": "base.modulecategory",
+        "id": "module-category-knowledge",
     	"fields" : {
-            "name": "{{ _('menu')|capfirst }}",
-            "parent": ["menu-sys-ui"],
-            "model": "base.menu",
+            "name": "{{ _('knowledge')|capfirst }}",
             "sequence": 130
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-forms",
+        "model": "base.modulecategory",
+        "id": "module-category-warehouse",
     	"fields" : {
-            "name": "{{ _('views')|capfirst }}",
-            "parent": ["menu-sys-ui"],
-            "model": "base.view",
+            "name": "{{ _('warehouse')|capfirst }}",
             "sequence": 140
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-reports",
+        "model": "base.modulecategory",
+        "id": "module-category-manufacturing",
     	"fields" : {
-            "name": "{{ _('reports')|capfirst }}",
-            "parent": ["menu-sys-ui"],
-            "model": "base.report",
+            "name": "{{ _('manufacturing')|capfirst }}",
             "sequence": 150
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-actions",
+        "model": "base.modulecategory",
+        "id": "module-category-invoicing-payments",
     	"fields" : {
-            "name": "{{ _('actions')|capfirst }}",
-            "parent": ["menu-sys-ui"],
-            "model": "base.action",
+            "name": "{{ _('Invoicing & Payments') }}",
             "sequence": 160
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-form-actions",
+        "model": "base.modulecategory",
+        "id": "module-category-account-finance",
     	"fields" : {
-            "name": "{{ _('form actions')|capfirst }}",
-            "parent": ["menu-sys-actions"],
-            "model": "base.formaction",
-            "sequence": 100
-        }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-sys-report-actions",
-    	"fields" : {
-            "name": "{{ _('report actions')|capfirst }}",
-            "parent": ["menu-sys-actions"],
-            "model": "base.reportaction",
-            "sequence": 110
-        }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-sys-users",
-    	"fields" : {
-            "name": "{{ _('users')|capfirst }}",
-            "parent": ["menu-sys-auth"],
-            "model": "base.user",
-            "sequence": 100
-        }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-sys-groups",
-    	"fields" : {
-            "name": "{{ _('groups')|capfirst }}",
-            "parent": ["menu-sys-auth"],
-            "model": "auth.group",
-            "sequence": 110
-        }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-sys-datadict",
-    	"fields" : {
-            "name": "{{ _('Data Dictionary') }}",
-            "parent": ["menu-sys"],
+            "name": "{{ _('Accounting & Finance') }}",
             "sequence": 170
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-module",
+        "model": "base.modulecategory",
+        "id": "module-category-purchase",
     	"fields" : {
-            "name": "{{ _('modules')|capfirst }}",
-            "parent": ["menu-sys-datadict"],
-            "model": "base.module",
-            "sequence": 100
+            "name": "{{ _('purchases')|capfirst }}",
+            "sequence": 180
         }
     },
     {
-        "model": "base.menu",
-        "id": "menu-sys-model",
+        "model": "base.modulecategory",
+        "id": "module-category-human-resources",
     	"fields" : {
-			"name": "{{ _('models')|capfirst }}",
-			"parent": ["menu-sys-datadict"],
-			"model": "base.basemodel",
-			"sequence": 110
+            "name": "{{ _('Human Resources') }}",
+            "sequence": 190
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-purchase",
+    	"fields" : {
+            "name": "{{ _('Additional Tools') }}",
+            "sequence": 200
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-marketing",
+    	"fields" : {
+            "name": "{{ _('marketing')|capfirst }}",
+            "sequence": 210
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-industry",
+    	"fields" : {
+            "name": "{{ _('industry')|capfirst }}",
+            "sequence": 220
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-reporting",
+    	"fields" : {
+            "name": "{{ _('reporting')|capfirst }}",
+            "sequence": 230
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-vehicles",
+    	"fields" : {
+            "name": "{{ _('vehicles')|capfirst }}",
+            "sequence": 230
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-communication",
+    	"fields" : {
+            "name": "{{ _('communication')|capfirst }}",
+            "sequence": 240
+        }
+    },
+    {
+        "model": "base.modulecategory",
+        "id": "module-category-administration",
+    	"fields" : {
+            "name": "{{ _('administration')|capfirst }}",
+            "sequence": 900
         }
     }
 ]

@@ -174,3 +174,15 @@ msgstr "Dicionário de Dados"
 
 msgid "User Interface"
 msgstr "Interface do Usuário"
+
+msgid "category"
+msgstr "categoria"
+
+msgid "author"
+msgstr "autor"
+
+msgid "version"
+msgstr "versão"
+
+msgid "short description"
+msgstr "descrição curta"

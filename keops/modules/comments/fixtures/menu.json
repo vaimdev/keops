@@ -1,0 +1,64 @@
+[
+    {
+        "model": "base.menu",
+        "id": "menu-messaging",
+    	"fields" : {
+            "name": "{{ _('messaging')|capfirst }}",
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-messaging-messaging",
+    	"fields" : {
+            "name": "{{ _('messaging')|capfirst }}",
+            "parent": ["menu-messaging"],
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-messaging-messaging-inbox",
+    	"fields" : {
+            "name": "{{ _('inbox')|capfirst }}",
+            "parent": ["menu-messaging-messaging"],
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-messaging-messaging-tome",
+    	"fields" : {
+            "name": "{{ _('to: me')|capfirst }}",
+            "parent": ["menu-messaging-messaging"],
+            "sequence": 110
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-messaging-messaging-todo",
+    	"fields" : {
+            "name": "{{ _('to-do')|capfirst }}",
+            "parent": ["menu-messaging-messaging"],
+            "sequence": 120
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-messaging-messaging-archives",
+    	"fields" : {
+            "name": "{{ _('archives')|capfirst }}",
+            "parent": ["menu-messaging-messaging"],
+            "sequence": 130
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-messaging-mygroups",
+    	"fields" : {
+            "name": "{{ _('my groups')|capfirst }}",
+            "parent": ["menu-messaging-mygroups"],
+            "sequence": 110
+        }
+    }
+]

@@ -24,5 +24,3 @@ class ModelProxyTestCase(TestCase):
             print('Model proxy result', str(m))
         for m in models.Company.objects.all():
             print('Advanced proxy result', str(m))
-
-# TODO: test foreignkey performance optimization

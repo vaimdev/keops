@@ -1,3 +1,4 @@
+
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from keops.db import models
@@ -10,9 +11,11 @@ class Currency(models.Model):
     display_format = models.CharField(_('display format'), max_length=16)
 
 class Language(models.Model):
-    code = models.CharField(_('locale code'), max_length=5)
+    code = models.CharField(_('locale code'), max_length=5, null=False, unique=True)
+    name = models.CharField(_('name'), max_length=64, null=False, unique=True)
     iso_code = models.CharField(_('ISO code'), max_length=10)
     translate = models.BooleanField(_('translate'), default=False)
+    active = models.BooleanField(_('active'), default=True)
 
     class Meta:
         verbose_name = _('language')
@@ -24,7 +27,7 @@ class Translation(models.Model):
     content_type = models.ForeignKey(ContentType)
     name = models.CharField(_('name'), max_length=64)
     language = models.ForeignKey(Language, verbose_name=_('language'))
-    source = models.TextField(_('source'), db_index=True)
+    source = models.CharField(_('source'), max_length=1024, db_index=True)
     value = models.TextField(_('value'))
 
     class Meta:

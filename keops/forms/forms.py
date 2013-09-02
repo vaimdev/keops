@@ -10,7 +10,7 @@ class View(object):
     
     def render(self, request, template, context):
         from django.shortcuts import render
-        context['form'] = self.get_form()
+        context['form'] = self
         return render(request, template, context)
     
     def view(self, request, **kwargs):

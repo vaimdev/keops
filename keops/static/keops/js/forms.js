@@ -15,6 +15,10 @@ Ext.define('Keops.form.ModelForm', {
         me.pagingToolbar = this.down('pagingtoolbar'); 
     	//me.state = null;
     	me._state = 'read';
+        me.btnCreate = this.queryById('btn-create');
+    	me.btnEdit = this.queryById('btn-edit');
+    	me.btnSave = this.queryById('btn-save');
+    	me.btnCancel = this.queryById('btn-cancel');
     },
     
     newRecord: function () {
@@ -60,10 +64,10 @@ Ext.define('Keops.form.ModelForm', {
     setState: function (state) {
     	this._state = state;
     	if (state == 'read') read = true; else read = false;
-		this.queryById('btn-create').setVisible(read);
-    	this.queryById('btn-edit').setVisible(read);
-    	this.queryById('btn-save').setVisible(!read);
-    	this.queryById('btn-cancel').setVisible(!read);
+		this.btnCreate.setVisible(read);
+    	this.btnEdit.setVisible(read);
+    	this.btnSave.setVisible(!read);
+    	this.btnCancel.setVisible(!read);
     	this.getForm().getFields().each(
     	function(item) 
     	{

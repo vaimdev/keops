@@ -1,5 +1,5 @@
 {% load i18n %}
-	var __header = '<table class="header"><tr><td style="vertical-align: top; font-size: 13px;"><a style="font-weight: bold" href="#action={{ action.pk }}&view_type=list">{{ form.label|capfirst }}</a> %s<div style="font-size: 11px; font-weight: normal; margin-top: 5px; text-shadow: none;">{{ form.help_text }}</div></td><td style="text-align: right; vertical-align: bottom; width: 400px;">{% include "keops/forms/search_header.html" %}</td></tr></table>';
+	var __header = '<table style="width: 100%"><tr><td style="vertical-align: top; font-size: 13px;"><a style="font-weight: bold" href="#action={{ action.pk }}&view_type=list">{{ form.label|capfirst }}</a> %s<div style="font-size: 11px; font-weight: normal; margin-top: 5px; text-shadow: none;">{{ form.help_text }}</div></td><td style="text-align: right; vertical-align: bottom; width: 400px;">{% include "keops/forms/search_header.html" %}</td></tr></table>';
 	var __store = Ext.create('Ext.data.Store', {
 		pageSize: 1,
 		fields: {{ fields|safe }},
@@ -24,7 +24,7 @@
 				if (form) {
 					var r = this.data.first();
 					form.loadRecord(r);
-					h = form.dockedItems.items[0];
+					h = form.dockedItems.items[0].items.items[0];
 					form.pk = r.raw.pk;
 					h.update(__header.replace('%s', '/ ' + r.raw.__str__));
 					//form
@@ -48,13 +48,22 @@
     dockedItems: [{
     	xtype: 'panel',
     	itemId: 'form-header',
+        bodyCls: 'toolbar-header',
         border: false,
-    	html: __header.replace('%s', '')
-    }, {
+        frame: false,
+        items: [
+            {
+                xtype: 'container',
+                border: false,
+                frame: false,
+                html: __header.replace('%s', '')
+            },
+            {
     	xtype: 'panel',
         layout: 'hbox',
+        bodyStyle: 'background: transparent',
         border: false,
-        bodyCls: 'toolbar-header',
+        frame: false,
     	defaults: {
     		margin: '1 1 1 1',
             xtype: 'button'
@@ -62,7 +71,7 @@
     	items: [
 	    	{ text: '{{ _("create")|capfirst }}', itemId: 'btn-create', handler: function() { this.up('form').newRecord(); } },
 	    	{ text: '{{ _("edit")|capfirst }}', itemId: 'btn-edit', handler: function() { this.up('form').editRecord(); } },
-	    	{ text: '{{ _("save")|capfirst }}', hidden: true, itemId: 'btn-save', cls: 'x-btn-red-button', handler: function() { this.up('form').saveRecord(); } },
+	    	{ text: '{{ _("save")|capfirst }}', hidden: true, itemId: 'btn-save', cls: 'x-btn-red-button', overCls: 'btn-red-button-over', handler: function() { this.up('form').saveRecord(); } },
 	    	{ text: '{{ _("cancel")|capfirst }}', hidden: true, itemId: 'btn-cancel', handler: function() { this.up('form').cancelChanges(); } },
 	    	{ xtype: 'tbspacer', margin: '0 5 0 5' },
 	    	{ text: '{{ _("print")|capfirst }}' },
@@ -74,9 +83,9 @@
 	    	{ text: '{{ _("more")|capfirst }}' },
 	    	{ xtype: 'tbspacer', margin: '0 5 0 5' }
     	]
-    }, {
+    }]}, {
     	xtype: 'pagingtoolbar',
-    	style: 'background-color: #eee;',
+    	bodyStyle: 'background-color: #eee;',
     	store: __store,
     	dock: 'bottom'
     }]});

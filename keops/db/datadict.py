@@ -10,7 +10,7 @@ from keops.forms.admin import ModelAdmin
 dd_items = {
     # Extra attributes
     'display_expression': None,
-    'state_field': None, # main state field representation
+    'status_field': None, # main model status field representation
     'field_groups': {
         'edit_fields': [],
         'print_fields': [],
@@ -68,21 +68,12 @@ class ModelBase(object):
             extra = type('Extra', (object,), dd_items.copy())
             new_class.add_to_class('Extra', extra)
 
-        # Auto detect display_expression
-        if extra.display_expression is None and new_class.__str__ is models.Model.__str__:
-            field = None
-            for f in new_class._meta.concrete_fields:
-                if isinstance(f, (models.CharField, models.ForeignKey)):
-                    field = f.name
-                    break
-            extra.display_expression = field
-
         # Auto detect state_field
-        if extra.state_field is None:
+        if extra.status_field is None:
             try:
-                f = new_class._meta.get_field('state')
+                f = new_class._meta.get_field('status')
                 if f.choices:
-                    extra.state_field = 'state'
+                    extra.state_field = 'status'
             except:
                 pass
 
@@ -136,7 +127,7 @@ class Model(object):
     def save(self, *args, **kwargs):
         if hasattr(self, '_modified_fields') and not kwargs.get('force_insert', None):
             kwargs.setdefault('update_fields', self._modified_fields)
-        print(self.__class__.__name__, kwargs)
+        #print(self.__class__.__name__, kwargs)
         if not hasattr(self.__class__, 'Extra'):
             return Model._save(self, *args, **kwargs)
         extra = self.__class__.Extra
@@ -252,7 +243,7 @@ class Model(object):
     # Monkey patch
     models.Model.__init__ = __init__
     models.Model.delete = delete
-    models.Model.save = save
-    models.Model._save_table = _save_table
-    models.Model.__setattr__ = __setattr__
+    #models.Model.save = save
+    #models.Model._save_table = _save_table
+    #models.Model.__setattr__ = __setattr__
     models.Model.__str__ = __str__

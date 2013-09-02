@@ -13,6 +13,7 @@ def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwarg
     entries that no longer have a matching model class.
     """
     ContentType.objects.clear_cache()
+    mod_name = '.'.join(app.__name__.split('.')[:-1])
     app_models = get_models(app)
     if not app_models:
         return
@@ -28,7 +29,6 @@ def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwarg
     )
 
     # Register module
-    mod_name = '.'.join(app.__name__.split('.')[:-1])
     module = Module.objects.using(db).filter(app_label=app_label)
     if module:
         module = module[0]
