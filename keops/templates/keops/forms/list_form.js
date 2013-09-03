@@ -57,7 +57,6 @@
     listeners: {
     	itemdblclick: function (sender, record, item, index, e, eOpts) {
     		window.location = '#action={{ action.pk }}&view_type=form&pk=' + record.raw.pk;
-    		console.log(record.raw.pk);
     	}
     },
     viewConfig: {

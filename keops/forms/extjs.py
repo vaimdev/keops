@@ -97,7 +97,6 @@ def get_form_items(form):
             else:
                 fields = fieldsets
 
-            #print([f.field for f in fieldset])
             for container in fieldset:
                 container = [f for f in container]
                 if len(container) == 1:
