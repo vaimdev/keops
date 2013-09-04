@@ -6,7 +6,7 @@ from django import forms
 
 def get_xtype(field):
     if isinstance(field, forms.DateTimeField):
-        return {'xtype': 'datefield'}
+        return {'xtype': 'datefield', 'baseBodyCls': 'x-form-small-field'}
     elif isinstance(field, forms.BooleanField):
         return {'xtype': 'checkbox', 'boxLabel': str(field.label)}
     elif isinstance(field, forms.ModelMultipleChoiceField):
@@ -21,6 +21,7 @@ def get_xtype(field):
             'labelAlign': 'top',
             'labelStyle': 'margin-bottom: 5px',
             'labelSeparator': ':',
+            'height': 220,
             'fromTitle': _('Available'),
             'toTitle': _('Selected'),
             'storeUrl': reverse('keops.views.db.lookup'),
@@ -81,7 +82,7 @@ def get_form_items(form):
             fieldsets = []
             fsets = {
                 'xtype': 'panel',
-                 'title': page.name,
+                 'title': str(page.name),
                  'items': fieldsets,
                  'layout': 'column',
                  'defaults': { 'padding': "5 8 8 8" }
@@ -92,7 +93,7 @@ def get_form_items(form):
         for fieldset in page:
             if fieldset.name:
                 fields = []
-                fs = {'xtype': 'fieldset', 'title': fieldset.name, 'items': fields}
+                fs = {'xtype': 'fieldset', 'title': str(fieldset.name), 'items': fields}
                 fieldsets.append(fs)
             else:
                 fields = fieldsets

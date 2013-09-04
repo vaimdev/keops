@@ -1,10 +1,37 @@
 [
     {
         "model": "base.menu",
+        "id": "menu-settings",
+    	"fields" : {
+            "name": "{{ _('settings')|capfirst }}",
+            "sequence": 900
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-settings-companies",
+    	"fields" : {
+            "name": "{{ _('companies')|capfirst }}",
+            "parent": ["menu-settings"],
+            "sequence": 130
+        }
+    },
+    {
+        "model": "base.menu",
+        "id": "menu-settings-companies-company",
+    	"fields" : {
+            "name": "{{ _('companies')|capfirst }}",
+            "parent": ["menu-settings-companies"],
+            "model": "base.company",
+            "sequence": 100
+        }
+    },
+    {
+        "model": "base.menu",
         "id": "menu-sys",
     	"fields" : {
             "name": "{{ _('system')|capfirst }}",
-            "sequence": 100
+            "sequence": 910
         }
     },
     {
@@ -18,29 +45,20 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-config",
+        "id": "menu-sys-settings",
     	"fields" : {
-            "name": "{{ _('configurations')|capfirst }}",
+            "name": "{{ _('settings')|capfirst }}",
             "parent": ["menu-sys-adm"],
             "sequence": 100
         }
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-company",
+        "id": "menu-settings-users",
     	"fields" : {
-            "name": "{{ _('company')|capfirst }}",
-            "parent": ["menu-sys-adm"],
-            "sequence": 110
-        }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-sys-auth",
-    	"fields" : {
-            "name": "{{ _('authentication')|capfirst }}",
-            "parent": ["menu-sys"],
-            "sequence": 110
+            "name": "{{ _('users')|capfirst }}",
+            "parent": ["menu-settings"],
+            "sequence": 40
         }
     },
     {
@@ -114,20 +132,20 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-users",
+        "id": "menu-settings-users-users",
     	"fields" : {
             "name": "{{ _('users')|capfirst }}",
-            "parent": ["menu-sys-auth"],
+            "parent": ["menu-settings-users"],
             "model": "base.user",
             "sequence": 100
         }
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-groups",
+        "id": "menu-settings-users-group",
     	"fields" : {
             "name": "{{ _('groups')|capfirst }}",
-            "parent": ["menu-sys-auth"],
+            "parent": ["menu-settings-users"],
             "model": "auth.group",
             "sequence": 110
         }

@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import models as auth
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
@@ -9,6 +10,8 @@ from keops.db import models
 class User(auth.AbstractUser):
     email_signature = models.TextField(_('e-mail signature'))
     document_signature = models.TextField(_('document signature'))
+
+    REQUIRED_FIELDS = ['email', 'first_name']
     
     class Meta:
         db_table = 'auth_user'

@@ -1,6 +1,6 @@
-
 from collections import OrderedDict
 import json
+from django.utils import six
 from django import forms
 from keops.forms import extjs
 from .forms import View
@@ -35,12 +35,20 @@ class TabPage(object):
         self.form = form
         self.name = name
         self.fieldsets = fieldsets
-        
+
     def __iter__(self):
         for name, fieldset in self.fieldsets:
             yield Fieldset(name, self.form, fieldset)
+
+class ModelAdminBase(type):
+    def __new__(cls, name, bases, attrs):
+        new_class = type.__new__(cls, name, bases, attrs)
+        if attrs.get('admin_default', None):
+            new_class()
+        return new_class
             
-class ModelAdmin(View):
+class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
+    admin_default = False
     template_name = 'keops/forms/model_form.js'
     list_template = 'keops/forms/list_form.js'
     fields = ()
@@ -65,15 +73,18 @@ class ModelAdmin(View):
         self.admin = admin
         self._prepared = False
         if self.model:
-            self._prepare()
+            if self.admin_default:
+                self.contribute_to_class(self.model, '_admin')
+            else:
+                self._prepare()
         
     def contribute_to_class(self, cls, name):
         cls._admin = self
         self.model = cls
         if self.admin:
             dsgn_attrs = dict(self.admin.__dict__.copy())
-            # ignore internal items
-            attrs = [k for k in dsgn_attrs if not k.startswith('__')]
+            # ignore private/internal items
+            attrs = [k for k in dsgn_attrs if not k.startswith('_')]
             for attr in attrs:
                 setattr(self, attr, dsgn_attrs[attr])
             del self.admin
@@ -88,8 +99,9 @@ class ModelAdmin(View):
             self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f, 
                 (models.AutoField, models.OneToOneField)) and getattr(f, 'custom_attrs', {}).get('visible', True)]
         if not self.list_display:
-            self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not isinstance(f, 
-                (models.AutoField, models.OneToOneField, models.ManyToManyField)) and getattr(f, 'custom_attrs', {}).get('visible', True)]
+            self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not\
+                isinstance(f, (models.AutoField, models.OneToOneField, models.ManyToManyField)) and\
+                getattr(f, 'custom_attrs', {}).get('visible', True)]
 
         if not self.pages:
             pages = OrderedDict()
@@ -124,7 +136,7 @@ class ModelAdmin(View):
             
         self.title = self.title or self.model._meta.verbose_name_plural
         self.label = self.label or self.model._meta.verbose_name
-            
+
     def _prepare_form(self):
         if self._prepared:
             return

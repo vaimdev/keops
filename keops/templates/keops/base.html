@@ -3,7 +3,11 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Keops</title>
+    {%  if DEBUG %}
     <script src="{{ STATIC_URL }}js/extjs/ext-all.js"></script>
+    {% else %}
+    <script src="{{ STATIC_URL }}js/extjs/ext-all-debug.js"></script>
+    {%  endif %}
     <script src="{{ STATIC_URL }}js/extjs/ext-theme-gray.js"></script>
     <link rel="stylesheet" href="{{ STATIC_URL }}js/extjs/resources/ext-theme-gray/ext-theme-gray-all.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/keops.css">

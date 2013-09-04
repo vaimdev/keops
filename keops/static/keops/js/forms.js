@@ -1,6 +1,7 @@
 Ext.define('Keops.form.ModelForm', {
 	extend: 'Ext.form.Panel',
 	alias: 'widget.modelform',
+    newText: 'New',
 
     initComponent: function () {
         var me = this;
@@ -19,6 +20,9 @@ Ext.define('Keops.form.ModelForm', {
     	me.btnEdit = this.queryById('btn-edit');
     	me.btnSave = this.queryById('btn-save');
     	me.btnCancel = this.queryById('btn-cancel');
+    	me.btnPrint = this.queryById('btn-print');
+    	me.btnRecord = this.queryById('btn-record');
+    	me.btnMore = this.queryById('btn-more');
     },
     
     newRecord: function () {
@@ -43,8 +47,12 @@ Ext.define('Keops.form.ModelForm', {
     },
     
     cancelChanges: function () {
-    	this.store.load({ params: { id: this.store.first().raw.pk } });
-    	this.setState('read');
+        var f = this.store.first();
+        if (f) {
+            this.store.load({ params: { id: f.raw.pk } });
+            this.setState('read');
+        }
+        else this.setState(null);
     },
     
     render: function() {
@@ -61,17 +69,40 @@ Ext.define('Keops.form.ModelForm', {
         ]);
     },
 
+    setLabelText: function(s) {
+        if (!this._labelForm) this._labelForm = this.queryById('form-label');
+        if (this._labelForm) this._labelForm.update('<b>' + this.formTitle + '</b>/' + s);
+    },
+
     setState: function (state) {
     	this._state = state;
-    	if (state == 'read') read = true; else read = false;
-		this.btnCreate.setVisible(read);
-    	this.btnEdit.setVisible(read);
-    	this.btnSave.setVisible(!read);
-    	this.btnCancel.setVisible(!read);
+        if (!state) {
+            read = true;
+            this.btnCreate.setVisible(true);
+            this.btnEdit.setVisible(false);
+            this.btnSave.setVisible(false);
+            this.btnCancel.setVisible(false);
+            this.btnPrint.setVisible(false);
+            this.btnRecord.setVisible(false);
+            this.btnMore.setVisible(false);
+        }
+    	else if (state == 'read') read = true; else read = false;
+        if (state) {
+            this.btnCreate.setVisible(read);
+            this.btnEdit.setVisible(read);
+            this.btnSave.setVisible(!read);
+            this.btnCancel.setVisible(!read);
+            this.btnPrint.setVisible(read);
+            this.btnRecord.setVisible(read);
+            this.btnMore.setVisible(read);
+        }
+        if (state == 'create') this.setLabelText(this.newText)
+        else if (!state) this.setLabelText('');
+        fields = this.storeFields;
     	this.getForm().getFields().each(
     	function(item) 
     	{
-            if (item.setReadOnly) item.setReadOnly(read);
+            if ((fields.indexOf(item.name) > -1) && item.setReadOnly) item.setReadOnly(read);
     	});
     }
 });

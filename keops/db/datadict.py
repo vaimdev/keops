@@ -1,6 +1,5 @@
 # This module implements ADD (Active Data Dictionary) on Django default classes
 # Sorry! Monkey patch is the only way to do this for now
-
 from django.db import models
 from django import forms
 from django.utils.translation import ugettext_lazy as _

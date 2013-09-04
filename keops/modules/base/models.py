@@ -32,6 +32,9 @@ class Company(Element):
     website = models.URLField('website')
     comment = models.TextField(_('comments'), help_text=_('Company comments'))
 
+    class Meta:
+        verbose_name_plural = _('companies')
+
 class CompanyModel(models.Model):
     company = models.ForeignKey(Company, verbose_name=_('company'), null=False)
 
