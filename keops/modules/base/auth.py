@@ -17,7 +17,7 @@ class User(auth.AbstractUser):
         db_table = 'auth_user'
 
     def __str__(self):
-        return self.username + (self.first_name and (' (' + self.first_name + (self.last_name and (' ' + self.last_name) or '') + ')'))
+        return self.username + (self.first_name and (' (' + self.first_name + (self.last_name and (' ' + self.last_name) or '') + ')') or '')
 
 class UserContent(models.Model):
     """

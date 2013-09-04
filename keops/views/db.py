@@ -82,6 +82,7 @@ def lookup(request):
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def submit(request):
+    print(request.POST)
     pk = request.POST.get('pk')
     model = _get_model(request.POST)
     data = json.loads(request.POST['data'])

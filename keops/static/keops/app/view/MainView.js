@@ -74,9 +74,9 @@ Ext.define('Keops.view.MainView', {
     },
     
     submit: function(form, url, params, success, callback) {
-        app.setLoading(true);
+        keops.app.setLoading(true);
     	if (!success) success = function () {};
-        if (!callback) callback = function () { app.setLoading(false); };
+        if (!callback) callback = function () { keops.app.setLoading(false); };
 
     	Ext.Ajax.request({
     		url: url,

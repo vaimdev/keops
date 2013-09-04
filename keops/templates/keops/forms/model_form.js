@@ -20,6 +20,9 @@
 		autoLoad: true,
         {% endif %}
 		listeners: {
+            beforeload: function() {
+                this._form.setLoading(keops.msgs.loading);
+            },
 			load: function() {
 				var form = this._form;
 				if (form) {
@@ -31,6 +34,7 @@
                         form.setState('read');
                     }
                     else form.setState(null);
+                    form.setLoading(false);
 				}
 			}
 		}

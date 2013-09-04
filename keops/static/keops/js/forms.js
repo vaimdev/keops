@@ -26,6 +26,15 @@ Ext.define('Keops.form.ModelForm', {
     },
     
     newRecord: function () {
+        var fields = this.storeFields;
+        var values = {};
+    	this.getForm().getFields().each(
+    	function(item)
+    	{
+            if (fields.indexOf(item.name) > -1) values[item.name] = null;
+    	});
+        values = this.store.add([values]);
+        this.loadRecord(values[0]);
     	this.setState('create');
     },
 
@@ -48,11 +57,14 @@ Ext.define('Keops.form.ModelForm', {
     
     cancelChanges: function () {
         var f = this.store.first();
-        if (f) {
-            this.store.load({ params: { id: f.raw.pk } });
+        if (f && f.raw.pk) {
+            this.loadRecord(f);
             this.setState('read');
         }
-        else this.setState(null);
+        else {
+            this.setState(null);
+            this.getForm().reset();
+        }
     },
     
     render: function() {
@@ -71,7 +83,7 @@ Ext.define('Keops.form.ModelForm', {
 
     setLabelText: function(s) {
         if (!this._labelForm) this._labelForm = this.queryById('form-label');
-        if (this._labelForm) this._labelForm.update('<b>' + this.formTitle + '</b>/' + s);
+        if (this._labelForm) this._labelForm.update('<b>' + this.formTitle + '</b>/' + (s || ''));
     },
 
     setState: function (state) {
