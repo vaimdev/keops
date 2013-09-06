@@ -97,14 +97,24 @@
                 },
                 trigger1Cls: Ext.baseCSSPrefix + 'form-search-trigger'
             }, {
-                        xtype: 'panel',
+                        xtype: 'container',
+                        width: 230,
+                        layout: {
+                            type: 'hbox',
+                            align: 'stretch'
+                        },
                         border: false, frame: false, bodyStyle: 'background: transparent',
-                        rtl: true,
                         items: [{
+                            xtype: 'container',
+                            border: false, frame: false, bodyStyle: 'background: transparent',
+                            flex: 1
+                        },
+                        {
                             xtype: 'button',
                             handler: function() { window.location.href = '#action={{ action.pk }}&view_type=list'; },
                             text: '{{ _("list")|capfirst }}'
-                        }, {
+                        },
+                        {
                             xtype: 'button',
                             handler: function() { window.location.href = '#action={{ action.pk }}&view_type=form'; },
                             text: '{{ _("form")|capfirst }}'
