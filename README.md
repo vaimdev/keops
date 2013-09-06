@@ -3,7 +3,7 @@ keops
 
 The Django ERP.
 
-Keops is a Django based business framework, to simplify the RIA business development,
+Keops is a Django based modular business framework, to simplify the RIA business development,
 this is a RAD tool that's delivers really professionals products on less time, using all power of Django combined with the ExtJS framework as presentation layer.
 The project focus is the possibility to get two licenses styles for each app/module: Open and Commercial Licenses.
 
