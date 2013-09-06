@@ -43,6 +43,7 @@ Ext.define('Keops.form.ModelForm', {
     },
 
     saveRecord: function () {
+        // Only submit modified data
     	var form = this.getForm();
     	params = { model: this.store.proxy.extraParams.model, pk: this.pk };
     	params.data = Ext.encode(form.getFieldValues(true));

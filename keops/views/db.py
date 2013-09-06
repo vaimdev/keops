@@ -91,7 +91,6 @@ def submit(request):
     """
     Default data submit view.
     """
-    print(request.POST)
     pk = request.POST.get('pk')
     model = _get_model(request.POST)
     data = json.loads(request.POST['data'])
