@@ -57,15 +57,15 @@ def grid_column(name, field):
     elif isinstance(field, forms.DateTimeField):
         col['xtype'] = 'datecolumn'
         col['format'] = formats.get_format('SHORT_DATETIME_FORMAT')
-        print(col['format'])
     elif isinstance(field, forms.BooleanField):
         col['renderer'] = 'function (value) { if (value === true) return "%s"; else return "%s"; }' % (_('Yes'), _('No'))
     return col
 
 def get_field(name, field):
-    d = {'columnWidth': .5, 'fieldLabel': str(field.label), 'name': name, 'labelWidth': 140, 'labelSeparator': ''}#, 'labelAlign': 'top'} # optional
+    d = {'columnWidth': .5, 'fieldLabel': str(field.label), 'name': name, 'labelWidth': 140}#, 'labelAlign': 'top'} # optional
     d.update(get_xtype(field))
     if d['xtype'] == 'checkbox':
+        d['labelSeparator'] = ''
         d['fieldLabel'] = ' '
     return d
 
@@ -75,7 +75,9 @@ def get_form_fields(form):
 
 def get_container(container):
     items = [get_field(*f) for f in container]
-    d = {'columnWidth': .5, 'xtype': 'container', 'items': items}
+    for i in items[1:]:
+        i['padding'] =  '0 0 0 8'
+    d = {'columnWidth': .5, 'xtype': 'fieldcontainer', 'layout': 'hbox', 'items': items}
     return d
 
 def get_form_items(form):
@@ -86,10 +88,10 @@ def get_form_items(form):
             fieldsets = []
             fsets = {
                 'xtype': 'panel',
-                 'title': str(page.name),
-                 'items': fieldsets,
-                 'layout': 'column',
-                 'defaults': { 'padding': "5 8 8 8" }
+                'title': str(page.name),
+                'items': fieldsets,
+                'layout': 'column',
+                'defaults': { 'padding': "5 8 8 8" }
             }
             pages.append(fsets)
         else:
@@ -111,4 +113,5 @@ def get_form_items(form):
     if pages:
         tabpage = {'xtype': 'tabpanel', 'columnWidth': 1, 'items': pages, 'frame': True, 'padding': '0 0 0 0'}
         items.append(tabpage)
+    print(items)
     return items
