@@ -60,6 +60,7 @@ Ext.define('Keops.form.ModelForm', {
         if (f && f.raw.pk) {
             this.loadRecord(f);
             this.setState('read');
+            this.setLabelText(f.raw.__str__);
         }
         else {
             this.setState(null);
@@ -87,6 +88,7 @@ Ext.define('Keops.form.ModelForm', {
     },
 
     setState: function (state) {
+        console.log('set sate', state);
     	this._state = state;
         if (!state) {
             read = true;

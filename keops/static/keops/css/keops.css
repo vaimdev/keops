@@ -26,10 +26,9 @@ label {
 	font-weight: bold;
 }
 
-input {
-	padding: 2px 4px;
-	border: 1px solid #cccccc;
-	background: white;
+textarea[readonly="readonly"]
+{
+    background-color:blue;
 }
 
 a {

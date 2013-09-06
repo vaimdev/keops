@@ -81,7 +81,16 @@ def lookup(request):
     data = {'items': [{'id': obj.pk, 'text': str(obj)} for obj in queryset[start:limit]], 'total': queryset.count()}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+def _submit(request, model, data):
+    """
+    Submit nested data (ManyToMany/OneToMany).
+    """
+    pass
+
 def submit(request):
+    """
+    Default data submit view.
+    """
     print(request.POST)
     pk = request.POST.get('pk')
     model = _get_model(request.POST)

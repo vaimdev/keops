@@ -145,9 +145,9 @@
     	dock: 'bottom'
     }]});
     __store._form = __form;
-    keops.app.show(__form);
 {% if state == 'create' %}
 __form.newRecord();
 {% else %}
 __form.setState(null);
 {% endif %}
+    keops.app.show(__form);
