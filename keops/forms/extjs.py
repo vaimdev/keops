@@ -54,6 +54,10 @@ def grid_column(name, field):
     elif isinstance(field, forms.DateField):
         col['xtype'] = 'datecolumn'
         col['format'] = formats.get_format('SHORT_DATE_FORMAT')
+    elif isinstance(field, forms.DateTimeField):
+        col['xtype'] = 'datecolumn'
+        col['format'] = formats.get_format('SHORT_DATETIME_FORMAT')
+        print(col['format'])
     elif isinstance(field, forms.BooleanField):
         col['renderer'] = 'function (value) { if (value === true) return "%s"; else return "%s"; }' % (_('Yes'), _('No'))
     return col
