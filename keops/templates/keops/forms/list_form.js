@@ -1,6 +1,6 @@
 {% load i18n %}
 	var __store = Ext.create('Ext.data.Store', {
-		pageSize: 25,
+		pageSize: {{ pagesize }},
 		fields: {{ fields|safe }},
 		proxy: {
 			type: 'ajax',

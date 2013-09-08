@@ -63,6 +63,12 @@ class Module(Element):
     class Meta:
         verbose_name = _('module')
 
+    class Extra:
+        field_groups = {
+            'list_fields': ('name', 'app_label', 'module_name', 'short_description'),
+            'search_fields': ('name', 'app_label', 'module_name', 'short_description'),
+        }
+
     def __str__(self):
         return '%s (%s)' % (self.app_label, self.name)
 

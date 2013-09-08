@@ -11,8 +11,10 @@ dd_items = {
     'display_expression': None,
     'status_field': None, # main model status field representation
     'field_groups': {
+        'display_fields': [],
         'edit_fields': [],
         'print_fields': [],
+        'list_fields': [],
         'search_fields': [],
         'filter_fields': [],
     },
@@ -55,17 +57,18 @@ class ModelBase(object):
             for f in proxy_fields:
                 new_class.add_to_class(f[0], f[1])
 
-        # Add Admin meta class to _admin model attribute
-        new_class.add_to_class('_admin', ModelAdmin(admin))
-
+        # Add Extra class
         extra = getattr(new_class, 'Extra', None)
         if extra:
-            for d, v in dd_items.items():
+            for d, v in dd_items.copy().items():
                 if not hasattr(extra, d):
                     setattr(extra, d, v)
         else:
             extra = type('Extra', (object,), dd_items.copy())
             new_class.add_to_class('Extra', extra)
+
+        # Add Admin meta class to _admin model attribute
+        new_class.add_to_class('_admin', ModelAdmin(admin))
 
         # Auto detect state_field
         if extra.status_field is None:

@@ -5,8 +5,10 @@ from django.core.urlresolvers import reverse
 from django import forms
 
 def get_xtype(field):
-    if isinstance(field, forms.DateTimeField):
+    if isinstance(field, forms.DateField):
         return {'xtype': 'datefield', 'baseBodyCls': 'x-form-small-field'}
+    elif isinstance(field, forms.DateTimeField):
+        return {'xtype': 'datetimefield', 'baseBodyCls': 'x-form-small-field'}
     elif isinstance(field, forms.BooleanField):
         return {'xtype': 'checkbox', 'boxLabel': str(field.label)}
     elif isinstance(field, forms.ModelMultipleChoiceField):
@@ -62,7 +64,7 @@ def grid_column(name, field):
     return col
 
 def get_field(name, field):
-    d = {'columnWidth': .5, 'fieldLabel': str(field.label), 'name': name, 'labelWidth': 140}#, 'labelAlign': 'top'} # optional
+    d = {'columnWidth': .5, 'fieldLabel': str(field.label), 'name': name, 'labelWidth': 140}
     d.update(get_xtype(field))
     if d['xtype'] == 'checkbox':
         d['labelSeparator'] = ''
@@ -75,9 +77,10 @@ def get_form_fields(form):
 
 def get_container(container):
     items = [get_field(*f) for f in container]
+    items[0]['padding'] =  '2 0 2 0'
     for i in items[1:]:
-        i['padding'] =  '0 0 0 8'
-    d = {'columnWidth': .5, 'xtype': 'fieldcontainer', 'layout': 'hbox', 'items': items}
+        i['padding'] =  '2 0 2 8'
+    d = {'columnWidth': .5, 'xtype': 'fieldcontainer', 'layout': 'hbox', 'padding': '3 8 6 0', 'items': items}
     return d
 
 def get_form_items(form):
@@ -113,5 +116,4 @@ def get_form_items(form):
     if pages:
         tabpage = {'xtype': 'tabpanel', 'columnWidth': 1, 'items': pages, 'frame': True, 'padding': '0 0 0 0'}
         items.append(tabpage)
-    print(items)
     return items

@@ -91,16 +91,22 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         self._prepare()
         
     def _prepare(self):
+        extra = getattr(self.model, 'Extra', None)
+        if extra:
+            if not self.fields and extra.field_groups and extra.field_groups.get('display_fields', None):
+                self.fields = extra.field_groups['display_fields']
+            if not self.list_display and extra.field_groups and extra.field_groups.get('list_fields', None):
+                self.list_display = extra.field_groups['list_fields']
         if self.model._meta.abstract:
             return
         from django.db import models
         model_fields = sorted(self.model._meta.concrete_fields + self.model._meta.many_to_many)
         if not self.fields:
-            self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f, 
-                (models.AutoField, models.OneToOneField)) and getattr(f, 'custom_attrs', {}).get('visible', True)]
+            self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f,
+                models.AutoField) and getattr(f, 'custom_attrs', {}).get('visible', True)]
         if not self.list_display:
             self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not\
-                isinstance(f, (models.AutoField, models.OneToOneField, models.ManyToManyField)) and\
+                isinstance(f, (models.AutoField, models.ManyToManyField)) and\
                 getattr(f, 'custom_attrs', {}).get('visible', True)]
 
         if not self.pages:
@@ -128,7 +134,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         elif not self.search_fields or not self.display_expression:
             search_fields = ''
             for f in self.fields:
-                field = self.model._meta.get_field_by_name(f)[0]
+                field = self.model._meta.get_field(f)
                 if isinstance(field, models.CharField):
                     search_fields = ['%s__icontains']
                     break
@@ -181,9 +187,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
     def list_view(self, request, **kwargs):
         self._prepare_form()
-        kwargs['items'] = json.dumps([extjs.grid_column(name, self.widgets[name]) for name in self.list_display])
+        kwargs['items'] = json.dumps([extjs.grid_column(name, self.get_formfield(name)) for name in self.list_display])
         kwargs['fields'] = json.dumps(self.list_display)
         self._prepare_context(request, kwargs)
+        kwargs.setdefault('pagesize', 50)
         return self.render(request, self.list_template, kwargs)
 
     def add_view(self, request, **kwargs):
@@ -197,6 +204,16 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def get_queryset(self, request):
         return self.model.objects.all()
 
-    def get_form_field(self, field):
+    def get_formfield(self, field):
         self._prepare_form()
+        if not field in self.widgets:
+            f = self.model._meta.get_field(field)
+            if f:
+                w = f.formfield()
+                self.widgets[field] = w
+                lbl = w.label
+            else:
+                lbl = field
+                w = forms.CharField(label=lbl)
+            self.widgets[field] = w
         return self.widgets[field]

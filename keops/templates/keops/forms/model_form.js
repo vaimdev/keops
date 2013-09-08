@@ -91,14 +91,14 @@
                 xtype: 'triggerfield',
                 style: 'background-color: #ffffff',
                 emptyText: '{{ _("search")|capfirst }}',
-                width: 230,
+                width: 330,
                 onTriggerClick: function() {
                     window.location.href = '#action={{ action.pk }}&view_type=list&' + Ext.Object.toQueryString({q: this.getValue()});
                 },
                 trigger1Cls: Ext.baseCSSPrefix + 'form-search-trigger'
             }, {
                         xtype: 'container',
-                        width: 230,
+                        width: 330,
                         layout: {
                             type: 'hbox',
                             align: 'stretch'

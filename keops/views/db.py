@@ -22,7 +22,6 @@ def search_text(queryset, text, search_fields=None):
     # Search by the search_fields property (Admin)
     if not search_fields:
         search_fields = queryset.model._admin.search_fields
-    print(search_fields)
     if hasattr(queryset.model, '_admin'):
         filter = {f: text for f in search_fields}
     else:
@@ -33,7 +32,7 @@ def grid(request):
     model_name = request.GET['model']
     model = ContentType.objects.get_by_natural_key(*model_name.split('.')).model_class()
     start = int(request.GET.get('start', '0'))
-    limit = int(request.GET.get('limit', '25')) + start # settings
+    limit = int(request.GET.get('limit', '50')) + start # settings
     queryset = model.objects.all()[start:limit]
 
     # Check content type permissions permissions

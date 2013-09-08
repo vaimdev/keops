@@ -46,7 +46,7 @@ class BaseModelManager(ElementManager):
         return BaseModel.objects.get(content_type=ContentType.objects.get_by_natural_key(app_label, model))
     
 class BaseModel(ModuleElement):
-    content_type = models.OneToOneField(ContentType)
+    content_type = models.OneToOneField(ContentType, verbose_name=_('content type'))
     ancestor = models.ForeignKey('self', verbose_name=_('base model'))
     description = models.CharField(_('description'), max_length=128)
     is_abstract = models.BooleanField(_('is abstract'), default=False)
@@ -56,6 +56,13 @@ class BaseModel(ModuleElement):
     class Meta:
         db_table = 'base_model'
         verbose_name = _('model')
+
+    class Extra:
+        field_groups = {
+            'display_fields': ('module', 'ancestor', 'description', 'is_abstract', 'groups', 'users'),
+            'list_fields': ('module', 'content_type', 'description'),
+            'search_fields': ('content_type__name', 'description'),
+        }
         
     def __str__(self):
         return '%s.%s' % (self.content_type.app_label, self.content_type.model)
@@ -99,7 +106,7 @@ class Default(models.Model):
     model = models.ForeignKey(BaseModel, verbose_name=_('model'), on_delete='CASCADE')
     field = models.CharField(_('field'), max_length=64)
     value = models.TextField(_('value'))
-    user = models.ForeignKey('base.User', verbose_name=_('user'), help_text=_('leave blank for all users'))
+    user = models.ForeignKey('base.User', verbose_name=_('user'), help_text=_('Leave blank for all users'))
     
     class Meta:
         db_table = 'base_default'

@@ -16,6 +16,12 @@ class User(auth.AbstractUser):
     class Meta:
         db_table = 'auth_user'
 
+    class Extra:
+        field_groups = {
+            'list_fields': ('username', 'email', 'first_name', 'last_name'),
+            'search_fields': ('username', 'email', 'first_name', 'last_name'),
+        }
+
     def __str__(self):
         return self.username + (self.first_name and (' (' + self.first_name + (self.last_name and (' ' + self.last_name) or '') + ')') or '')
 
