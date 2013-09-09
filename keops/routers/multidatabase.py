@@ -1,4 +1,4 @@
-# Enable orun to work with multi database using DATABASE_ROUTER setting
+# Enable django to work with multi database using DATABASE_ROUTER settings
 
 class MultiDatabaseRouter(object):
     def db_for_read(self, model, **hints):
@@ -15,6 +15,7 @@ class MultiDatabaseRouter(object):
         apps = ('sessions', 'sites', 'contenttypes', 'auth', 'base', 'admin')
         app_label = model._meta.app_label
         try:
+            # TODO implements apps cache here
             from keops.modules.base import models
             apps.extend([r.app_label for r in models.Module.objects.using(db).all()])
         except:

@@ -1,6 +1,6 @@
 # This module implements ADD (Active Data Dictionary) on Django default classes
 # Sorry! Monkey patch is the only way to do this for now
-from django.db import models, connections, router, transaction
+from django.db import models, connections, router, transaction, DatabaseError
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from keops.forms.admin import ModelAdmin
@@ -70,8 +70,9 @@ class ModelBase(object):
         # Add Admin meta class to _admin model attribute
         new_class.add_to_class('_admin', ModelAdmin(admin))
 
-        new_class._meta._writable_fields = [f.name for f in new_class._meta.concrete_fields] +\
-                                           [f.attname for f in new_class._meta.concrete_fields if isinstance(f, models.ForeignKey)]
+        new_class._meta._log_fields = [f.name for f in new_class._meta.concrete_fields if not f.primary_key] +\
+            [f.attname for f in new_class._meta.concrete_fields\
+             if isinstance(f, models.ForeignKey) and not f.primary_key]
 
         # Auto detect state_field
         if extra.status_field is None:
@@ -84,7 +85,20 @@ class ModelBase(object):
 
         return new_class
 
+    # Monkey-Patch - Adjust for multi datbase delete method support
+    # detect only db installed apps models
+    def get_all_related_objects(self, local_only=False, include_hidden=False,
+                                include_proxy_eq=False):
+        using = router.db_for_write(self.model)
+        objs = models.base.Options.get_all_related_objects_with_model(
+                self,
+                local_only=local_only, include_hidden=include_hidden,
+                include_proxy_eq=include_proxy_eq)
+        objs = [k for k, v in objs if router.allow_syncdb(using, k.model)]
+        return objs
+
     # Monkey patch
+    models.base.Options.get_all_related_objects = get_all_related_objects
     models.base.ModelBase.__new__ = __new__
 
 # Change Model.save method to trigger events
@@ -103,10 +117,9 @@ class Model(object):
         if self.pk:
             self._modified_fields = []
 
-    # Monkey-patch (optimize for SQL databases on delete cascade support)
-    def delete(self, using=None):
+    def delete(self, *args, **kwargs):
         if not hasattr(self.__class__, 'Extra'):
-            return Model._save(self, *args, **kwargs)
+            return Model._delete(self, *args, **kwargs)
         extra = self.__class__.Extra
 
         # Before events
@@ -115,13 +128,7 @@ class Model(object):
         if extra.before_change:
             extra.before_change(self, using=using)
 
-        using = using or router.db_for_write(self.__class__, instance=self)
-        assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
-
-        conn = connections[using]
-        qn = conn.ops.quote_name
-        c = conn.cursor()
-        c.execute('DELETE FROM %s WHERE %s = %d' % (qn(self._meta.db_table), qn(self._meta.pk.attname), self.pk))
+        r = Model._delete(self, *args, **kwargs)
 
         # After events
         if extra.after_delete:
@@ -130,11 +137,13 @@ class Model(object):
             extra.after_change(self, using=using)
 
         self._modified_fields = []
+        return r
 
     delete.alters_data = True
 
+    # Monkey-patch performance (update only modified fields)
     def save(self, *args, **kwargs):
-        if hasattr(self, '_modified_fields') and not kwargs.get('force_insert'):
+        if hasattr(self, '_modified_fields') and not kwargs.get('force_insert') and not kwargs.get('force_update'):
             kwargs.setdefault('update_fields', self._modified_fields)
         if not hasattr(self.__class__, 'Extra'):
             return Model._save(self, *args, **kwargs)
@@ -176,7 +185,7 @@ class Model(object):
 
     save.alters_data = True
 
-    # Path for performance optimization
+    # Monkey-Patch for performance optimization
     def _save_table(self, raw=False, cls=None, force_insert=False,
                     force_update=False, using=None, update_fields=None):
         """
@@ -202,9 +211,9 @@ class Model(object):
                       for f in non_pks]
             updated = self._do_update(base_qs, using, pk_val, values, update_fields)
             if force_update and not updated:
-                raise models.DatabaseError("Forced update did not affect any rows.")
+                raise DatabaseError("Forced update did not affect any rows.")
             if update_fields and not updated:
-                raise models.DatabaseError("Save with update_fields did not affect any rows.")
+                raise DatabaseError("Save with update_fields did not affect any rows.")
         if not updated:
             if meta.order_with_respect_to:
                 # If this is a model with an order_with_respect_to
@@ -229,7 +238,7 @@ class Model(object):
         if hasattr(self, 'pk') and hasattr(self, '_modified_fields') and\
                 not key in self._modified_fields and\
                 (self.pk or (self.pk is None and not value is None)) and\
-                key in self._meta._writable_fields:
+                key in self._meta._log_fields:
             self._modified_fields.append(key)
         Model._setattr(self, key, value)
 
@@ -252,7 +261,7 @@ class Model(object):
     # Monkey patch
     models.Model.__init__ = __init__
     models.Model.delete = delete
-    models.Model.save = save
-    models.Model._save_table = _save_table
-    models.Model.__setattr__ = __setattr__
+    #models.Model.save = save
+    #models.Model._save_table = _save_table
+    #models.Model.__setattr__ = __setattr__
     models.Model.__str__ = __str__

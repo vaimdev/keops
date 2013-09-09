@@ -88,7 +88,7 @@ def Deserializer(object_list, **options):
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
-        data = {Model._meta.pk.attname: Model._meta.pk.to_python(d.get("pk", None))}
+        data = {Model._meta.pk.attname: Model._meta.pk.to_python(d.get("pk"))}
         rec = id = None
         if 'id' in d:
             from keops.modules.base.models import ModelData
@@ -157,10 +157,10 @@ def Deserializer(object_list, **options):
                 setattr(rec, k, v)
         else:
             rec = Model(**data)
-        rec.save(using=db)
+        rec.save(using=db, update_fields=None)
         if id:
             id.content_object = rec
-            id.save()
+            id.save(using=db, update_fields=None)
         yield base.DeserializedObject(rec, m2m_data)
 
 def _get_model(model_identifier):
