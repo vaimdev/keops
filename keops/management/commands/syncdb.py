@@ -1,4 +1,3 @@
-
 import os
 from importlib import import_module
 from optparse import make_option
@@ -40,10 +39,6 @@ class Command(syncdb.Command):
                     fixtures += [os.path.join(dname, 'fixtures', f) for f in mod.app_info.get('fixtures', [])]
 
             if fixtures:
-                if fname in fixtures:
-                    call_command('loaddata', fname, verbosity=verbosity,
-                                 database=db, skip_validation=False)
-                    fixtures.remove(fname)
-                if fixtures:
-                    call_command('loadfixtures', *fixtures, verbosity=verbosity,
-                                 database=db, skip_validation=False)
+                call_command('loaddata', *fixtures, verbosity=verbosity,
+                             database=db, skip_validation=False)
+                fixtures.remove(fname)

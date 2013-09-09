@@ -1,6 +1,6 @@
 
 import os
-import keops.settings
+from django.conf import settings
 
 def register_modules(prefix, path):
     lst = os.listdir(path)
@@ -9,7 +9,7 @@ def register_modules(prefix, path):
             try:
                 mod = '%s.%s' % (prefix, s)
                 __import__(mod)
-                keops.settings.INSTALLED_APPS.append(mod)
+                settings.INSTALLED_APPS.append(mod)
             except:
                 pass
 

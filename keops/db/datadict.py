@@ -261,7 +261,7 @@ class Model(object):
     # Monkey patch
     models.Model.__init__ = __init__
     models.Model.delete = delete
-    #models.Model.save = save
-    #models.Model._save_table = _save_table
-    #models.Model.__setattr__ = __setattr__
+    models.Model.save = save
+    models.Model._save_table = _save_table
+    models.Model.__setattr__ = __setattr__
     models.Model.__str__ = __str__

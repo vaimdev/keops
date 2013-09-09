@@ -22,7 +22,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.auth',
-    'django.contrib.messages'
+    'django.contrib.messages',
+    'keops.modules.base',
 ]
 
 MIDDLEWARE_CLASSES = (
