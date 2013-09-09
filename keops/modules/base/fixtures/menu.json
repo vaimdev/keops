@@ -18,7 +18,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-settings-companies-company",
+        "id": "menu-settings-companies-companies",
     	"fields" : {
             "name": "{{ _('companies')|capfirst }}",
             "parent": ["menu-settings-companies"],

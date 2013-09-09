@@ -1,6 +1,41 @@
 
 from keops.db import models
 
+class Model1(models.Model):
+    field1 = models.CharField()
+    field2 = models.BinaryField()
+    field3 = models.BinaryField()
+    field4 = models.BinaryField()
+    field5 = models.BinaryField()
+    field6 = models.BinaryField()
+    field7 = models.BinaryField()
+    field8 = models.BinaryField()
+    field9 = models.BinaryField()
+    field10 = models.BinaryField()
+    field11 = models.BinaryField()
+    field12 = models.BinaryField()
+    field13 = models.BinaryField()
+    field14 = models.BinaryField()
+    field15 = models.BinaryField()
+    field16 = models.BinaryField()
+    field17 = models.BinaryField()
+    field18 = models.BinaryField()
+    field19 = models.BinaryField()
+    field20 = models.BinaryField()
+    field21 = models.BinaryField()
+    field22 = models.BinaryField()
+    field23 = models.BinaryField()
+    field24 = models.BinaryField()
+    field25 = models.BinaryField()
+    field26 = models.BinaryField()
+    field27 = models.BinaryField()
+    field28 = models.BinaryField()
+    field29 = models.BinaryField()
+    field30 = models.BinaryField()
+    field31 = models.BinaryField()
+    field32 = models.BinaryField()
+
+
 class Person(models.Model):
     first_name = models.CharField()
     last_name = models.CharField()

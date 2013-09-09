@@ -19,7 +19,7 @@ Ext.application({
     	if (url) {
     	
     	// prevent reload form
-    	keops.app.setLoading(keops.msgs.loading);
+    	keops.app.setLoading(gettext('Loading...'));
     	Ext.Ajax.request({
     		url: '?' + url,
     		success: function(response) {

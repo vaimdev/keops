@@ -35,6 +35,12 @@ class Company(Element):
     class Meta:
         verbose_name_plural = _('companies')
 
+    class Extra:
+        field_groups = {
+            'list_fields': ('name', 'country', 'website'),
+            'search_fields': ('name', 'country', 'website'),
+        }
+
 class CompanyModel(models.Model):
     company = models.ForeignKey(Company, verbose_name=_('company'), null=False)
 
@@ -165,7 +171,7 @@ class AttributeValue(models.Model):
 class File(models.Model):
     """
     Manage file contents.
-    This will improve performance, preventing queryset objects to select binary fields
+    This will improve performance, preventing queryset objects to select binary field value
     """
     name = models.CharField(_('name'))
     file_format = models.CharField(max_length=10, null=False) # document file format

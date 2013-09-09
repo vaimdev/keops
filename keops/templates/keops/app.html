@@ -1,5 +1,8 @@
 {% extends "keops/base.html" %}
 
+{% block translation_script %}
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+{% endblock %}
 {% block startup_script %}
     <link rel="stylesheet" href="{{ STATIC_URL }}js/extjs/examples/ux/css/ItemSelector.css">
     <script src="{{ STATIC_URL }}keops/js/forms.js"></script>
@@ -11,7 +14,6 @@ Ext.Loader.setPath('Ext.ux', '/static/js/extjs/examples/ux');
 keops.siteName = '{{ site_name }}';
 keops.menuName = '{{ menu.name }}';
 keops.menu = {{ sub_menu|safe }};
-keops.msgs.loading = '{{ _('loading...')|capfirst }}';
 keops.htmlMenu = "<ul>{% for item in main_menu %}<il><a href='../{{ item.pk }}'>{{ item.name }}</a></il>{% endfor %}</ul>";
 })();
 Ext.onReady(function() {

@@ -21,7 +21,7 @@
         {% endif %}
 		listeners: {
             beforeload: function() {
-                this._form.setLoading(keops.msgs.loading);
+                this._form.setLoading(gettext('Loading...'));
             },
 			load: function() {
 				var form = this._form;
@@ -93,7 +93,7 @@
                 emptyText: '{{ _("search")|capfirst }}',
                 width: 330,
                 onTriggerClick: function() {
-                    window.location.href = '#action={{ action.pk }}&view_type=list&' + Ext.Object.toQueryString({q: this.getValue()});
+                    window.location.href = '#action={{ action.pk }}&view_type=list&' + Ext.Object.toQueryString({query: this.getValue()});
                 },
                 trigger1Cls: Ext.baseCSSPrefix + 'form-search-trigger'
             }, {
@@ -141,7 +141,10 @@
                     { text: '{{ _("print")|capfirst }}', itemId: 'btn-print' },
                     { text: '{{ _("record")|capfirst }}', itemId: 'btn-record',
                         menu: { xtype: 'menu',
-                            items: [{ text: '{{ _("duplicate")|capfirst }}' }, { text: '{{ _("delete")|capfirst }}'}]
+                            items: [
+                                { text: '{{ _("duplicate")|capfirst }}' },
+                                { text: '{{ _("delete")|capfirst }}', handler: function() { this.up('form').confirmDeleteRecord('{% url 'keops.views.db.submit' %}'); } }
+                            ]
                         }
                     },
                     { text: '{{ _("more")|capfirst }}', itemId: 'btn-more' },

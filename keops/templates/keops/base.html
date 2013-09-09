@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Keops</title>
+	{% block translation_script %}{% endblock %}
     {%  if DEBUG %}
     <script src="{{ STATIC_URL }}js/extjs/ext-all.js"></script>
     {% else %}

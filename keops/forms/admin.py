@@ -103,11 +103,11 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         model_fields = sorted(self.model._meta.concrete_fields + self.model._meta.many_to_many)
         if not self.fields:
             self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f,
-                models.AutoField) and getattr(f, 'custom_attrs', {}).get('visible', True)]
+                models.AutoField) and getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
         if not self.list_display:
             self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not\
                 isinstance(f, (models.AutoField, models.ManyToManyField)) and\
-                getattr(f, 'custom_attrs', {}).get('visible', True)]
+                getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
 
         if not self.pages:
             pages = OrderedDict()

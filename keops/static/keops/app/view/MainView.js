@@ -64,7 +64,7 @@ Ext.define('Keops.view.MainView', {
     },
 
     loader: {
-        loadMask: keops.msgs.loading
+        loadMask: gettext('Loading...')
     },
     
     show: function(item) {
@@ -72,18 +72,32 @@ Ext.define('Keops.view.MainView', {
     	if (c.items.length > 0) c.items.items[0].destroy();
     	c.add(item);
     },
+
+    showError: function(msg) {
+        Ext.Msg.show({title: gettext('Error'), msg: msg, buttons: Ext.Msg.OK, icon: Ext.MessageBox.ERROR});
+    },
     
-    submit: function(form, url, params, success, callback) {
-        keops.app.setLoading(true);
+    submit: function(form, url, params, success, failure, callback, method) {
+        var me = this;
+        if (!method) method = 'POST'
+        if (form) form.setLoading(true);
+        else form = keops.app;
     	if (!success) success = function () {};
-        if (!callback) callback = function () { keops.app.setLoading(false); };
+        if (!failure) failure = function (data) { me.showError(data.status.toString() + ' - ' + gettext(data.statusText) + '<br/>' + data.responseText); console.log(data); };
+        if (!callback) callback = function () { form.setLoading(false); };
+
+        if (method == 'DELETE') {
+            url += '?' + Ext.urlEncode(params);
+            params = null;
+        }
 
     	Ext.Ajax.request({
     		url: url,
     		scope: form,
     		params: params,
-    		method: 'POST',
+    		method: method,
     		success: success,
+            failure: failure,
             callback: callback
     	});
     }

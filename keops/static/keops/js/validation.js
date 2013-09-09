@@ -9,7 +9,7 @@ keops.submit = function (form, url) {
         failure: function (form, action) {
             switch (action.failureType) {
             case Ext.form.action.Action.CLIENT_INVALID:
-                Ext.Msg.alert('Erro', 'Favor preencher os campos corretamente.');
+                Ext.Msg.alert(gettext('Error'), gettext('Please fill the fields correctly.'));
                 break;
             }
         }

@@ -25,6 +25,51 @@ Ext.define('Keops.form.ModelForm', {
     	me.btnMore = this.queryById('btn-more');
     },
     
+    confirmDeleteRecord: function(url) {
+    	var me = this;
+        Ext.Msg.confirm(gettext('Confirm'), gettext('Confirm delete record?'),
+            function(sender) {
+                if (sender == 'yes') me.deleteRecord(url);
+            });
+    },
+
+    deleteRecord: function(url) {
+        var form = this.getForm();
+        var params = { pk: this.pk, model: this.store.proxy.extraParams.model };
+        this.doAjax(url, params, 'DELETE');
+    },
+
+    doAjax: function(url, params, method) {
+        if (!method) method = 'POST';
+        var me = this;
+        var form = this.getForm();
+        me.setLoading(true);
+        var success = function (data) {
+        	var msg = Ext.decode(data.responseText);
+        	if (msg.success) {
+        		if (msg.data && msg.data.pk) form.pk = msg.data.pk;
+        		if (method == 'DELETE') {
+        			if ((me.store.currentPage == 1) || (me.store.currentPage == (me.store.totalCount - 1))) me.store.load();
+        			else if (me.store.currentPage < me.store.totalCount) me.store.nextPage();
+        			else me.store.previousPage();
+        		}
+        		else {
+	        		//me.setState('read');
+	        		app.msg(msg.label, msg.msg);
+	        		me.getForm().loadRecord(msg);
+	        		//me.clearDetailsChange();
+        		}
+        	}
+        	else if (msg.data) {
+        		me.getForm().loadRecord(msg);
+        	}
+        	else {
+        		Ext.Msg.alert(gettext('Error'), msg.msg);
+        	}
+        }
+        keops.app.submit(me, url, params, me.submitSuccess, null, null, method);
+    },
+
     newRecord: function () {
         var fields = this.storeFields;
         var values = {};

@@ -63,3 +63,9 @@ msgstr "carregando..."
 
 msgid "image"
 msgstr "imagem"
+
+msgid "Success"
+msgstr "Sucesso"
+
+msgid "Record sucessfully deleted!"
+msgstr "Registro excluído com sucesso!"

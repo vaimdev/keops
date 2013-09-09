@@ -1,6 +1,6 @@
 # This module implements ADD (Active Data Dictionary) on Django default classes
 # Sorry! Monkey patch is the only way to do this for now
-from django.db import models
+from django.db import models, connections, router, transaction
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from keops.forms.admin import ModelAdmin
@@ -38,7 +38,7 @@ class ModelBase(object):
 
     def __new__(cls, name, bases, attrs):
         admin = attrs.pop('Admin', None)
-        meta = attrs.get('Meta', None)
+        meta = attrs.get('Meta')
 
         # IMPORTANT
         # Force model proxy to allow add fields, this model inheritance
@@ -70,6 +70,9 @@ class ModelBase(object):
         # Add Admin meta class to _admin model attribute
         new_class.add_to_class('_admin', ModelAdmin(admin))
 
+        new_class._meta._writable_fields = [f.name for f in new_class._meta.concrete_fields] +\
+                                           [f.attname for f in new_class._meta.concrete_fields if isinstance(f, models.ForeignKey)]
+
         # Auto detect state_field
         if extra.status_field is None:
             try:
@@ -83,11 +86,6 @@ class ModelBase(object):
 
     # Monkey patch
     models.base.ModelBase.__new__ = __new__
-
-def _find_field(cls, attname):
-    for f in cls._meta.fields:
-        if f.name == attname or f.attname == attname:
-            return f
 
 # Change Model.save method to trigger events
 class Model(object):
@@ -105,34 +103,43 @@ class Model(object):
         if self.pk:
             self._modified_fields = []
 
-    def delete(self, *args, **kwargs):
+    # Monkey-patch (optimize for SQL databases on delete cascade support)
+    def delete(self, using=None):
         if not hasattr(self.__class__, 'Extra'):
             return Model._save(self, *args, **kwargs)
         extra = self.__class__.Extra
+
         # Before events
         if extra.before_delete:
-            extra.before_delete(self, *args, **kwargs)
+            extra.before_delete(self, using=using)
         if extra.before_change:
-            extra.before_change(self, *args, **kwargs)
+            extra.before_change(self, using=using)
 
-        r = Model._delete(self, *args, **kwargs)
+        using = using or router.db_for_write(self.__class__, instance=self)
+        assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
+
+        conn = connections[using]
+        qn = conn.ops.quote_name
+        c = conn.cursor()
+        c.execute('DELETE FROM %s WHERE %s = %d' % (qn(self._meta.db_table), qn(self._meta.pk.attname), self.pk))
 
         # After events
         if extra.after_delete:
-            extra.after_delete(self, *args, **kwargs)
+            extra.after_delete(self, using=using)
         if extra.after_change:
-            extra.after_change(self, *args, **kwargs)
+            extra.after_change(self, using=using)
 
         self._modified_fields = []
-        return r
+
+    delete.alters_data = True
 
     def save(self, *args, **kwargs):
-        if hasattr(self, '_modified_fields') and not kwargs.get('force_insert', None):
+        if hasattr(self, '_modified_fields') and not kwargs.get('force_insert'):
             kwargs.setdefault('update_fields', self._modified_fields)
-        #print(self.__class__.__name__, kwargs)
         if not hasattr(self.__class__, 'Extra'):
             return Model._save(self, *args, **kwargs)
         extra = self.__class__.Extra
+
         # Before events
         if extra.before_save:
             extra.before_save(self, *args, **kwargs)
@@ -222,7 +229,7 @@ class Model(object):
         if hasattr(self, 'pk') and hasattr(self, '_modified_fields') and\
                 not key in self._modified_fields and\
                 (self.pk or (self.pk is None and not value is None)) and\
-                (_find_field(self.__class__, key)):
+                key in self._meta._writable_fields:
             self._modified_fields.append(key)
         Model._setattr(self, key, value)
 
@@ -245,7 +252,7 @@ class Model(object):
     # Monkey patch
     models.Model.__init__ = __init__
     models.Model.delete = delete
-    #models.Model.save = save
-    #models.Model._save_table = _save_table
-    #models.Model.__setattr__ = __setattr__
+    models.Model.save = save
+    models.Model._save_table = _save_table
+    models.Model.__setattr__ = __setattr__
     models.Model.__str__ = __str__
