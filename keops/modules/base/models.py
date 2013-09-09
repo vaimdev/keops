@@ -36,6 +36,7 @@ class Company(Element):
         verbose_name_plural = _('companies')
 
     class Extra:
+        display_expression = ('name',)
         field_groups = {
             'list_fields': ('name', 'country', 'website'),
             'search_fields': ('name', 'country', 'website'),

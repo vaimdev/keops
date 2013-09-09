@@ -117,9 +117,9 @@ class Model(object):
         if self.pk:
             self._modified_fields = []
 
-    def delete(self, *args, **kwargs):
+    def delete(self, using=None):
         if not hasattr(self.__class__, 'Extra'):
-            return Model._delete(self, *args, **kwargs)
+            return Model._delete(self, using=using)
         extra = self.__class__.Extra
 
         # Before events
@@ -128,7 +128,7 @@ class Model(object):
         if extra.before_change:
             extra.before_change(self, using=using)
 
-        r = Model._delete(self, *args, **kwargs)
+        r = Model._delete(self, using=using)
 
         # After events
         if extra.after_delete:
@@ -212,8 +212,8 @@ class Model(object):
             updated = self._do_update(base_qs, using, pk_val, values, update_fields)
             if force_update and not updated:
                 raise DatabaseError("Forced update did not affect any rows.")
-            if update_fields and not updated:
-                raise DatabaseError("Save with update_fields did not affect any rows.")
+            #if update_fields and not updated:
+            #    raise DatabaseError("Save with update_fields did not affect any rows.")
         if not updated:
             if meta.order_with_respect_to:
                 # If this is a model with an order_with_respect_to

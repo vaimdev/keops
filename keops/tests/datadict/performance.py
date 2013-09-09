@@ -37,7 +37,7 @@ class PerformanceTestCase(TestCase):
 
     def _read(self, model):
         for r in model.objects.all():
-            print('Read', r.field1)
+            r.field1
 
     def _update(self, model):
         for r in model.objects.all():
