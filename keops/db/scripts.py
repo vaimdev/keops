@@ -4,8 +4,8 @@ from importlib import import_module
 from django.db import connections
 from django.db.utils import load_backend
 
-def _create_connection(database):
-    connection = connections[database]
+def _create_connection(db):
+    connection = connections[db]
     db_settings = connection.settings_dict
     db_engine = db_settings['ENGINE']
     backend = load_backend(db_engine)
@@ -25,14 +25,14 @@ def _create_connection(database):
         conn = cx_Oracle.connect('SYSTEM', db_settings['PASSWORD'], 'localhost/master')
         return conn
     
-def createdb(database):
-    connection = connections[database]
+def createdb(db):
+    connection = connections[db]
     db_settings = connection.settings_dict
     db_engine = db_settings['ENGINE']
     db_name = db_settings['NAME']
     db_engine = db_engine.split('.')[-1]
 
-    conn = _create_connection(database)
+    conn = _create_connection(db)
     print('Creating db "%s"' % db_name)
 
     if db_engine == 'sqlite3':
@@ -49,15 +49,15 @@ def createdb(database):
         conn.cursor().execute('grant all privilege to %s' % db_settings['USER'])
 
 
-def dropdb(database):
-    connection = connections[database]
+def dropdb(db):
+    connection = connections[db]
     connection.close()
     db_settings = connection.settings_dict
     db_engine = db_settings['ENGINE']
     db_name = db_settings['NAME']
     db_engine = db_engine.split('.')[-1]
 
-    conn = _create_connection(database)
+    conn = _create_connection(db)
     print('Dropping db "%s"' % db_name)
 
     if db_engine == 'sqlite3':
@@ -83,24 +83,24 @@ def dropdb(database):
         except Exception as e:
             print(e)
 
-def syncdb(database):
+def syncdb(db):
     from django.core.management import call_command
-    call_command('syncdb', database=database, interactive=False)
+    call_command('syncdb', database=db, interactive=False)
     from django.conf import settings
     from django.utils import translation
     translation.activate(settings.LANGUAGE_CODE)
 
-def recreatedb(database):
-    dropdb(database)
-    createdb(database)
+def recreatedb(db):
+    dropdb(db)
+    createdb(db)
 
-def runfile(filename, database):
+def runfile(filename, db):
     f = open(filename, encoding='utf-8')
-    conn = connections[database]
+    conn = connections[db]
     conn.cursor().execute(f.read())
 
 
-def install(app_name, database, demo=True):
+def install(app_name, db, demo=True):
     app_label = app_name.split('.')[-1]
     
     def install_app():
@@ -112,11 +112,11 @@ def install(app_name, database, demo=True):
             else:
                 info = { 'name': app_label, 'description': '', 'version': '0.1' }
             from keops.modules.base import models as base
-            if base.Module.objects.using(database).filter(app_label=app_label):
-                print('Application "%s" already installed on database "%s".' % (app_label, database))
+            if base.Module.objects.using(db).filter(app_label=app_label):
+                print('Application "%s" already installed on database "%s".' % (app_label, db))
                 return
             else:
-                base.Module.objects.using(database).create(
+                base.Module.objects.using(db).create(
                     module_name=app_name,
                     name=info['name'],
                     app_label=app_label,

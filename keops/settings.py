@@ -5,13 +5,15 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
+
 USE_I18N = True
 USE_L10N = True
 
 STATIC_URL = '/static/'
 TEMPLATE_DIRS = []
-DATABASES = {'default': {}}
+
 DATABASE_ROUTERS = ['keops.routers.multidatabase.MultiDatabaseRouter']
+DATABASES = {'default': {}}
 
 AUTH_USER_MODEL = 'base.user'
 
@@ -35,7 +37,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 # IMPORTANT! MULTI-DB SUPPORT WORKS WITH 'django.contrib.sessions.backends.cache' ONLY
-# TO CHANGE IT, MULTI-DB SUPPORT NEED TO BE REMOVED
+# ANOTHER SESSION STORE NEEDS DJANGO DEFAULT DATABASE ROUTER
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 SERIALIZATION_MODULES = {

@@ -152,11 +152,12 @@ def Deserializer(object_list, **options):
             else:
                 data[field.name] = field.to_python(field_value)
 
-        if rec:
-            for k, v in data.items():
-                setattr(rec, k, v)
-        else:
-            rec = Model(**data)
+        if not rec:
+            rec = Model()
+            rec._state.db = db
+        for k, v in data.items():
+            setattr(rec, k, v)
+
         rec.save(using=db, update_fields=None)
         if id:
             id.content_object = rec

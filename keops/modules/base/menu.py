@@ -5,7 +5,7 @@ from .module import *
 from .action import *
 
 class MenuManager(ElementManager):
-    def add_menu(self, path, action, icon=None):
+    def add_menu(self, path, action, icon=None, using=None):
         menu = self.model()
         menu.full_name = path
         menu.action = action
@@ -60,13 +60,13 @@ class Menu(ModuleElement):
     ## Auto create model form action for target menu item
     def get_model(self):
         if self.action and self.action.action_type == 'form':
-            return FormAction.objects.get(pk=self.action.pk).model
+            return FormAction.objects.using(self._state.db).get(pk=self.action.pk).model
     def set_model(self, model):
         from keops.modules.base.models import BaseModel
         if isinstance(model, str):
             model = model.split('.')
-            model = BaseModel.objects.get(content_type__app_label=model[0], content_type__model=model[1])
-        action = FormAction.objects.create(name='%s "%s.%s"' % (('showmodel',) + model.content_type.natural_key()), model=model)
+            model = BaseModel.objects.using(self._state.db).get(content_type__app_label=model[0], content_type__model=model[1])
+        action = FormAction.objects.using(self._state.db).create(name='%s "%s.%s"' % (('showmodel',) + model.content_type.natural_key()), model=model)
         self.action = action
         self.image = '/static/keops/icons/page.png'
     model = property(get_model, set_model)
@@ -78,7 +78,7 @@ class Menu(ModuleElement):
     def set_form(self, form):
         if isinstance(form, str):
             form = View.objects.get(name=form)
-        action = FormAction.objects.create(name='%s "%s"' % ('showform', form.name), view=form)
+        action = FormAction.objects.using(self._state.db).create(name='%s "%s"' % ('showform', form.name), view=form)
         self.action = action
         self.image = '/static/keops/icons/page.png'
     form = property(get_form, set_form)
@@ -86,15 +86,15 @@ class Menu(ModuleElement):
     ## Auto create report action for target menu item
     def get_report(self):
         if self.action and self.action.action_type == 'report':
-            return ReportAction.objects.get(pk=self.action.pk).report
+            return ReportAction.objects.using(self._state.db).get(pk=self.action.pk).report
     def set_report(self, report):
         if isinstance(report, str):
             try:
-                rep = Report.objects.get(name=report)
+                rep = Report.objects.using(self._state.db).get(name=report)
             except:
-                rep = Report.objects.create(name=report)
+                rep = Report.objects.using(self._state.db).create(name=report)
             report = rep
-        action = ReportAction.objects.create(name='%s "%s"' % ('showreport', report.name), report=report)
+        action = ReportAction.objects.using(self._state.db).create(name='%s "%s"' % ('showreport', report.name), report=report)
         self.action = action
         self.image = '/static/keops/icons/page.png'
     report = property(get_report, set_report)

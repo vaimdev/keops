@@ -11,14 +11,14 @@ def index(request):
     Set default db alias session value.
     """
     # set default django-db-alias to 'default'
+    from keops.middleware.threadlocal import get_db, set_db
     assert request.method == 'GET'
     alias = request.GET.get('alias')
     if alias:
-        request.session['django-db-alias'] = alias
+        set_db(alias)
         next = request.GET.get('next')
         if next:
             return HttpResponseRedirect(next)
-    from keops.middleware.threadlocal import get_db
     return HttpResponse(get_db())
 
 def _get_model(context):

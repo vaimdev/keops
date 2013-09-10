@@ -32,6 +32,8 @@ dd_items = {
     'before_change': None,
 }
 
+models.base.ModelState._modified_fields = []
+
 class ModelBase(object):
 
     _new = models.base.ModelBase.__new__
