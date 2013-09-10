@@ -1,3 +1,4 @@
+import json
 from django.conf import settings
 from django.test import TestCase, Client
 
@@ -45,24 +46,40 @@ class AuthTestCase(TestCase):
         # try to login
         response = self.client.post(settings.LOGIN_URL + '?next=/admin/', {'username': 'admin', 'password': 'admin'})
         assert response.status_code == 302
-        response = self.client.get(settings.LOGOUT_URL)
 
         # test db2 alias
-        response = self.client.get('/db/?alias=db2')
+        response = self.client2.get('/db/?alias=db2')
         assert response.status_code == 200
         assert response.content == b'db2'
-        response = self.client.get('/db/?alias=db2&next=/admin/')
+        response = self.client2.get('/db/?alias=db2&next=/admin/')
         # must redirect to login
         assert response.status_code == 302
         # try to login
-        response = self.client.post(settings.LOGIN_URL + '?next=/admin/', {'username': 'admin', 'password': 'admin'})
+        response = self.client2.post(settings.LOGIN_URL + '?next=/admin/', {'username': 'admin', 'password': 'admin'})
         assert response.status_code == 302
-        response = self.client.get(settings.LOGOUT_URL)
-        response = self.client.get('/db/?alias=db2&next=/admin/')
+        response = self.client2.get(settings.LOGOUT_URL)
+        response = self.client2.get('/db/?alias=db2&next=/admin/')
         # try invalid login
-        response = self.client.post(settings.LOGIN_URL + '?next=/admin/', {'username': 'test', 'password': 'test'})
+        response = self.client2.post(settings.LOGIN_URL + '?next=/admin/', {'username': 'test', 'password': 'test'})
         assert response.status_code == 200
         # try login
-        response = self.client.post(settings.LOGIN_URL + '?next=/admin/', {'username': 'test', 'password': 'db2testpwd'})
+        response = self.client2.post(settings.LOGIN_URL + '?next=/admin/', {'username': 'test', 'password': 'db2testpwd'})
         assert response.status_code == 302
-        response = self.client.get(settings.LOGOUT_URL)
+        response = self.client.get('/db/')
+        assert response.content == b'default'
+        response = self.client2.get('/db/')
+        assert response.content == b'db2'
+
+        # CRUD tests
+        company = {'model': 'base.company', 'data': json.dumps({'name': 'My test company on default alias'})}
+        response = self.client.post('/db/submit/', company)
+        assert response.status_code == 200
+
+        company = {'model': 'base.company', 'data': json.dumps({'name': 'My test company on db2 alias'})}
+        response = self.client2.post('/db/submit/', company)
+        assert response.status_code == 200
+
+        # Check data exists
+        from keops.modules.base import models
+        models.Company.objects.using('default').get(name='My test company on default alias')
+        models.Company.objects.using('db2').get(name='My test company on db2 alias')
