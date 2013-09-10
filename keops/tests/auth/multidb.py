@@ -71,6 +71,7 @@ class AuthTestCase(TestCase):
         assert response.content == b'db2'
 
         # CRUD tests
+        # CREATE
         company = {'model': 'base.company', 'data': json.dumps({'name': 'My test company on default alias'})}
         response = self.client.post('/db/submit/', company)
         assert response.status_code == 200
@@ -81,5 +82,25 @@ class AuthTestCase(TestCase):
 
         # Check data exists
         from keops.modules.base import models
-        models.Company.objects.using('default').get(name='My test company on default alias')
-        models.Company.objects.using('db2').get(name='My test company on db2 alias')
+        # READ
+        cp1 = models.Company.objects.using('default').get(name='My test company on default alias')
+        cp2 = models.Company.objects.using('db2').get(name='My test company on db2 alias')
+
+        # UPDATE
+        company = {'model': 'base.company', 'pk': cp1.pk, 'data': json.dumps({'name': 'default alias'})}
+        response = self.client.post('/db/submit/', company)
+        assert response.status_code == 200
+
+        company = {'model': 'base.company', 'pk': cp2.pk, 'data': json.dumps({'name': 'db2 alias'})}
+        response = self.client2.post('/db/submit/', company)
+        assert response.status_code == 200
+
+        # DELETE
+        cp1 = models.Company.objects.using('default').get(name='default alias')
+        cp2 = models.Company.objects.using('db2').get(name='db2 alias')
+
+        response = self.client.delete('/db/submit/?model=base.company&pk=%d' % cp1.pk)
+        assert response.status_code == 200
+
+        response = self.client2.delete('/db/submit/?model=base.company&pk=%d' % cp2.pk)
+        assert response.status_code == 200
