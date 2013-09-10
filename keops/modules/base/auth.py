@@ -11,6 +11,8 @@ class User(auth.AbstractUser):
     email_signature = models.TextField(_('e-mail signature'))
     document_signature = models.TextField(_('document signature'))
 
+    raw_password = property(fset=auth.AbstractUser.set_password)
+
     REQUIRED_FIELDS = ['email', 'first_name']
     
     class Meta:

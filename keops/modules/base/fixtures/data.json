@@ -1,5 +1,13 @@
 [
     {
+        "model": "sites.site",
+        "id": "site-main",
+    	"fields" : {
+            "domain": "domain.com",
+            "name": "domain.com"
+        }
+    },
+    {
         "model": "base.modulecategory",
         "id": "module-category-basic",
     	"fields" : {

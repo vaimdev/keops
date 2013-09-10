@@ -23,7 +23,6 @@ class PerformanceTestCase(TestCase):
         # Inherited model
         self._create(models.Customer)
         self._read(models.Customer)
-        self._update(models.Customer)
         self._delete(models.Customer)
 
     def _create(self, model):
@@ -37,7 +36,7 @@ class PerformanceTestCase(TestCase):
 
     def _read(self, model):
         for r in model.objects.all():
-            r.field1
+            str(r)
 
     def _update(self, model):
         for r in model.objects.all():

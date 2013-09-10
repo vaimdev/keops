@@ -41,4 +41,3 @@ class Command(syncdb.Command):
             if fixtures:
                 call_command('loaddata', *fixtures, verbosity=verbosity,
                              database=db, skip_validation=False)
-                fixtures.remove(fname)

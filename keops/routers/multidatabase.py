@@ -1,6 +1,8 @@
 # Enable django to work with multi database using DATABASE_ROUTER settings
 
 import copy
+from django.db import DEFAULT_DB_ALIAS
+from keops.middleware.threadlocal import get_db
 
 class MultiDatabaseRouter(object):
     APPS_CACHE = {}
@@ -19,10 +21,10 @@ class MultiDatabaseRouter(object):
         return apps
 
     def db_for_read(self, model, **hints):
-        return 'default'
+        return get_db()
     
     def db_for_write(self, model, **hints):
-        return 'default'
+        return get_db()
     
     def allow_relation(self, obj1, obj2, **hints):
         return True

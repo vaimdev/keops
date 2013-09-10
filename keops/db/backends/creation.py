@@ -90,7 +90,7 @@ class BaseDatabaseCreation(object):
                     final_output.append(stmt)
         return final_output, pending_references
 
-    # Monkey-patch (adjust on delete cascade to database)
+    # Monkey-patch (adjust on delete cascade to database relations)
     def sql_for_pending_references(self, model, style, pending_references):
         """
         Returns any ALTER TABLE statements to add constraints after the fact.
@@ -111,7 +111,7 @@ class BaseDatabaseCreation(object):
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%s' % (
                     r_col, col, self._digest(r_table, table))
-                print(r_name)
+                print('relation', r_name)
                 if f.rel.on_delete == models.CASCADE:
                     cascade = ' ON DELETE CASCADE '
                 else:
@@ -128,4 +128,4 @@ class BaseDatabaseCreation(object):
         return final_output
 
     creation.BaseDatabaseCreation.sql_create_model = sql_create_model
-    #creation.BaseDatabaseCreation.sql_for_pending_references = sql_for_pending_references
+    creation.BaseDatabaseCreation.sql_for_pending_references = sql_for_pending_references

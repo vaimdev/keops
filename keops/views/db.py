@@ -2,9 +2,24 @@
 import json
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_text
+
+def index(request):
+    """
+    Set default db alias session value.
+    """
+    # set default django-db-alias to 'default'
+    assert request.method == 'GET'
+    alias = request.GET.get('alias')
+    if alias:
+        request.session['django-db-alias'] = alias
+        next = request.GET.get('next')
+        if next:
+            return HttpResponseRedirect(next)
+    from keops.middleware.threadlocal import get_db
+    return HttpResponse(get_db())
 
 def _get_model(context):
     # Check permission

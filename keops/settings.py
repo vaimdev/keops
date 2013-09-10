@@ -14,7 +14,6 @@ DATABASES = {'default': {}}
 DATABASE_ROUTERS = ['keops.routers.multidatabase.MultiDatabaseRouter']
 
 AUTH_USER_MODEL = 'base.user'
-LOGIN_URL = '/accounts/login'
 
 INSTALLED_APPS = [
     'keops',
@@ -35,6 +34,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
+# IMPORTANT! MULTI-DB SUPPORT WORKS WITH 'django.contrib.sessions.backends.cache' ONLY
+# TO CHANGE IT, MULTI-DB SUPPORT NEED TO BE REMOVED
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
 SERIALIZATION_MODULES = {
     'python' : 'keops.core.serializers.python',
     'json' : 'keops.core.serializers.json',
@@ -45,7 +48,6 @@ SERIALIZATION_MODULES = {
 TEMPLATE_PROCESSORS = (
     "django.core.context_processors.request",
 )
-
 
 TEMPLATE_LOADERS = ['keops.template.loaders.app_directories.Loader',]
 
@@ -82,7 +84,6 @@ LOGGING = {
         },
         'django.db.backends': {
             'handlers': ['console'],
-            #'level': 'DEBUG',
         },
         'app': {
             'handlers': ['console'],
