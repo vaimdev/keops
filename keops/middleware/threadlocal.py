@@ -12,13 +12,15 @@ def get_current_user():
     if request:
         return getattr(request, "user", None)
 
-def get_db():
-    request = get_current_request()
+def get_db(request=None):
+    if not request:
+        request = get_current_request()
     if request:
         return request.session.setdefault('_db_alias', DEFAULT_DB_ALIAS)
 
-def set_db(alias):
-    request = get_current_request()
+def set_db(alias, request=None):
+    if not request:
+        request = get_current_request()
     if request:
         request.session['_db_alias'] = alias
 

@@ -1,17 +1,16 @@
-
 import json
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_text
+from keops.db import get_db, set_db
 
 def index(request):
     """
     Set default db alias session value.
     """
-    # set default django-db-alias to 'default'
-    from keops.middleware.threadlocal import get_db, set_db
+    # set default _db_alias to 'alias'
     assert request.method == 'GET'
     alias = request.GET.get('alias')
     if alias:
@@ -23,7 +22,12 @@ def index(request):
 
 def _get_model(context):
     # Check permission
-    return ContentType.objects.get_by_natural_key(*context['model'].split('.')).model_class()
+    # TODO CACHE PERMISSION
+    model = context['model']
+    if isinstance(model, str):
+        return ContentType.objects.get_by_natural_key(*model.split('.')).model_class()
+    else:
+        return model
 
 def field_text(value):
     if value is None:
@@ -60,20 +64,20 @@ def grid(request):
     data = {'items': rows, 'total': model.objects.all().count()}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
-def _read(context):
+def _read(context, using):
     pk = context.get('pk')
     model = _get_model(context)
     start = int(context.get('start', '0'))
     limit = int(context.get('limit', '1')) + start # settings
     if pk:
-        queryset = model.objects.filter(pk=pk)
+        queryset = model.objects.using(using).filter(pk=pk)
         count = 1
     else:
         if 'id' in context:
-            queryset = model.objects.filter(pk=context['id'])
+            queryset = model.objects.using(using).filter(pk=context['id'])
         else:
-            queryset = model.objects.all()[start:limit]
-        count = model.objects.all().count()
+            queryset = model.objects.using(using).all()[start:limit]
+        count = model.objects.using(using).all().count()
         
     # TODO Check model permission
     
@@ -82,7 +86,8 @@ def _read(context):
     return {'items': rows, 'total': count}
     
 def read(request):
-    return HttpResponse(json.dumps(_read(request.GET)), content_type='application/json')
+    using = get_db(request)
+    return HttpResponse(json.dumps(_read(request.GET, using)), content_type='application/json')
 
 def lookup(request):
     context = request.GET
@@ -97,41 +102,72 @@ def lookup(request):
     data = {'items': [{'id': obj.pk, 'text': str(obj)} for obj in queryset[start:limit]], 'total': queryset.count()}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
-def _save(request, model, data):
+def _save(context, using):
     """
-    Submit nested data (ManyToMany/OneToMany).
+    Save context data on using specified database.
     """
-    pass
+    pk = context.get('pk')
+    model = _get_model(context)
+    data = context.get('data')
+    obj = None
+    if pk:
+        obj = model.objects.using(using).get(pk=pk)
+    if data:
+        if isinstance(data, str):
+            data = json.loads(data)
+        obj = obj or model()
+        for k, v in data.items():
+            setattr(obj, k, v)
+        obj.save(using=using)
 
-def _delete(context):
+        # submit related data
+    related = context.get('related')
+    if related:
+        _save_related(json.loads(related), obj, using)
+    return True, obj
+
+def _save_related(data, parent, using):
+    """
+    Save nested/related data rows (ManyToMany/OneToMany).
+    """
+    for obj in data:
+        model = models.get_model(*obj['model'].split('.'))
+        link_field = obj['linkField']
+        rows = obj['data']
+        for row in rows:
+            action = row.get('action')
+            record = row.get('data')
+            pk = row.get('pk')
+            if action == 'DELETE':
+                model.objects.using(using).get(pk=pk).delete()
+                continue
+            elif action == 'CREATE':
+                record[link_field] = parent.pk
+            context = {'pk': pk, 'model': model, 'data': record}
+            _save(context, using)
+
+def _delete(context, using):
     """
     Default delete operation.
     """
     model = _get_model(context)
-    obj = model.objects.get(pk=context['pk'])
-    obj.delete()
+    obj = model.objects.using(using).get(pk=context['pk'])
+    obj.delete(using=using)
     return {
         'success': True,
         'action': 'DELETE',
-        'label': str(_('Success')),
-        'msg': str(_('Record successfully deleted!')),
+        'label': _('Success'),
+        'msg': _('Record successfully deleted!'),
     }
 
 def submit(request):
     """
     Default data submit view.
     """
+    using = get_db(request)
     if request.method == 'DELETE':
-        result = _delete(request.GET)
+        result = _delete(request.GET, using)
     else:
-        pk = request.POST.get('pk')
-        model = _get_model(request.POST)
-        data = json.loads(request.POST['data'])
-        result = {'success': True}
-        if data:
-            obj = model.objects.get(pk=pk) if pk else model()
-            for k, v in data.items():
-                setattr(obj, k, v)
-            obj.save()
-        result['data'] = _read({'model': request.POST['model'], 'pk': obj.pk})['items'][0]
+        success, obj = _save(request.POST, using)
+        result = {'success': success, 'data': _read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]}
     return HttpResponse(json.dumps(result), content_type='application/json')
