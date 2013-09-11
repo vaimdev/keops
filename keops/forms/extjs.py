@@ -1,8 +1,9 @@
-
 from django.utils.translation import ugettext as _
 from django.utils import formats
 from django.core.urlresolvers import reverse
 from django import forms
+
+USE_ITEM_SELECTOR = False
 
 def get_xtype(field):
     if isinstance(field, forms.DateField):
