@@ -13,11 +13,9 @@ class VirtualFieldTestCase(TestCase):
         m = models.Master(name='master 1')
         m.save()
         models.Master.objects.create(name='master 2')
-
         d = models.Detail(name='master 1/detail 1', parent=m)
         d.save()
         d = models.Detail(name='master 1/detail 2', parent=m)
         d.save()
-
         for d in m.details.all():
             print('Print detail', d)

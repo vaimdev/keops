@@ -158,13 +158,14 @@ class OneToManyField(VirtualField):
     """
     Provides a one-to-many field representation.
     """
-    def __init__(self, related_name, to=None, to_field=None, pk_field=None, **options):
+    def __init__(self, related_name, to=None, to_field=None, pk_field=None, list_fields=None, **options):
         self.related_name = related_name
         self.to = to
         self.to_field = to_field
         self.pk_field = pk_field
         self._descriptor = None
         self._related = None
+        self._list_fields = list_fields
         super(OneToManyField, self).__init__(self, **options)
 
     def contribute_to_class(self, cls, name):
@@ -179,6 +180,14 @@ class OneToManyField(VirtualField):
         if self._descriptor is None and self.related_name:
             self._descriptor = getattr(self.model, self.related_name)
         return self._descriptor
+
+    @property
+    def list_fields(self):
+        if not self._list_fields:
+            self._list_fields = self.related.model.Extra.field_groups.get('list_fields') or\
+                [f.name for f in self.related.model._meta.concrete_fields\
+                 if not f.primary_key and not f is self.related.field]
+        return self._list_fields
 
     @property
     def related(self):

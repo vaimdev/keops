@@ -57,10 +57,15 @@ def grid(request):
     if field:
         obj = model.objects.using(using).get(pk=pk)
         queryset = getattr(obj, field)
+        field = getattr(model, field)
+        model = field.related.model
+        fields = field.list_fields
         count = queryset.all().count()
     else:
-        queryset = models.objects.using(using)
+        queryset = model.objects.using(using)
+        fields = model.Extra.list_fields
         count = queryset.all().count()
+    fields = fields or [f.name for f in model._meta.concrete_fields if not f.primary_key]
     start = int(request.GET.get('start', '0'))
     limit = int(request.GET.get('limit', '50')) + start # settings
     queryset = queryset.all()[start:limit]
@@ -68,7 +73,7 @@ def grid(request):
     # TODO Check content type permissions permissions
 
     get_val = lambda x: '' if x is None else x
-    fields = ['pk'] + [f.name for f in model._meta.fields if not f.primary_key]
+    fields = ['pk'] + fields
     rows = [{f: smart_text(get_val(getattr(row, f))) for f in fields} for row in queryset]
     data = {'items': rows, 'total': count}
     return HttpResponse(json.dumps(data), content_type='application/json')

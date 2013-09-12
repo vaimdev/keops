@@ -19,3 +19,4 @@ class Master(models.Model):
 class Detail(models.Model):
     parent = models.ForeignKey(Master, null=False)
     name = models.CharField(blank=False)
+    description = models.CharField()
