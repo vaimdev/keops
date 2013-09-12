@@ -1,8 +1,10 @@
 # Active Data Dictionary for Django base field class
 from django.conf import settings
 from django.db import models
+from django.db.models import signals
 
-__all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey', 'FileRelField', 'ImageRelField']
+__all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey',
+           'FileRelField', 'ImageRelField', 'PropertyField']
 
 FIELD_BASIC_SEARCH = "basic"
 FIELD_ADVANCED_SEARCH = "advanced"
@@ -101,6 +103,57 @@ class FileRelField(models.ForeignKey):
 
 class ImageRelField(FileRelField):
     pass
+
+class VirtualField(object):
+    """
+    Provides a generic virtual field.
+    """
+
+    def __init__(self, verbose_name=None, help_text=None, blank=None, editable=True, readonly=True, **options):
+        self.verbose_name = verbose_name
+        self.help_text = help_text
+        self.blank = blank
+        self.editable = editable
+        self.readonly = readonly
+        for k, v in options.items():
+            setattr(self, k, v)
+
+    def contribute_to_class(self, cls, name):
+        self.name = name
+        self.model = cls
+        self.cache_attr = "_%s_cache" % name
+        cls._meta.add_virtual_field(self)
+
+        # For some reason I don't totally understand, using weakrefs here doesn't work.
+        #signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)
+
+        # Connect myself as the descriptor for this field
+        setattr(cls, name, self)
+
+    def formfield(self):
+        return
+
+    def __get__(self, instance, instance_type=None):
+        return None
+
+
+class PropertyField(VirtualField):
+    """
+    Provides a virtual field based on property.
+    """
+
+    def __init__(self, verbose_name=None, fget=None, fset=None, **options):
+        self.fget = fget
+        self.fset = fset
+        super(PropertyField, self).__init__(verbose_name=verbose_name, **options)
+
+    def __get__(self, instance, instance_type=None):
+        if self.fget:
+            return self.fget(instance)
+
+    def __set__(self, instance, value):
+        if self.fset:
+            self.fset(instance, value)
 
 # TODO: add ImageRelField (a foreign key to file model), to performance optimization binary content load
 # TODO: optimize foreignkey queryset
