@@ -1,6 +1,9 @@
-
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+
+# Change django settings to base.file as default FILE_FIELD_MODEL
+settings.__dict__.setdefault('FILE_FIELD_MODEL', 'base.File')
+
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
@@ -25,7 +28,7 @@ class Company(Element):
     currency = models.ForeignKey('base.Currency', verbose_name=_('currency'))
     zip_code = models.CharField(_('zip'), max_length=24)
     country = models.ForeignKey('base.Country')
-    #logo = models.ImageField(_('Logo'))
+    logo = models.ImageRelField(verbose_name=_('Logo'))
     email = models.EmailField('e-mail')
     phone = models.CharField(_('phone'), max_length=64)
     fax = models.CharField(_('fax'), max_length=64)
@@ -159,7 +162,7 @@ class AttributeValue(models.Model):
     text_value = models.CharField(max_length=1024)
     texta_value = models.TextField()
     logical_value = models.BooleanField()
-    #file_value = models.FileField()
+    file_value = models.FileRelField()
     ref_value = models.PositiveIntegerField()
     int_value = models.BigIntegerField()
     decimal_value = models.MoneyField()
@@ -177,9 +180,6 @@ class File(models.Model):
     name = models.CharField(_('name'))
     file_format = models.CharField(max_length=10, null=False) # document file format
     image = models.BinaryField(null=False)
-
-# Change django settings to base.file as default FILE_FIELD_MODEL
-settings.__dict__.setdefault('FILE_FIELD_MODEL', 'base.file')
 
 # TODO: Build dynamic Active Data Dictionary via database
 # TODO: Build dynamic Custom User Interface via database

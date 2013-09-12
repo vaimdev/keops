@@ -13,9 +13,9 @@ class Category(models.Model):
         verbose_name = _('Contact Category')
         verbose_name_plural = _('Contact Categories')
 
-class Partner(base.CompanyModel):
+class Contact(base.CompanyModel):
     name = models.CharField(_('name'), max_length=128, null=False)
-    #image
+    image = models.ImageRelField(verbose_name=_('image'))
     active = models.BooleanField(_('active'), default=True)
     parent_id = models.ForeignKey('self')
     partner_category = models.ForeignKey(Category, verbose_name=_('partner category'))
@@ -37,6 +37,6 @@ class Partner(base.CompanyModel):
     use_company_address = models.BooleanField(_('use company address'), default=False)
 
     class Meta:
-        db_table = 'contacts_partner'
-        verbose_name = _('Contact')
-        verbose_name_plural = _('Contacts')
+        db_table = 'contacts_contact'
+        verbose_name = _('contact')
+        verbose_name_plural = _('contacts')

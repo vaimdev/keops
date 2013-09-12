@@ -1,9 +1,8 @@
 # Active Data Dictionary for Django base field class
-
 from django.conf import settings
 from django.db import models
 
-__all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey']
+__all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey', 'FileRelField', 'ImageRelField']
 
 FIELD_BASIC_SEARCH = "basic"
 FIELD_ADVANCED_SEARCH = "advanced"
@@ -96,6 +95,7 @@ class FileRelField(models.ForeignKey):
                  db_constraint=True, **options):
         if to is None and hasattr(settings, 'FILE_FIELD_MODEL'):
             to = settings.FILE_FIELD_MODEL
+        options.setdefault('related_name', '+')
         super(FileRelField, self).__init__(to=to, to_field=to_field, rel_class=rel_class,
                                            db_constraint=db_constraint, **options)
 

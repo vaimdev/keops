@@ -1,5 +1,4 @@
 # Implement enterprise social network
-
 import datetime
 from datetime import timezone
 from django.utils.translation import ugettext_lazy as _
