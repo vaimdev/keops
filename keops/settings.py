@@ -17,6 +17,8 @@ DATABASES = {'default': {}}
 
 AUTH_USER_MODEL = 'base.user'
 
+FILE_FIELD_MODEL = 'base.file'
+
 INSTALLED_APPS = [
     'keops',
     'django.contrib.sessions',

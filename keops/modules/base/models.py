@@ -1,9 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-
-# Change django settings to base.file as default FILE_FIELD_MODEL
-settings.__dict__.setdefault('FILE_FIELD_MODEL', 'base.File')
-
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
@@ -15,6 +11,15 @@ from .action import *
 from .menu import *
 from .ui import *
 from .module import *
+
+class File(models.Model):
+    """
+    Manage file contents.
+    This will improve performance, preventing queryset objects to select binary field value
+    """
+    name = models.CharField(_('name'))
+    file_format = models.CharField(max_length=10, null=False) # document file format
+    image = models.BinaryField(null=False)
 
 # Company/data context
 class Company(Element):
@@ -171,15 +176,6 @@ class AttributeValue(models.Model):
     
     class Meta:
         db_table = 'base_attribute_value'
-
-class File(models.Model):
-    """
-    Manage file contents.
-    This will improve performance, preventing queryset objects to select binary field value
-    """
-    name = models.CharField(_('name'))
-    file_format = models.CharField(max_length=10, null=False) # document file format
-    image = models.BinaryField(null=False)
 
 # TODO: Build dynamic Active Data Dictionary via database
 # TODO: Build dynamic Custom User Interface via database

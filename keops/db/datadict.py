@@ -76,7 +76,18 @@ class ModelBase(object):
             [f.attname for f in new_class._meta.concrete_fields\
              if isinstance(f, models.ForeignKey) and not f.primary_key]
 
-        # Auto detect state_field
+        # Auto detect display_expression
+        if extra.display_expression is None:
+            fk = None
+            for f in new_class._meta.concrete_fields:
+                if isinstance(f, models.CharField):
+                    extra.display_expression = (f.name,)
+                    break
+                if isinstance(f, models.ForeignKey) and not fk:
+                    fk = (f.name,)
+            extra.display_expression = extra.display_expression or fk
+
+        # Auto detect status_field
         if extra.status_field is None:
             try:
                 f = new_class._meta.get_field('status')
@@ -94,8 +105,10 @@ class ModelBase(object):
         using = router.db_for_write(self.model)
         objs = models.base.Options.get_all_related_objects_with_model(
                 self,
-                local_only=local_only, include_hidden=include_hidden,
-                include_proxy_eq=include_proxy_eq)
+                local_only=local_only,
+                include_hidden=include_hidden,
+                include_proxy_eq=include_proxy_eq
+        )
         objs = [k for k, v in objs if router.allow_syncdb(using, k.model)]
         return objs
 

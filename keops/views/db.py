@@ -50,18 +50,27 @@ def search_text(queryset, text, search_fields=None):
     return queryset.filter(**filter)
 
 def grid(request):
-    model_name = request.GET['model']
-    model = ContentType.objects.get_by_natural_key(*model_name.split('.')).model_class()
+    using = get_db(request)
+    model = _get_model(request.GET)
+    pk = request.GET.get('pk')
+    field = request.GET.get('field') # Check related field
+    if field:
+        obj = model.objects.using(using).get(pk=pk)
+        queryset = getattr(obj, field)
+        count = queryset.all().count()
+    else:
+        queryset = models.objects.using(using)
+        count = queryset.all().count()
     start = int(request.GET.get('start', '0'))
     limit = int(request.GET.get('limit', '50')) + start # settings
-    queryset = model.objects.all()[start:limit]
+    queryset = queryset.all()[start:limit]
 
-    # Check content type permissions permissions
+    # TODO Check content type permissions permissions
 
     get_val = lambda x: '' if x is None else x
     fields = ['pk'] + [f.name for f in model._meta.fields if not f.primary_key]
     rows = [{f: smart_text(get_val(getattr(row, f))) for f in fields} for row in queryset]
-    data = {'items': rows, 'total': model.objects.all().count()}
+    data = {'items': rows, 'total': count}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def _read(context, using):

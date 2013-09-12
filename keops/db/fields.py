@@ -4,7 +4,8 @@ from django.db import models
 from django.db.models import signals
 
 __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey',
-           'FileRelField', 'ImageRelField', 'PropertyField']
+           'FileRelField', 'ImageRelField', 'VirtualField', 'PropertyField',
+           'OneToManyField']
 
 FIELD_BASIC_SEARCH = "basic"
 FIELD_ADVANCED_SEARCH = "advanced"
@@ -133,9 +134,6 @@ class VirtualField(object):
     def formfield(self):
         return
 
-    def __get__(self, instance, instance_type=None):
-        return None
-
 
 class PropertyField(VirtualField):
     """
@@ -154,6 +152,47 @@ class PropertyField(VirtualField):
     def __set__(self, instance, value):
         if self.fset:
             self.fset(instance, value)
+
+
+class OneToManyField(VirtualField):
+    """
+    Provides a one-to-many field representation.
+    """
+    def __init__(self, related_name, to=None, to_field=None, pk_field=None, **options):
+        self.related_name = related_name
+        self.to = to
+        self.to_field = to_field
+        self.pk_field = pk_field
+        self._descriptor = None
+        self._related = None
+        super(OneToManyField, self).__init__(self, **options)
+
+    def contribute_to_class(self, cls, name):
+        super(OneToManyField, self).contribute_to_class(cls, name)
+        if self.pk_field is None:
+            self.pk_field = cls._meta.pk
+        elif isinstance(self.pk_field, str):
+            self.pk_field = cls._meta.get_field(self.pk_field)
+
+    @property
+    def descriptor(self):
+        if self._descriptor is None and self.related_name:
+            self._descriptor = getattr(self.model, self.related_name)
+        return self._descriptor
+
+    @property
+    def related(self):
+        if self._related is None and self.related_name:
+            self._related = self.descriptor.related
+        return self._related
+
+    def __get__(self, instance, instance_type=None):
+        if isinstance(instance, models.Model):
+            return getattr(instance, self.related_name, None)
+        else:
+            return self
+
+
 
 # TODO: add ImageRelField (a foreign key to file model), to performance optimization binary content load
 # TODO: optimize foreignkey queryset
