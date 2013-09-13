@@ -1,4 +1,4 @@
 from django.forms import widgets
 
-class GridWidget(widgets.MultiWidget):
+class GridWidget(widgets.Widget):
     pass

@@ -8,7 +8,7 @@ class ClientTestCase(TestCase):
     def setUp(self):
         self.client = Client()
 
-    def test_session(self):
+    def test_get(self):
         from . import models
         m = models.Master(name='master 1')
         m.save()
@@ -22,3 +22,11 @@ class ClientTestCase(TestCase):
         response = self.client.get('/db/grid/?model=virtual_field.master&field=details&pk=%d' % m.pk)
         data = json.loads(response.content.decode('utf-8'))
         assert data['total'] == 4
+
+    def test_one_to_many_ui(self):
+        from keops.modules.base import models as base
+        m = base.Menu(name='menu-test')
+        m.model = 'virtual_field.master'
+        m.save()
+        response = self.client.get('/admin/menu/%d/?action=%d&view_type=form' % (m.pk, m.action.pk))
+        print(response.content)

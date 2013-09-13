@@ -71,7 +71,7 @@ Ext.define('Ext.ux.form.field.DateTime', {
 
 Ext.define('Keops.form.field.ComboBox', {
     extend: 'Ext.form.field.ComboBox',
-    alias: 'widget.kcombobox',
+    alias: 'widget.keops.combobox',
     
     buttonSearchTitle: 'Search',
     buttonOpenTitle: 'Open Resource',

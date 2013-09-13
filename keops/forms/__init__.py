@@ -1,6 +1,4 @@
 
-from .admin import *
-
 def autodiscover():
     """
     Auto-discover INSTALLED_APPS forms.py/forms modules and fail silently when

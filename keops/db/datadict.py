@@ -253,6 +253,7 @@ class Model(object):
         if hasattr(self, 'pk') and hasattr(self, '_modified_fields') and\
                 not key in self._modified_fields and\
                 (self.pk or (self.pk is None and not value is None)) and\
+                hasattr(self._meta, '_log_fields') and\
                 key in self._meta._log_fields:
             self._modified_fields.append(key)
         Model._setattr(self, key, value)

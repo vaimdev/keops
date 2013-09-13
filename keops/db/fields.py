@@ -105,17 +105,19 @@ class FileRelField(models.ForeignKey):
 class ImageRelField(FileRelField):
     pass
 
-class VirtualField(object):
+class VirtualField(models.Field):
     """
     Provides a generic virtual field.
     """
 
     def __init__(self, verbose_name=None, help_text=None, blank=None, editable=True, readonly=True, **options):
+        self.primary_key = False
         self.verbose_name = verbose_name
         self.help_text = help_text
         self.blank = blank
         self.editable = editable
         self.readonly = readonly
+        self.custom_attrs = options.pop('custom_attrs', {})
         for k, v in options.items():
             setattr(self, k, v)
 
@@ -130,9 +132,6 @@ class VirtualField(object):
 
         # Connect myself as the descriptor for this field
         setattr(cls, name, self)
-
-    def formfield(self):
-        return
 
 
 class PropertyField(VirtualField):
@@ -166,6 +165,8 @@ class OneToManyField(VirtualField):
         self._descriptor = None
         self._related = None
         self._list_fields = list_fields
+        self._choices = None
+        options.setdefault('default', models.NOT_PROVIDED)
         super(OneToManyField, self).__init__(self, **options)
 
     def contribute_to_class(self, cls, name):
@@ -194,6 +195,12 @@ class OneToManyField(VirtualField):
         if self._related is None and self.related_name:
             self._related = self.descriptor.related
         return self._related
+
+    def formfield(self, **kwargs):
+        from keops.forms import fields
+        defaults = {'form_class': fields.GridField, 'queryset': None}
+        defaults.update(kwargs)
+        return super(OneToManyField, self).formfield(**defaults)
 
     def __get__(self, instance, instance_type=None):
         if isinstance(instance, models.Model):

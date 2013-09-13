@@ -2,8 +2,7 @@ from django.utils.translation import ugettext as _
 from django.utils import formats
 from django.core.urlresolvers import reverse
 from django import forms
-
-USE_ITEM_SELECTOR = False
+import keops.forms.fields
 
 def get_xtype(field):
     if isinstance(field, forms.DateField):
@@ -32,13 +31,17 @@ def get_xtype(field):
         }
     elif isinstance(field, forms.ModelChoiceField):
         model = field.queryset.model
-        return {'xtype': 'kcombobox',
-                'storeUrl': reverse('keops.views.db.lookup'),
-                'storeModel': '%s.%s' % (model._meta.app_label, model._meta.model_name)}
+        return {
+            'xtype': 'keops.combobox',
+            'storeUrl': reverse('keops.views.db.lookup'),
+            'storeModel': '%s.%s' % (model._meta.app_label, model._meta.model_name)
+        }
     elif isinstance(field.widget, forms.widgets.Select):
         return {'xtype': 'combobox', 'store': [[c[0], str(c[1])] for c in field.widget.choices], 'forceSelection': True, 'minChars': 0}
     elif isinstance(field, forms.IntegerField):
         return {'xtype': 'numberfield', 'allowDecimals': False, 'baseBodyCls': 'x-form-small-field'}
+    elif isinstance(field, keops.forms.fields.GridField):
+        return {'xtype': 'grid'}
     else:
         return {'xtype': 'textfield', 'maxLength': field.widget.attrs.get('maxlength'), 'enforceMaxLength': True}
 

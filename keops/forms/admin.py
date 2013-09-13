@@ -4,6 +4,7 @@ from django.utils import six
 from django import forms
 from keops.forms import extjs
 from .forms import View
+from django.contrib.contenttypes import generic
 
 class FieldLine(object):
     def __init__(self, form, fields):
@@ -100,10 +101,12 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if self.model._meta.abstract:
             return
         from django.db import models
-        model_fields = sorted(self.model._meta.concrete_fields + self.model._meta.many_to_many)
+        model_fields = self.model._meta.fields + self.model._meta.virtual_fields
+        self.model_fields = model_fields
         if not self.fields:
-            self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f,
-                models.AutoField) and getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
+            self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f, (
+                models.AutoField, generic.GenericForeignKey)) and\
+                getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
         if not self.list_display:
             self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not\
                 isinstance(f, (models.AutoField, models.ManyToManyField)) and\
@@ -111,7 +114,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
         if not self.pages:
             pages = OrderedDict()
-            
+
         for field in model_fields:
             if not field.name in self.fields:
                 continue
@@ -146,11 +149,11 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def _prepare_form(self):
         if self._prepared:
             return
-        for field in self.model._meta.concrete_fields + self.model._meta.many_to_many:
-            if not field.name in self.fields:
+        for field in self.model_fields:
+            if not field.name in self.fields or isinstance(field, generic.GenericForeignKey):
                 continue
             if not field.name in self.widgets:
-                self.widgets[field.name] = field.custom_attrs.get('widget', None) or field.formfield()
+                self.widgets[field.name] = getattr(field, 'custom_attrs', {}).get('widget', None) or field.formfield()
         self._prepared = True
 
     def __iter__(self):
@@ -171,11 +174,11 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         
     def view(self, request, view_type, **kwargs):
         if view_type == 'list':
-            c = self.list_view
+            v = self.list_view
         else:
             self._prepare_change_view(request, kwargs)
-            c = super(ModelAdmin, self).view
-        return c(request, **kwargs)
+            v = super(ModelAdmin, self).view
+        return v(request, **kwargs)
     
     def _prepare_change_view(self, request, context):
         context['items'] = json.dumps(extjs.get_form_items(self))

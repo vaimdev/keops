@@ -1,0 +1,9 @@
+[
+    {
+        "model": "base.menu",
+    	"fields" : {
+            "full_name": "Tests/Tests/Master",
+            "model": "virtual_field.master"
+        }
+    }
+]
