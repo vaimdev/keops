@@ -16,6 +16,11 @@ class Action(ModuleElement):
     class Meta:
         verbose_name = _('actions')
 
+    class Extra:
+        field_groups = {
+            'list_fields': ('name', 'short_description', 'description', 'action_type')
+        }
+
     def get_action_type(self):
         return None
 
@@ -40,6 +45,11 @@ class ViewAction(Action):
         db_table = 'base_view_action'
         verbose_name = _('view action')
         verbose_name_plural = _('view actions')
+
+    class Extra:
+        field_groups = {
+            'list_fields': ('name', 'short_description', 'description', 'content_type')
+        }
 
     def get_action_type(self):
         return 'view'
@@ -84,6 +94,11 @@ class FormAction(Action):
         db_table = 'base_form_action'
         verbose_name = _('form action')
         verbose_name_plural = _('form actions')
+
+    class Extra:
+        field_groups = {
+            'list_fields': ('name', 'short_description', 'description', 'view', 'model')
+        }
 
     def execute(self, request, *args, **kwargs):
         from .views import actions

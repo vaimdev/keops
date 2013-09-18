@@ -104,11 +104,11 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         from django.db import models
         model_fields = self.model._meta.concrete_fields + self.model._meta.many_to_many + self.model._meta.virtual_fields
         self.model_fields = model_fields
-        print(model_fields)
         if not self.fields:
             self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f, (
                 models.AutoField, generic.GenericForeignKey)) and\
                 getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
+        print(self.list_display)
         if not self.list_display:
             self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not\
                 isinstance(f, (models.AutoField, models.ManyToManyField)) and\
@@ -201,6 +201,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         #kwargs['items'] = json.dumps([extjs.grid_column(name, self.get_formfield(name)) for name in self.list_display])
         #kwargs['fields'] = json.dumps(self.list_display)
         kwargs['fields'] = [self.get_formfield(f) for f in self.list_display]
+        kwargs['list_display'] = ['{{item.%s}}' % f for f in self.list_display]
         self._prepare_context(request, kwargs)
         kwargs.setdefault('pagesize', 50)
         return self.render(request, self.list_template, kwargs)

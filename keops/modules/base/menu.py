@@ -27,6 +27,11 @@ class Menu(ModuleElement):
         verbose_name_plural = _('menu items')
         ordering = ['sequence', 'id']
 
+    class Extra:
+        field_groups = {
+            'list_fields': ('name', 'parent', 'action', 'image', 'sequence')
+        }
+
     def __str__(self):
         return self.get_full_name()
 
@@ -43,7 +48,8 @@ class Menu(ModuleElement):
         while parent:
             parents.insert(0, parent.name)
             parent = parent.parent
-        return '/'.join(parents)
+        return ' / '.join(parents)
+
     def set_full_name(self, path):
         cls = self.__class__
         menu = None
@@ -58,6 +64,7 @@ class Menu(ModuleElement):
             if not menu:
                 menu = cls.objects.create(name=item.replace('\\', '/'), parent=parent, module_id=self.module_id)
         self.parent = menu
+
     full_name = property(get_full_name, set_full_name)
 
     ## Auto create model form action for target menu item

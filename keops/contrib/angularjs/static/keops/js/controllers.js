@@ -1,2 +1,0 @@
-var TabDemo = function ($scope) {
-};

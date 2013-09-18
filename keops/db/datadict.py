@@ -1,5 +1,6 @@
 # This module implements ADD (Active Data Dictionary) on Django default classes
 # Sorry! Monkey patch is the only way to do this for now
+import copy
 from django.db import models, connections, router, transaction, DatabaseError
 from django import forms
 from django.utils.translation import ugettext_lazy as _
@@ -11,12 +12,12 @@ dd_items = {
     'display_expression': None,
     'status_field': None, # main model status field representation
     'field_groups': {
-        'display_fields': [],
-        'edit_fields': [],
-        'print_fields': [],
-        'list_fields': [],
-        'search_fields': [],
-        'filter_fields': [],
+        'display_fields': None,
+        'edit_fields': None,
+        'print_fields': None,
+        'list_fields': None,
+        'search_fields': None,
+        'filter_fields': None,
     },
 
     # Events
@@ -62,12 +63,17 @@ class ModelBase(object):
         # Add Extra class
         extra = getattr(new_class, 'Extra', None)
         if extra:
-            for d, v in dd_items.copy().items():
-                if not hasattr(extra, d):
-                    setattr(extra, d, v)
+            base = extra
         else:
-            extra = type('Extra', (object,), dd_items.copy())
+            base = object
+
+        if not 'Extra' in attrs:
+            extra = type('Extra', (base,), {})
             new_class.add_to_class('Extra', extra)
+
+        for d, v in dd_items.items():
+            if not hasattr(extra, d):
+                setattr(extra, d, copy.copy(v))
 
         # Add Admin meta class to _admin model attribute
         new_class.add_to_class('_admin', ModelAdmin(admin))
@@ -86,6 +92,12 @@ class ModelBase(object):
                 if isinstance(f, models.ForeignKey) and not fk:
                     fk = (f.name,)
             extra.display_expression = extra.display_expression or fk
+
+        if not extra.field_groups.get('list_fields'):
+            extra.field_groups['list_fields'] = [
+                f.name for f in new_class._meta.fields \
+                if not isinstance(f, (models.AutoField, models.ManyToManyField)) and\
+                getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
 
         # Auto detect status_field
         if extra.status_field is None:

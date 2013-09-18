@@ -1,4 +1,4 @@
-<table class="data-grid">
+<table class="data-grid" infinite-scroll="list.nextPage('{{ model_name }}')" infinite-scroll-distance="1">
     <thead>
         <tr>
             {% for field in fields %}
@@ -7,5 +7,10 @@
         </tr>
     </thead>
     <tbody>
+        <tr ng-repeat="item in list.items">
+            {% for field in list_display %}
+            <td>{{ field }}</td>
+            {% endfor %}
+        </tr>
     </tbody>
 </table>

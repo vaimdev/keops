@@ -78,7 +78,7 @@ def grid(request):
     get_val = lambda x: '' if x is None else x
     fields = ['pk'] + fields
     rows = [{f: smart_text(get_val(getattr(row, f))) for f in fields} for row in queryset]
-    data = {'items': rows, 'total': queryset.count()}
+    data = {'items': rows, 'total': queryset.count(), 'fields': fields}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def _read(context, using):

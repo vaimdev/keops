@@ -199,6 +199,16 @@ body {
     cursor: pointer;
 }
 
+#keops-app .data-grid td {
+    height: 22px;
+    padding-left: 8px;
+    cursor: pointer;
+}
+
+#keops-app .data-grid tr:hover {
+    background-color: #eaf2ff;
+}
+
 #keops-app .form-view {
     margin: 16px 5px 0 10px;
 }
