@@ -72,14 +72,14 @@ class ModelBase(object):
         # Add Admin meta class to _admin model attribute
         new_class.add_to_class('_admin', ModelAdmin(admin))
 
-        new_class._meta._log_fields = [f.name for f in new_class._meta.concrete_fields if not f.primary_key] +\
-            [f.attname for f in new_class._meta.concrete_fields\
+        new_class._meta._log_fields = [f.name for f in new_class._meta.fields if not f.primary_key] +\
+            [f.attname for f in new_class._meta.fields\
              if isinstance(f, models.ForeignKey) and not f.primary_key]
 
         # Auto detect display_expression
         if extra.display_expression is None:
             fk = None
-            for f in new_class._meta.concrete_fields:
+            for f in new_class._meta.fields:
                 if isinstance(f, models.CharField):
                     extra.display_expression = (f.name,)
                     break
@@ -277,7 +277,7 @@ class Model(object):
     # Monkey patch
     models.Model.__init__ = __init__
     models.Model.delete = delete
-    models.Model.save = save
-    models.Model._save_table = _save_table
-    models.Model.__setattr__ = __setattr__
+    #models.Model.save = save
+    #models.Model._save_table = _save_table
+    #models.Model.__setattr__ = __setattr__
     models.Model.__str__ = __str__

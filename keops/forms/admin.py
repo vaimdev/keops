@@ -2,9 +2,9 @@ from collections import OrderedDict
 import json
 from django.utils import six
 from django import forms
-from keops.forms import extjs
+from keops.utils.html import *
+from keops.contrib.angularjs import form
 from .forms import View
-from django.contrib.contenttypes import generic
 
 class FieldLine(object):
     def __init__(self, form, fields):
@@ -13,7 +13,7 @@ class FieldLine(object):
     
     def __iter__(self):
         for field in self.fields:
-            yield (field, self.form.widgets[field])
+            yield (field, self.form.get_formfield(field))
 
 class Fieldset(object):
     def __init__(self, name, form, fieldset):
@@ -50,8 +50,8 @@ class ModelAdminBase(type):
             
 class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     admin_default = False
-    template_name = 'keops/forms/model_form.js'
-    list_template = 'keops/forms/list_form.js'
+    template_name = 'keops/forms/model_form.html'
+    list_template = 'keops/forms/list_form.html'
     fields = ()
     exclude = ()
     readonly_fields = ()
@@ -59,7 +59,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     pages = ()
     search_fields = ()
     columns = 2
-    widgets = {}
+    form_fields = {}
+    bound_fields = {}
     formfield_overrides = None
 
     toolbar_actions = ['create', 'read', 'update', 'delete', 'print', 'delete', 'search']
@@ -73,12 +74,12 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def __init__(self, admin=None):
         self.admin = admin
         self._prepared = False
+        self._form = None
+        self._instance = None
         if self.model:
             if self.admin_default:
                 self.contribute_to_class(self.model, '_admin')
-            else:
-                self._prepare()
-        
+
     def contribute_to_class(self, cls, name):
         cls._admin = self
         self.model = cls
@@ -89,9 +90,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             for attr in attrs:
                 setattr(self, attr, dsgn_attrs[attr])
             del self.admin
-        self._prepare()
-        
+
     def _prepare(self):
+        from django.contrib.contenttypes import generic
         extra = getattr(self.model, 'Extra', None)
         if extra:
             if not self.fields and extra.field_groups and extra.field_groups.get('display_fields', None):
@@ -101,8 +102,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if self.model._meta.abstract:
             return
         from django.db import models
-        model_fields = self.model._meta.fields + self.model._meta.virtual_fields
+        model_fields = self.model._meta.concrete_fields + self.model._meta.many_to_many + self.model._meta.virtual_fields
         self.model_fields = model_fields
+        print(model_fields)
         if not self.fields:
             self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f, (
                 models.AutoField, generic.GenericForeignKey)) and\
@@ -149,26 +151,32 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def _prepare_form(self):
         if self._prepared:
             return
+        self._prepare()
         for field in self.model_fields:
-            if not field.name in self.fields or isinstance(field, generic.GenericForeignKey):
+            if not field.name in self.fields:
                 continue
-            if not field.name in self.widgets:
-                self.widgets[field.name] = getattr(field, 'custom_attrs', {}).get('widget', None) or field.formfield()
+            if not field.name in self.form_fields:
+                self.form_fields[field.name] = getattr(field, 'custom_attrs', {}).get('widget', None) or field.formfield()
         self._prepared = True
 
     def __iter__(self):
         self._prepare_form()
         for page, fieldsets in self.pages:
             yield TabPage(page, self, fieldsets)
-            
-    def get_form(self, request):
-        return forms.models.modelform_factory(self.model, fields=self.fields, exclude=self.exclude, widgets=self.widgets)
-    
+
+    def as_table(self):
+        s = TABLE()
+        return
+
+    @property
+    def form(self):
+        if not self._form:
+            self._form = forms.models.modelform_factory(self.model)
+        return self._form
+
     def _prepare_context(self, request, context):
         context.update({
             'model': self.model,
-            'json': json,
-            'extjs': extjs,
             'model_name': '%s.%s' % (self.model._meta.app_label, self.model._meta.model_name),
         })
         
@@ -181,8 +189,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         return v(request, **kwargs)
     
     def _prepare_change_view(self, request, context):
-        context['items'] = json.dumps(extjs.get_form_items(self))
-        context['fields'] = json.dumps(['pk'] + list(self.fields))
+        context['form_view'] = form.form_str(self)
+        #context['fields'] = json.dumps(['pk'] + list(self.fields))
         pk = request.GET.get('pk')
         if pk:
             context['pk'] = pk
@@ -190,8 +198,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
     def list_view(self, request, **kwargs):
         self._prepare_form()
-        kwargs['items'] = json.dumps([extjs.grid_column(name, self.get_formfield(name)) for name in self.list_display])
-        kwargs['fields'] = json.dumps(self.list_display)
+        #kwargs['items'] = json.dumps([extjs.grid_column(name, self.get_formfield(name)) for name in self.list_display])
+        #kwargs['fields'] = json.dumps(self.list_display)
+        kwargs['fields'] = [self.get_formfield(f) for f in self.list_display]
         self._prepare_context(request, kwargs)
         kwargs.setdefault('pagesize', 50)
         return self.render(request, self.list_template, kwargs)
@@ -209,14 +218,14 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
     def get_formfield(self, field):
         self._prepare_form()
-        if not field in self.widgets:
+        if not field in self.form_fields:
             f = self.model._meta.get_field(field)
             if f:
                 w = f.formfield()
-                self.widgets[field] = w
+                self.form_fields[field] = w
                 lbl = w.label
             else:
                 lbl = field
                 w = forms.CharField(label=lbl)
-            self.widgets[field] = w
-        return self.widgets[field]
+            self.form_fields[field] = w
+        return self.form_fields[field]

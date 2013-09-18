@@ -79,12 +79,11 @@ def DecimalField(*args, **options):
     return models.DecimalField(*args, **options)
 
 # Change ForeignKey fields for business model
-def ForeignKey(to, to_field=None, rel_class=models.ManyToOneRel,
-               db_constraint=True, **options):
+def ForeignKey(to, to_field=None, rel_class=models.ManyToOneRel, **options):
     #list_display = options.pop('list_display', [])
     # Protect foreign key delete cascade
     options.setdefault('on_delete', models.PROTECT)
-    f = models.ForeignKey(to=to, to_field=to_field, rel_class=rel_class, db_constraint=db_constraint, **options)
+    f = models.ForeignKey(to=to, to_field=to_field, rel_class=rel_class, **options)
     #f.list_display = list_display
     return f
 

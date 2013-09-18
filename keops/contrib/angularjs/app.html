@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="keopsApp">
+<head>
+    <title>Keops</title>
+    <link rel="stylesheet" href="static/keops/css/app.css">
+    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+    <script src="static/js/angular.js"></script>
+    <script src="static/js/angular-route.js"></script>
+    <script src="static/js/ui-bootstrap-tpls-0.6.0.min.js"></script>
+    <script src="static/keops/js/app.js"></script>
+</head>
+<body>
+    <div id="keops-app">
+        <table id="keops-app-table">
+            <tr>
+                <td colspan="2" id="keops-app-header">
+                    <img src="../../static/keops/images/logo.png" id="keops-app-logo">
+                    <div id="keops-app-site-name">
+                        <span class="keops-site-name">COMPANY NAME</span>
+                    </div>
+                    <div id="keops-app-menu">
+                        <ul>
+                            <il><a href="#">System</a></il>
+                            <il><a href="#">Administration</a></il>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td id="keops-app-left-menu">
+                    <h4><span>SYSTEM</span></h4>
+                    <ul>
+                        <il>Sub-menu 1</il>
+                        <div>
+                            <a href="#">Menu 1.1</a>
+                            <a href="#">Menu 1.2</a>
+                            <a href="#">Menu 1.3</a>
+                        </div>
+                        <il>Sub-menu 2</il>
+                        <div>
+                            <a href="#">Menu 2.1</a>
+                            <a href="#">Menu 2.2</a>
+                            <div>
+                                <a class="menu-level-3" href="#">Menu 2.2.1</a>
+                            </div>
+                            <a href="#">Menu 2.3</a>
+                            <div>
+                                <a class="menu-level-3" href="#">Menu 2.3.1</a>
+                                <div>
+                                    <a class="menu-level-4" href="#">Menu 2.3.1.1 (with long menu text name)</a>
+                                </div>
+                            </div>
+                            <a href="#">Menu 2.4</a>
+                        </div>
+                    </ul>
+                </td>
+                <td id="keops-app-content-panel">
+                    <div>
+                        Value: <input ng-model='input1'>
+                    </div>
+                    <div>
+                        Typed value: {{input1 || 'New Record'}}
+                    </div>
+                    <div>
+                        <tabset>
+                            <tab heading="tab 1">
+                                <span>test 1</span>
+                            </tab>
+                            <tab heading="tab 2">
+                                <span>test 2</span>
+                            </tab>
+                        </tabset>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

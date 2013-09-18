@@ -30,6 +30,9 @@ class Menu(ModuleElement):
     def __str__(self):
         return self.get_full_name()
 
+    def get_absolute_url(self):
+        return 'action/%d' % self.action_id
+
     @property
     def is_leaf(self):
         return self.__class__.objects.filter(parent_id=self.pk).count() == 0

@@ -1,0 +1,19 @@
+<table style="width: 100%;">
+    <tr>
+        <td class="form-header">
+            <table style="width: 100%; height: 70px">
+                <tr>
+                    <td class="form-title"><b>{{ form.title|capfirst }}</b></td>
+                    <td style="text-align: right;">
+                        <input placeholder="{{ _("Search") }}">
+                        <div class="btn-group" style="right: 14px; position: absolute;">
+                            <a type="button" class="btn active">{{ _("list")|capfirst }}</a>
+                            <a type="button" class="btn" href="#action/{{ action.pk }}/?view_type=form">{{ _("form")|capfirst }}</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% include "keops/forms/grid.html" %}

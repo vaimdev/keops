@@ -21,6 +21,7 @@ FILE_FIELD_MODEL = 'base.file'
 
 INSTALLED_APPS = [
     'keops',
+    'keops.contrib.angularjs',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.contenttypes',

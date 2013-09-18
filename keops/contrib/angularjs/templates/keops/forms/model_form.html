@@ -1,0 +1,19 @@
+<table style="width: 100%;">
+    <tr>
+        <td class="form-header">
+            <table style="width: 100%; height: 70px">
+                <tr>
+                    <td class="form-title"><b><a href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a></b> / {% verbatim %}{{form_label}}{% endverbatim %}</td>
+                    <td style="text-align: right;">
+                        <input placeholder="{{ _("Search") }}">
+                        <div class="btn-group" style="right: 14px; position: absolute;">
+                            <a type="button" class="btn" href="#action/{{ action.pk }}?view_type=list">{{ _("list")|capfirst }}</a>
+                            <a type="button" class="btn active">{{ _("form")|capfirst }}</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{{ form_view|safe }}

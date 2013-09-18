@@ -1,0 +1,264 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    overflow-y: scroll;
+    padding: 0;
+}
+
+#keops-app {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#keops-app-header {
+    border-top: 2px solid #C71F27;
+    height: 69px;
+	table-layout: fixed;
+	border-spacing: 0;
+    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	text-shadow: 0 1px 1px #fff;
+    background-color: rgb(252, 252, 252);
+}
+
+#keops-app-site-name {
+    height: 25px;
+	padding: 5px 10px 0px 80px;
+	text-shadow: none;
+}
+
+#keops-app-logo {
+    position: absolute;
+}
+
+#keops-app-menu {
+	padding: 0px 0px 0px 80px;
+    border-top: solid 1px rgb(202, 202, 202);
+    border-bottom: solid 1px rgb(202, 202, 202);
+    color: #555;
+	background-color: #eaeaea;
+    background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+	background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+	background-image: linear-gradient(#fafafa, #eaeaea);
+	background-repeat: repeat-x;
+    height: 38px;
+}
+
+#keops-app-menu ul {
+	float: left;
+	margin: 0;
+	padding: 0;
+	border-right: #F7F7F7 solid 1px;
+	border-left: #D0D0D0 solid 1px;
+	height: 39px;
+	line-height: 39px;
+}
+
+#keops-app-menu il {
+	list-style: none;
+	float: left;
+	border-right: #D0D0D0 solid 1px;
+	border-left: #F7F7F7 solid 1px;
+}
+
+#keops-app-menu il.aHover {
+	background: #F9F8F8;
+}
+
+#keops-app-menu a {
+	color: rgb(92, 92, 92);
+	display: block;
+	padding: 0 8px 0 8px;
+	height: 38px;
+}
+
+#keops-app-menu a:hover {
+	background: #F9F8F8;
+    text-decoration: none;
+}
+
+#keops-app-menu a:active {
+    backgroud: rgb(231, 231, 231);
+}
+
+.keops-site-name {
+    font-size: 11px;
+}
+
+#keops-app-table {
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#keops-app-table td {
+    text-align: left;
+    vertical-align: top;
+}
+
+#keops-app-left-menu {
+    width: 220px;
+    background-color: rgb(252, 252, 252);
+	box-shadow: 0 3px 0 rgba(255, 255, 255, 0.4), 0 0 5px rgba(0, 0, 0, 0.1);
+    border-right: solid 1px rgb(221, 221, 221);
+	text-shadow: 0 1px 1px #fff;
+}
+
+#keops-app-left-menu h4 {
+    font-weight: bold;
+    font-size: 12px;
+    padding: 5px 3px 0 0;
+    background-color: rgb(252, 252, 252);
+}
+
+#keops-app-left-menu h4 span {
+    margin: 3px 8px 0 10px;
+    padding-bottom: 5px;
+    display: block;
+    border-bottom: solid 1px rgb(221, 221, 221);
+}
+
+#keops-app-left-menu ul {
+    margin: 0;
+}
+
+#keops-app-left-menu il {
+    display: block;
+    padding: 12px 0 5px 0;
+    margin-left: 16px;
+    font-weight: bold;
+}
+
+#keops-app-left-menu a {
+    display: block;
+    padding: 5px 0 5px 25px;
+    text-decoration: none;
+}
+
+#keops-app-left-menu a:hover {
+    background-color: #e7e7e7;
+    background-image: -moz-linear-gradient(#fafafa, #e7e7e7);
+	background-image: -webkit-linear-gradient(#fafafa, #e7e7e7);
+	background-image: linear-gradient(#fafafa, #e7e7e7);
+	background-repeat: repeat-x;
+    margin: -1px;
+    border: 1px solid #cacaca;
+}
+
+#keops-app-left-menu .menu-level-3 {
+    padding-left: 35px;
+}
+
+#keops-app-left-menu .menu-level-4 {
+    padding-left: 45px;
+}
+
+#keops-app-left-menu .menu-level-5 {
+    padding-left: 55px;
+}
+
+#keops-app .form-header {
+    width: 100%;
+    background-color: rgb(252, 252, 252);
+    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-bottom: solid 1px rgb(221, 221, 221);
+
+    background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+	background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+	background-image: linear-gradient(#fafafa, #eaeaea);
+	background-repeat: repeat-x;
+
+    padding: 5px 10px 5px 10px;
+}
+
+#keops-app .data-grid {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#keops-app .data-grid thead {
+    border-top: 1px solid #f9f9f9;
+    border-bottom: 2px solid #cacaca;
+    padding: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+#keops-app .data-grid th {
+    height: 24px;
+    background-color: #f8f8f8;
+    border-left: 1px solid #e1e1e1;
+    padding-left: 8px;
+    cursor: pointer;
+}
+
+#keops-app .form-view {
+    margin: 16px 5px 0 10px;
+}
+
+#keops-app .form-view table {
+    width: 100%;
+    table-layout: fixed;
+    display: inline-block;
+}
+
+#keops-app .form-view table td {
+    vertical-align: top;
+}
+
+#keops-app .form-view .label-cell {
+    width: 1%;
+    max-width: 220px;
+    border-right: 1px solid #dddddd;
+    padding-right: 8px;
+}
+
+#keops-app .form-view .field-cell {
+    margin: 0;
+    width: 99%;
+    padding: 0 20px 4px 10px;
+}
+
+.label-cell label {
+    font-weight: bold;
+    min-width: 120px;
+}
+
+.field-cell .char-field {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.form-view .field-container {
+    display: block !important;
+    table-layout: fixed;
+    margin: 0 -10px 0 -10px;
+}
+
+.form-view .field-container .field-cell {
+    width: 50% !important;
+}
+
+#keops-app .form-view > .tabbable {
+    margin-top: 15px;
+}
+
+.nav {
+    cursor: pointer;
+}
+
+#keops-app table {
+    border-collapse: separate;
+}
+
+#keops-app .form-title {
+    font-size: 14px;
+	text-shadow: 0 1px 1px #fff;
+}
