@@ -7,7 +7,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="item in list.items">
+        <tr ng-repeat="item in list.items" ng-class-odd="'data-grid-row-odd'" ng-class-even="'data-grid-row-even'">
             {% for field in list_display %}
             <td>{{ field }}</td>
             {% endfor %}

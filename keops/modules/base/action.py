@@ -1,4 +1,3 @@
-
 import json
 from django.utils.translation import ugettext_lazy as _
 from keops.db import models
@@ -14,7 +13,8 @@ class Action(ModuleElement):
     context = models.TextField(_('context'))
 
     class Meta:
-        verbose_name = _('actions')
+        verbose_name = _('action')
+        verbose_name_plural = _('actions')
 
     class Extra:
         field_groups = {

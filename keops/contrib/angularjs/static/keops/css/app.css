@@ -181,6 +181,7 @@ body {
 #keops-app .data-grid {
     width: 100%;
     border-collapse: collapse;
+    text-shadow: 0 1px 1px #fff;
 }
 
 #keops-app .data-grid thead {
@@ -203,6 +204,14 @@ body {
     height: 22px;
     padding-left: 8px;
     cursor: pointer;
+}
+
+#keops-app .data-grid-row-even {
+    background-color: #ffffff;
+}
+
+#keops-app .data-grid-row-odd {
+    background-color: #f7f7f7;
 }
 
 #keops-app .data-grid tr:hover {
