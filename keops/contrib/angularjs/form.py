@@ -27,7 +27,11 @@ def get_field(name, field):
     label = LABEL(str(field.label), attrs={'for': _id})
     attrs = get_widget(field)
     tag = attrs.pop('tag', 'input')
-    return TD(label, attrs={'class': 'label-cell'}), TD(TAG(tag=tag, id=_id, name=name, attrs={'ng-model': 'form.item.' + name}, **attrs), attrs={'class': 'field-cell'})
+    return TD(label, attrs={'class': 'label-cell'}), TD(
+        TAG(tag=tag, id=_id, name=name, attrs={'ng-show': 'form.write', 'ng-model': 'form.item.' + name}, **attrs),
+        SPAN('{{form.item.%s}}' % name, attrs={'ng-show': '!form.write'}),
+        attrs={'class': 'field-cell'}
+    )
 
 def get_formfields(form):
     for k, v in form.widgets.items():

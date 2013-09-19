@@ -71,6 +71,7 @@ keopsApp.factory('Form', function($http, SharedData){
         this.start = -1;
         this.total = null;
         this.loaded = false;
+        this.write = false;
         this.url = "/db/read/?limit=1&model=";
         if (SharedData.list) {
             this.start = SharedData.list.index - 1;

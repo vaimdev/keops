@@ -24,6 +24,9 @@ def HTML(*args, **kwargs):
 def BODY(*args, **kwargs):
     return TAG('body', *args, **kwargs)
 
+def SPAN(*args, **kwargs):
+    return TAG('span', *args, **kwargs)
+
 def BUTTON(*args, **kwargs):
     value = kwargs.pop('value', '')
     value = kwargs.pop('_value', value)
