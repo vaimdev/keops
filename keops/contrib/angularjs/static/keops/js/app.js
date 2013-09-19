@@ -1,4 +1,4 @@
-var keopsApp = angular.module('keopsApp', ['ngRoute', 'ui.bootstrap', 'infinite-scroll']).config(
+var keopsApp = angular.module('keopsApp', ['ngRoute', 'ui.bootstrap', 'infinite-scroll', 'ui.keops']).config(
     function($routeProvider, $locationProvider) {
             $routeProvider.
                     when('/action/:id', {
@@ -88,7 +88,6 @@ keopsApp.factory('Form', function($http, SharedData){
         $http.get(url).success(function(data) {
             if (this.total === null) this.total = data.total;
             this.item = data.items[0];
-            console.log(this.item);
             this.loading = false;
             this.loaded = this.start == this.total - 1;
         }.bind(this));

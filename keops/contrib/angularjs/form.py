@@ -15,6 +15,8 @@ def get_widget(field):
         d['type'] = 'checkbox'
     elif isinstance(field, forms.EmailField):
         d['type'] = 'email'
+    elif isinstance(field, forms.ModelChoiceField):
+        d['tag'] = 'input combobox'
 
     if not isinstance(field, forms.BooleanField):
         d['class'] = 'char-field'
@@ -23,7 +25,9 @@ def get_widget(field):
 def get_field(name, field):
     _id = 'id-' + name
     label = LABEL(str(field.label), attrs={'for': _id})
-    return TD(label, attrs={'class': 'label-cell'}), TD(INPUT(id=_id, name=name, attrs={'ng-model': 'form.item.' + name}, **get_widget(field)), attrs={'class': 'field-cell'})
+    attrs = get_widget(field)
+    tag = attrs.pop('tag', 'input')
+    return TD(label, attrs={'class': 'label-cell'}), TD(TAG(tag=tag, id=_id, name=name, attrs={'ng-model': 'form.item.' + name}, **attrs), attrs={'class': 'field-cell'})
 
 def get_formfields(form):
     for k, v in form.widgets.items():

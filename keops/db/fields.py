@@ -34,8 +34,11 @@ class Field(object):
 
     def __init__(self, *args, **kwargs):
         # Change default field db null to false
-        if not isinstance(self, models.BooleanField):
-            kwargs.setdefault('null', not (kwargs.get('primary_key', False) or isinstance(self, models.OneToOneField)))
+        kwargs.setdefault('null', not (kwargs.get('primary_key', False) or isinstance(self, models.OneToOneField)))
+        kwargs.setdefault('blank', kwargs['null'])
+        if isinstance(self, models.BooleanField):
+            kwargs.pop('null', None)
+            kwargs.pop('blank', None)
         # Add custom_attrs to field
         self.custom_attrs = kwargs.pop('custom_attrs', {})
         self.readonly = kwargs.pop('readonly', False)

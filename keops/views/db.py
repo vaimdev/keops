@@ -1,3 +1,4 @@
+import datetime
 import json
 from django.utils.translation import ugettext as _
 from django.db import models
@@ -32,10 +33,10 @@ def _get_model(context):
 def field_text(value):
     if value is None:
         return ''
-    elif isinstance(value, models.Model):
-        return [{'id': value.pk, 'text': str(value)}]
-    elif hasattr(value, '__call__'):
+    elif callable(value):
         return value()
+    elif isinstance(value, (int, str, float)):
+        return value
     else:
         return str(value)
 
@@ -121,7 +122,7 @@ def lookup(request):
         queryset = model.objects.all()
     else:
         queryset = search_text(model.objects.all(), query)
-    data = {'items': [{'id': obj.pk, 'text': str(obj)} for obj in queryset[start:limit]], 'total': queryset.count()}
+    data = {'items': [{'value': obj.pk, 'label': str(obj)} for obj in queryset[start:limit]], 'total': queryset.count()}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def _save(context, using):
