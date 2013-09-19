@@ -7,10 +7,11 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="item in list.items" ng-class-odd="'data-grid-row-odd'" ng-class-even="'data-grid-row-even'">
+        <tr ng-repeat="item in list.items" ng-class-odd="'data-grid-row-odd'" ng-class-even="'data-grid-row-even'" ng-click="itemClick('action/{{ action.pk }}/', 'view_type=form&pk={% verbatim %}{{item.pk}}{% endverbatim %}', $index)">
             {% for field in list_display %}
             <td>{{ field }}</td>
             {% endfor %}
         </tr>
     </tbody>
 </table>
+<div ng-show="list.loading">{{ _('loading...')|capfirst }}</div>

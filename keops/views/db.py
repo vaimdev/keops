@@ -71,6 +71,11 @@ def grid(request):
     fields = fields or [f.name for f in model._meta.concrete_fields if not f.primary_key]
     start = int(request.GET.get('start', '0'))
     limit = int(request.GET.get('limit', '50')) + start # settings
+    total = request.GET.get('total', False)
+    if total:
+        total = queryset.all().count()
+    else:
+        total = None
     queryset = queryset.all()[start:limit]
 
     # TODO Check content type permissions permissions
@@ -78,7 +83,7 @@ def grid(request):
     get_val = lambda x: '' if x is None else x
     fields = ['pk'] + fields
     rows = [{f: smart_text(get_val(getattr(row, f))) for f in fields} for row in queryset]
-    data = {'items': rows, 'total': queryset.count(), 'fields': fields}
+    data = {'items': rows, 'total': total}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def _read(context, using):

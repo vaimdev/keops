@@ -1,15 +1,35 @@
+<div ng-controller="FormController" ng-init="form.nextPage('{{ model_name }}')">
 <table style="width: 100%;">
     <tr>
         <td class="form-header">
             <table style="width: 100%; height: 70px">
                 <tr>
-                    <td class="form-title"><b><a href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a></b> / {% verbatim %}{{form_label}}{% endverbatim %}</td>
-                    <td style="text-align: right;">
-                        <input placeholder="{{ _("Search") }}">
-                        <div class="btn-group" style="right: 14px; position: absolute;">
-                            <a type="button" class="btn" href="#action/{{ action.pk }}?view_type=list">{{ _("list")|capfirst }}</a>
-                            <a type="button" class="btn active">{{ _("form")|capfirst }}</a>
-                        </div>
+                    <td class="form-title"><b><a href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a></b> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</td>
+                    <td style="width: 300px;">
+                        <table style="float: right">
+                            <tr>
+                                <td style="text-align: right;" colspan="3">
+                                    <input placeholder="{{ _("search")|capfirst }}">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="vertical-align: bottom;">
+                                        <label class="form-data-info">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</label>
+                                </td>
+                                <td style="padding-left: 10px;">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn" ng-click="form.prevPage('{{ model_name }}')">&lt;</button>
+                                        <button type="button" class="btn" ng-click="form.nextPage('{{ model_name }}')">&gt;</button>
+                                    </div>
+                                </td>
+                                <td style="padding-left: 30px;">
+                                    <div class="btn-group">
+                                        <a type="button" class="btn" href="#action/{{ action.pk }}/?view_type=list">{{ _("list")|capfirst }}</a>
+                                        <a type="button" class="btn active">{{ _("form")|capfirst }}</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
             </table>
@@ -17,3 +37,4 @@
     </tr>
 </table>
 {{ form_view|safe }}
+</div>

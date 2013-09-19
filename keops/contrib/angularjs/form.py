@@ -23,7 +23,7 @@ def get_widget(field):
 def get_field(name, field):
     _id = 'id-' + name
     label = LABEL(str(field.label), attrs={'for': _id})
-    return TD(label, attrs={'class': 'label-cell'}), TD(INPUT(id=_id, name=name, attrs={'ng-model': name}, **get_widget(field)), attrs={'class': 'field-cell'})
+    return TD(label, attrs={'class': 'label-cell'}), TD(INPUT(id=_id, name=name, attrs={'ng-model': 'form.item.' + name}, **get_widget(field)), attrs={'class': 'field-cell'})
 
 def get_formfields(form):
     for k, v in form.widgets.items():
