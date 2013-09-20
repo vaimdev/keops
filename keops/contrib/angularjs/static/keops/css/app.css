@@ -275,10 +275,6 @@ body {
     margin-top: 15px;
 }
 
-.keops-form-info {
-    white-space: nowrap;
-}
-
 .nav {
     cursor: pointer;
 }
@@ -294,4 +290,5 @@ body {
 
 #keops-app .form-data-info {
 	text-shadow: 0 1px 1px #fff;
+    font-size: 11px;
 }

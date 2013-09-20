@@ -14,8 +14,7 @@ ui.directive('combobox', function() {
                              data: { query: request.term },
                              dataType: "json",
                              success: function() {
-                                 var data = arguments[0].items;
-                                 return response(data);
+                                 return response(arguments[0]);
                              },
                              error: function () {
                                  response([]);

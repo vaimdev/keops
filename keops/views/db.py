@@ -121,8 +121,9 @@ def lookup(request):
     if query == '':
         queryset = model.objects.all()
     else:
-        queryset = search_text(model.objects.all(), query)
-    data = {'items': [{'value': obj.pk, 'label': str(obj)} for obj in queryset[start:limit]], 'total': queryset.count()}
+        queryset = model.objects.all()
+        #queryset = search_text(model.objects.all(), query)
+    data = [{'value': obj.pk, 'label': str(obj)} for obj in queryset[start:limit]]
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def _save(context, using):

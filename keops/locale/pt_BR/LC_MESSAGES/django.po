@@ -22,6 +22,12 @@ msgstr "Disponível"
 msgid "Selected"
 msgstr "Selecionado"
 
+msgid "yes"
+msgstr "sim"
+
+msgid "no"
+msgstr "não"
+
 msgid "create"
 msgstr "criar"
 

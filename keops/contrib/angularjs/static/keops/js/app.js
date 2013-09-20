@@ -111,6 +111,16 @@ keopsApp.factory('Form', function($http, SharedData){
     return Form;
 });
 
-keopsApp.controller('FormController', function($scope, Form) {
+keopsApp.controller('FormController', function($scope, $http, Form, limitToFilter) {
     $scope.form = new Form();
+
+    $scope.lookupData = function (model, query) {
+        var r = $http({ method: 'GET', url: '/db/lookup/', params: { model: model, query: query } }).then(
+            function (response) {
+                console.log(response);
+                return limitToFilter(response.data.items, 15);
+            });
+        console.log(r);
+        return r;
+    };
 });

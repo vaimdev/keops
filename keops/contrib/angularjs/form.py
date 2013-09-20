@@ -1,35 +1,40 @@
 from django.utils.translation import ugettext as _
 from django.utils import formats
+from django.utils.text import capfirst
 from django.core.urlresolvers import reverse
 from django import forms
 import keops.forms.fields
 from keops.utils.html import *
 
-def get_widget(field):
+def get_widget(field, name=None):
     d = {}
+    s = {}
     if field.required:
         d['ng-required'] = 1
     if isinstance(field, forms.IntegerField):
         d['type'] = 'number'
     elif isinstance(field, forms.BooleanField):
         d['type'] = 'checkbox'
+        s['ng-bind'] = 'form.item.' + name + " ? '%s': '%s'" % (capfirst(_('yes')), capfirst(_('no')))
     elif isinstance(field, forms.EmailField):
         d['type'] = 'email'
     elif isinstance(field, forms.ModelChoiceField):
-        d['tag'] = 'input combobox'
+        meta = field.queryset.model._meta
+        d['tag'] = "input combobox"
+        d['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
 
     if not isinstance(field, forms.BooleanField):
         d['class'] = 'char-field'
-    return d
+    return d, s
 
 def get_field(name, field):
     _id = 'id-' + name
     label = LABEL(str(field.label), attrs={'for': _id})
-    attrs = get_widget(field)
+    attrs, span = get_widget(field, name)
     tag = attrs.pop('tag', 'input')
     return TD(label, attrs={'class': 'label-cell'}), TD(
         TAG(tag=tag, id=_id, name=name, attrs={'ng-show': 'form.write', 'ng-model': 'form.item.' + name}, **attrs),
-        SPAN('{{form.item.%s}}' % name, attrs={'ng-show': '!form.write'}),
+        SPAN('{{form.item.%s}}' % name, attrs={'ng-show': '!form.write'}, **span),
         attrs={'class': 'field-cell'}
     )
 
