@@ -18,8 +18,9 @@
                     <td style="width: 300px;">
                         <table style="float: right">
                             <tr>
-                                <td style="text-align: right;" colspan="3">
-                                    <input ng-show="!form.write" placeholder="{{ _("search")|capfirst }}">
+                                <td ng-show="!form.write" style="text-align: right;" colspan="3">
+                                    <input placeholder="{{ _("search")|capfirst }}" ng-model="searchField">
+                                    <a style="margin-bottom: 9px;" class="btn" ng-click="search('action/{{ action.pk }}/', 'view_type=list&query=' + searchField)">&gt;</a>
                                 </td>
                             </tr>
                             <tr>

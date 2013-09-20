@@ -190,7 +190,6 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     
     def _prepare_change_view(self, request, context):
         context['form_view'] = form.form_str(self)
-        #context['fields'] = json.dumps(['pk'] + list(self.fields))
         pk = request.GET.get('pk')
         if pk:
             context['pk'] = pk
@@ -198,8 +197,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
     def list_view(self, request, **kwargs):
         self._prepare_form()
-        #kwargs['items'] = json.dumps([extjs.grid_column(name, self.get_formfield(name)) for name in self.list_display])
-        #kwargs['fields'] = json.dumps(self.list_display)
+        kwargs['query'] = request.GET.get('query', '')
         kwargs['fields'] = [self.get_formfield(f) for f in self.list_display]
         kwargs['list_display'] = ['{{item.%s}}' % f for f in self.list_display]
         self._prepare_context(request, kwargs)

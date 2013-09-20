@@ -5,6 +5,7 @@ var keopsApp = angular.module('keopsApp', ['ngRoute', 'ui.bootstrap', 'infinite-
                             templateUrl: function(params) {
                                 if (params.view_type) var s = '&view_type=' + params.view_type
                                 else var s = '';
+                                if (params.query) s += '&query=' + params.query;
                                 return '?action=' + params.id + s;
                             }
                     });
@@ -111,16 +112,18 @@ keopsApp.factory('Form', function($http, SharedData){
     return Form;
 });
 
-keopsApp.controller('FormController', function($scope, $http, Form, limitToFilter) {
+keopsApp.controller('FormController', function($scope, $http, Form, limitToFilter, $location) {
     $scope.form = new Form();
 
     $scope.lookupData = function (model, query) {
-        var r = $http({ method: 'GET', url: '/db/lookup/', params: { model: model, query: query } }).then(
+        return $http({ method: 'GET', url: '/db/lookup/', params: { model: model, query: query } }).then(
             function (response) {
-                console.log(response);
                 return limitToFilter(response.data.items, 15);
             });
-        console.log(r);
-        return r;
+    };
+
+    $scope.search = function (url, query) {
+        console.log(url + query);
+        $location.path(url).search(query);
     };
 });
