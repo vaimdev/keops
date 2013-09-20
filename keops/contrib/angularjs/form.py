@@ -6,9 +6,9 @@ from django import forms
 import keops.forms.fields
 from keops.utils.html import *
 
-def get_widget(field, name=None):
-    d = {}
-    s = {}
+def get_widget(name, field):
+    d = {'tag': 'input'}
+    s = {'tag': 'span', 'ng-bind': 'form.item.' + name}
     if field.required:
         d['ng-required'] = 1
     if isinstance(field, forms.IntegerField):
@@ -22,6 +22,8 @@ def get_widget(field, name=None):
         meta = field.queryset.model._meta
         d['tag'] = "input combobox"
         d['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
+        s['tag'] = 'a'
+        s['href'] = '#'
 
     if not isinstance(field, forms.BooleanField):
         d['class'] = 'char-field'
@@ -30,11 +32,10 @@ def get_widget(field, name=None):
 def get_field(name, field):
     _id = 'id-' + name
     label = LABEL(str(field.label), attrs={'for': _id})
-    attrs, span = get_widget(field, name)
-    tag = attrs.pop('tag', 'input')
+    attrs, span = get_widget(name, field)
     return TD(label, attrs={'class': 'label-cell'}), TD(
-        TAG(tag=tag, id=_id, name=name, attrs={'ng-show': 'form.write', 'ng-model': 'form.item.' + name}, **attrs),
-        SPAN('{{form.item.%s}}' % name, attrs={'ng-show': '!form.write'}, **span),
+        TAG(id=_id, name=name, attrs={'ng-show': 'form.write', 'ng-model': 'form.item.' + name}, **attrs),
+        TAG(attrs={'ng-show': '!form.write'}, **span),
         attrs={'class': 'field-cell'}
     )
 

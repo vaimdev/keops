@@ -19,7 +19,7 @@
                         <table style="float: right">
                             <tr>
                                 <td style="text-align: right;" colspan="3">
-                                    <input placeholder="{{ _("search")|capfirst }}">
+                                    <input ng-show="!form.write" placeholder="{{ _("search")|capfirst }}">
                                 </td>
                             </tr>
                             <tr>
@@ -27,13 +27,13 @@
                                         <label class="form-data-info">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</label>
                                 </td>
                                 <td style="padding-left: 10px;">
-                                    <div class="btn-group">
+                                    <div ng-show="!form.write" class="btn-group">
                                         <button type="button" class="btn" ng-click="form.prevPage('{{ model_name }}')">&lt;</button>
                                         <button type="button" class="btn" ng-click="form.nextPage('{{ model_name }}')">&gt;</button>
                                     </div>
                                 </td>
                                 <td style="padding-left: 30px;">
-                                    <div class="btn-group">
+                                    <div ng-show="!form.write" class="btn-group">
                                         <a type="button" class="btn" href="#action/{{ action.pk }}/?view_type=list">{{ _("list")|capfirst }}</a>
                                         <a type="button" class="btn active">{{ _("form")|capfirst }}</a>
                                     </div>
