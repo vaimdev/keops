@@ -35,7 +35,7 @@
                                 </td>
                                 <td style="padding-left: 30px;">
                                     <div ng-show="!form.write" class="btn-group">
-                                        <a type="button" class="btn" href="#action/{{ action.pk }}/?view_type=list">{{ _("list")|capfirst }}</a>
+                                        <a type="button" class="btn" href="#{{ action.get_absolute_url }}list/">{{ _("list")|capfirst }}</a>
                                         <a type="button" class="btn active">{{ _("form")|capfirst }}</a>
                                     </div>
                                 </td>

@@ -81,6 +81,17 @@ def DecimalField(*args, **options):
     options.setdefault('decimal_places', 4)
     return models.DecimalField(*args, **options)
 
+
+def get_resource_url(field, *args, **kwargs):
+    if not getattr(field, 'resource_url', None):
+        from keops.modules.base import models
+        meta = field.rel.to._meta
+        action = models.Action.objects.get_by_model_name('%s.%s' % (meta.app_label, meta.model_name))
+        field.resource_url = action.get_absolute_url() + 'form/'
+    return field.resource_url
+
+models.ForeignKey.get_resource_url = get_resource_url
+
 # Change ForeignKey fields for business model
 def ForeignKey(to, to_field=None, rel_class=models.ManyToOneRel, **options):
     #list_display = options.pop('list_display', [])

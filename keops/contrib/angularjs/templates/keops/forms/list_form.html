@@ -19,7 +19,7 @@
                                 <td style="float: right;">
                                     <div class="btn-group" style="display: block">
                                         <a type="button" class="btn active">{{ _("list")|capfirst }}</a>
-                                        <a type="button" class="btn" href="#action/{{ action.pk }}/?view_type=form">{{ _("form")|capfirst }}</a>
+                                        <a type="button" class="btn" href="#{{ action.get_absolute_url }}form/">{{ _("form")|capfirst }}</a>
                                     </div>
                                 </td>
                             </tr>

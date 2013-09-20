@@ -157,7 +157,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             if not field.name in self.form_fields:
                 f = getattr(field, 'custom_attrs', {}).get('widget', None) or field.formfield()
                 self.form_fields[field.name] = f
-                f.target_field = field
+                f.target_attr = field
                 return f
         self._prepared = True
 
@@ -229,5 +229,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             else:
                 lbl = field
                 w = forms.CharField(label=lbl)
+                f = getattr(self.model, field)
+            w.target_attr = f
             self.form_fields[field] = w
         return self.form_fields[field]

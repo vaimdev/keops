@@ -31,6 +31,9 @@ class Action(ModuleElement):
             'list_fields': ('name', 'short_description', 'description', 'action_type')
         }
 
+    def get_absolute_url(self):
+        return 'action/%i/' % self.pk
+
     def get_action_type(self):
         return None
 

@@ -1,17 +1,26 @@
 var keopsApp = angular.module('keopsApp', ['ngRoute', 'ui.bootstrap', 'infinite-scroll', 'ui.keops']).config(
     function($routeProvider, $locationProvider) {
-            $routeProvider.when('/action/:id', {
-                        templateUrl: function (params) {
-                            if (params.view_type) var s = '&view_type=' + params.view_type
-                            else var s = '';
-                            if (params.query) s += '&query=' + params.query;
-                            return '?action=' + params.id + s;
-                        }
-                    }).when('/open/', {
-                        templateUrl: function (params) {
-                            return '?open&model=' + params.model + '&pk=' + params.pk;
-                        }
-                    });
+        $routeProvider.
+            when('/action/:id/',
+            {
+                reloadOnSearch: false,
+                templateUrl: function (params) {
+                    if (params.view_type) var s = '&view_type=' + params.view_type
+                    else var s = '';
+                    if (params.query) s += '&query=' + params.query;
+                    return '?action=' + params.id + s;
+                }
+            }).
+            when('/action/:id/:view_type',
+            {
+                reloadOnSearch: false,
+                templateUrl: function (params) {
+                    if (params.view_type) var s = '&view_type=' + params.view_type
+                    else var s = '';
+                    if (params.query) s += '&query=' + params.query;
+                    return '?action=' + params.id + s;
+                }
+            })
 
 });
 
@@ -68,7 +77,7 @@ keopsApp.controller('ListController', function($scope, $location, List) {
 
 
 // Form factory/controller
-keopsApp.factory('Form', function($http, SharedData, $location){
+keopsApp.factory('Form', function($http, SharedData, $location, $window){
     var Form = function() {
         this.item = {};
         this.loading = false;
@@ -90,12 +99,13 @@ keopsApp.factory('Form', function($http, SharedData, $location){
 
         this.start++;
         var url = this.url + model + '&start=' + this.start;
-        if (this.total === null) url += '&total=1';
+        if (this.total === null) url += '&total';
         if (this.pk != null) url += '&pk=' + this.pk;
         $http.get(url).success(function(data) {
-            this.pk = null;
             if (this.total === null) this.total = data.total;
             this.item = data.items[0];
+            if (!this.pk) $location.search('pk', this.item.pk);
+            this.pk = null;
             this.loading = false;
             this.loaded = this.start == this.total - 1;
             delete SharedData.list;
@@ -112,6 +122,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         $http.get(url).success(function(data) {
             if (this.total === null) this.total = data.total;
             this.item = data.items[0];
+            $location.search('pk', this.item.pk);
             console.log(this.items);
             this.loading = false;
         }.bind(this));
@@ -119,14 +130,14 @@ keopsApp.factory('Form', function($http, SharedData, $location){
     return Form;
 });
 
-keopsApp.controller('FormController', function($scope, $http, Form, $location, SharedData) {
+keopsApp.controller('FormController', function($scope, $http, Form, $location) {
     $scope.form = new Form();
 
-    $scope.search = function (url, query) {
-        $location.path(url).search(query);
+    $scope.search = function (url, search) {
+        $location.path(url).search(search);
     };
 
     $scope.openResource = function (url, search) {
-        $location.path(url).search(search);
+        $location.path(url).search(search).replace();
     }
 });

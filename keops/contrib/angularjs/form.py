@@ -18,12 +18,14 @@ def get_widget(name, field):
         s['ng-bind'] = 'form.item.' + name + " ? '%s': '%s'" % (capfirst(_('yes')), capfirst(_('no')))
     elif isinstance(field, forms.EmailField):
         d['type'] = 'email'
+    elif isinstance(field, forms.ModelMultipleChoiceField):
+        pass
     elif isinstance(field, forms.ModelChoiceField):
         meta = field.queryset.model._meta
         d['tag'] = 'input combobox'
         d['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
         s['tag'] = 'a'
-        s['ng-click'] = "openResource('open/', '%s)" % 'model=%s.%s&pk=\' + form.item.%s' % (meta.app_label, meta.model_name, field.target_field.attname)
+        s['ng-click'] = "openResource('%s', 'pk='%s)" % (field.target_attr.get_resource_url(), ' + form.item.%s' % field.target_attr.attname)
         s['style'] = 'cursor: pointer;'
 
     if not isinstance(field, forms.BooleanField):
