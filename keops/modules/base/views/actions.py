@@ -1,12 +1,11 @@
-
 import json
 from django.shortcuts import render
 from keops.forms.admin import ModelAdmin
 #from keops.modules.form.options import ModelAdmin
 #from keops.modules.admin.sites import site
 
-def response_form(request, action):
-    view_type = request.GET.get('view_type', action.view_type)
+def response_form(request, action, *args, **kwargs):
+    view_type = kwargs.get('view_type') or action.view_type
     state = request.GET.get('state', action.state or 'read')
     if action.view:
         pass
@@ -40,9 +39,7 @@ def show_model_admin(request, admin, view_type):
         fields = [name for name, field in f.base_fields.items()]
         items = json.dumps(extjs.get_form_items(f))
     fields = json.dumps(fields + ['pk'])
-    
-    
-    
+
     return render(request, template, {'form': f, 'model': model,
         'json': json, 'fields': fields, 'extjs': extjs, 'items': items,
         'model_name': '%s.%s' % (model._meta.app_label, model._meta.model_name),

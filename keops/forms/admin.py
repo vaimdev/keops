@@ -108,7 +108,6 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f, (
                 models.AutoField, generic.GenericForeignKey)) and\
                 getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
-        print(self.list_display)
         if not self.list_display:
             self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not\
                 isinstance(f, (models.AutoField, models.ManyToManyField)) and\
@@ -156,7 +155,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             if not field.name in self.fields:
                 continue
             if not field.name in self.form_fields:
-                self.form_fields[field.name] = getattr(field, 'custom_attrs', {}).get('widget', None) or field.formfield()
+                f = getattr(field, 'custom_attrs', {}).get('widget', None) or field.formfield()
+                self.form_fields[field.name] = f
+                f.target_field = field
+                return f
         self._prepared = True
 
     def __iter__(self):
@@ -221,6 +223,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             f = self.model._meta.get_field(field)
             if f:
                 w = f.formfield()
+                w.form_field = f
                 self.form_fields[field] = w
                 lbl = w.label
             else:

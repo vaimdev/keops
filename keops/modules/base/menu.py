@@ -1,4 +1,3 @@
-
 from django.utils.translation import ugettext_lazy as _
 from keops.db import models
 from .module import *
@@ -10,7 +9,7 @@ class MenuManager(ElementManager):
         menu.full_name = path
         menu.action = action
         menu.image = icon
-        menu.save()
+        menu.save(using=using)
 
 class Menu(ModuleElement):
     name = models.CharField(_('name'), max_length=128, null=False, db_index=True)

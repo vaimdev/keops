@@ -1,4 +1,4 @@
-import datetime
+import decimal
 import json
 from django.utils.translation import ugettext as _
 from django.db import models
@@ -21,7 +21,7 @@ def index(request):
             return HttpResponseRedirect(next)
     return HttpResponse(get_db())
 
-def _get_model(context):
+def get_model(context):
     # Check permission
     # TODO CACHE PERMISSION
     model = context['model']
@@ -35,7 +35,7 @@ def field_text(value):
         return ''
     elif callable(value):
         return value()
-    elif isinstance(value, (int, str, float)):
+    elif isinstance(value, (int, str, float, decimal.Decimal)):
         return value
     else:
         return str(value)
@@ -52,7 +52,7 @@ def search_text(queryset, text, search_fields=None):
 
 def grid(request):
     using = get_db(request)
-    model = _get_model(request.GET)
+    model = get_model(request.GET)
     pk = request.GET.get('pk')
     field = request.GET.get('field') # Check related field
     if field:
@@ -72,11 +72,11 @@ def grid(request):
     fields = fields or [f.name for f in model._meta.concrete_fields if not f.primary_key]
     start = int(request.GET.get('start', '0'))
     limit = int(request.GET.get('limit', '50')) + start # settings
-    total = request.GET.get('total', False)
-    if total:
-        total = queryset.all().count()
+    count = request.GET.get('total', False)
+    if count:
+        count = queryset.all().count()
     else:
-        total = None
+        count = None
     queryset = queryset.all()[start:limit]
 
     # TODO Check content type permissions permissions
@@ -84,27 +84,25 @@ def grid(request):
     get_val = lambda x: '' if x is None else x
     fields = ['pk'] + fields
     rows = [{f: smart_text(get_val(getattr(row, f))) for f in fields} for row in queryset]
-    data = {'items': rows, 'total': total}
+    data = {'items': rows, 'total': count}
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def _read(context, using):
     pk = context.get('pk')
-    model = _get_model(context)
+    model = get_model(context)
     start = int(context.get('start', '0'))
     limit = int(context.get('limit', '1')) + start # settings
+    count = None;
     if pk:
         queryset = model.objects.using(using).filter(pk=pk)
-        count = 1
     else:
-        if 'id' in context:
-            queryset = model.objects.using(using).filter(pk=context['id'])
-        else:
-            queryset = model.objects.using(using).all()[start:limit]
+        queryset = model.objects.using(using).all()[start:limit]
+    if 'total' in context:
         count = model.objects.using(using).all().count()
         
     # TODO Check model permission
     
-    fields = ['pk', '__str__'] + [f.name for f in model._meta.fields if not f.primary_key]
+    fields = ['pk', '__str__'] + [f.name for f in model._meta.fields if not f.primary_key] + [f.attname for f in model._meta.fields if isinstance(f, models.ForeignKey)]
     rows = [{f: field_text(getattr(row, f)) for f in fields} for row in queryset]
     return {'items': rows, 'total': count}
     
@@ -114,7 +112,7 @@ def read(request):
 
 def lookup(request):
     context = request.GET
-    model = _get_model(context)
+    model = get_model(context)
     start = int(context.get('start', '0'))
     limit = int(context.get('limit', '25')) + start # settings
     query = context.get('query', '')
@@ -131,7 +129,7 @@ def _save(context, using):
     Save context data on using specified database.
     """
     pk = context.get('pk')
-    model = _get_model(context)
+    model = get_model(context)
     data = context.get('data')
     obj = None
     if pk:
@@ -174,7 +172,7 @@ def _delete(context, using):
     """
     Default delete operation.
     """
-    model = _get_model(context)
+    model = get_model(context)
     obj = model.objects.using(using).get(pk=context['pk'])
     obj.delete(using=using)
     return {

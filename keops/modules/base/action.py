@@ -4,6 +4,14 @@ from keops.db import models
 from .module import *
 from .ui import *
 
+class ActionManager(ElementManager):
+    def get_by_model_name(self, model):
+        model = model.split('.')
+        ct = ContentType.objects.get(app_label=model[0], model=model[1])
+        from .models import BaseModel
+        model = BaseModel.objects.get(content_type=ct)
+        return FormAction.objects.get(model=model)
+
 class Action(ModuleElement):
     action_types = {}
     name = models.CharField(_('name'), max_length=128, null=False, unique=True)
@@ -11,6 +19,8 @@ class Action(ModuleElement):
     description = models.CharField(max_length=256, verbose_name=_('description'))
     action_type = models.CharField(_('type'), max_length=32, null=False)
     context = models.TextField(_('context'))
+
+    objects = ActionManager()
 
     class Meta:
         verbose_name = _('action')
@@ -102,7 +112,7 @@ class FormAction(Action):
 
     def execute(self, request, *args, **kwargs):
         from .views import actions
-        return actions.response_form(request, self)
+        return actions.response_form(request, self, *args, **kwargs)
 
 class ReportAction(Action):
     report = models.ForeignKey(Report, verbose_name=_('report'))

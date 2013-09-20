@@ -20,10 +20,11 @@ def get_widget(name, field):
         d['type'] = 'email'
     elif isinstance(field, forms.ModelChoiceField):
         meta = field.queryset.model._meta
-        d['tag'] = "input combobox"
+        d['tag'] = 'input combobox'
         d['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
         s['tag'] = 'a'
-        s['href'] = '#'
+        s['ng-click'] = "openResource('open/', '%s)" % 'model=%s.%s&pk=\' + form.item.%s' % (meta.app_label, meta.model_name, field.target_field.attname)
+        s['style'] = 'cursor: pointer;'
 
     if not isinstance(field, forms.BooleanField):
         d['class'] = 'char-field'
@@ -71,7 +72,6 @@ def form_str(form, cols=2):
                 if len(container) == 1:
                     fields.append(''.join(get_field(*container[0])))
                 else:
-                    print('container', get_container(container))
                     fields.append(get_container(container))
 
     l = len(items)
