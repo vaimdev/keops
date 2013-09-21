@@ -274,8 +274,13 @@ body {
     font-weight: bold;
 }
 
-.field-cell .char-field {
+.field-cell .long-field {
     width: 100%;
+    margin-bottom: 0;
+}
+
+.field-cell .small-field {
+    width: 132px;
     margin-bottom: 0;
 }
 

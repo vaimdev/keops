@@ -13,7 +13,7 @@ class FieldLine(object):
     
     def __iter__(self):
         for field in self.fields:
-            yield (field, self.form.get_formfield(field))
+            yield self.form.get_form_field(field)
 
 class Fieldset(object):
     def __init__(self, name, form, fieldset):
@@ -59,7 +59,6 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     pages = ()
     search_fields = ()
     columns = 2
-    form_fields = {}
     bound_fields = {}
     formfield_overrides = None
 
@@ -71,11 +70,13 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     label = None
     help_text = ''
 
+    model_form = None
+
     def __init__(self, admin=None):
         self.admin = admin
         self._prepared = False
         self._form = None
-        self._instance = None
+        self._model_form = None
         if self.model:
             if self.admin_default:
                 self.contribute_to_class(self.model, '_admin')
@@ -92,6 +93,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             del self.admin
 
     def _prepare(self):
+        if self._prepared:
+            return
         from django.contrib.contenttypes import generic
         extra = getattr(self.model, 'Extra', None)
         if extra:
@@ -148,33 +151,39 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         self.label = self.label or self.model._meta.verbose_name
 
     def _prepare_form(self):
-        if self._prepared:
-            return
         self._prepare()
         for field in self.model_fields:
             if not field.name in self.fields:
                 continue
-            if not field.name in self.form_fields:
-                f = getattr(field, 'custom_attrs', {}).get('widget', None) or field.formfield()
-                self.form_fields[field.name] = f
+            if not field.name in self.bound_fields:
+                f = self.form.fields[field.name] or field.formfield()
+                self.bound_fields[field.name] = self.form[field.name]
                 f.target_attr = field
                 return f
         self._prepared = True
 
     def __iter__(self):
-        self._prepare_form()
         for page, fieldsets in self.pages:
             yield TabPage(page, self, fieldsets)
 
     def as_table(self):
-        s = TABLE()
-        return
+        # To implement
+        pass
 
     @property
     def form(self):
+        """
+        Return default form instance.
+        """
         if not self._form:
-            self._form = forms.models.modelform_factory(self.model)
+            self._form = self.model_form()
         return self._form
+
+    @property
+    def model_form(self):
+        if not self._model_form:
+            self._model_form = forms.models.modelform_factory(self.model)
+        return self._model_form
 
     def _prepare_context(self, request, context):
         context.update({
@@ -183,6 +192,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         })
         
     def view(self, request, view_type, **kwargs):
+        self._prepare_form()
         if view_type == 'list':
             v = self.list_view
         else:
@@ -198,9 +208,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         self._prepare_context(request, context)
 
     def list_view(self, request, **kwargs):
-        self._prepare_form()
         kwargs['query'] = request.GET.get('query', '')
-        kwargs['fields'] = [self.get_formfield(f) for f in self.list_display]
+        kwargs['fields'] = [self.get_form_field(f) for f in self.list_display]
         kwargs['list_display'] = ['{{item.%s}}' % f for f in self.list_display]
         self._prepare_context(request, kwargs)
         kwargs.setdefault('pagesize', 50)
@@ -217,19 +226,18 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def get_queryset(self, request):
         return self.model.objects.all()
 
-    def get_formfield(self, field):
-        self._prepare_form()
-        if not field in self.form_fields:
+    def get_form_field(self, field):
+        if not field in self.bound_fields:
             f = self.model._meta.get_field(field)
             if f:
-                w = f.formfield()
-                w.form_field = f
-                self.form_fields[field] = w
-                lbl = w.label
+                form_field = f.formfield()
+                form_field.form_field = f
             else:
                 lbl = field
-                w = forms.CharField(label=lbl)
+                form_field = forms.CharField(label=lbl)
                 f = getattr(self.model, field)
-            w.target_attr = f
-            self.form_fields[field] = w
-        return self.form_fields[field]
+            self.form.fields[field] = form_field
+            bound_field = self.form[field]
+            form_field.target_attr = f
+            self.bound_fields[field] = bound_field
+        return self.bound_fields[field]

@@ -5,5 +5,42 @@
             "full_name": "Tests/Tests/Master",
             "model": "virtual_field.master"
         }
+    },
+    {
+        "model": "virtual_field.model1",
+        "fields": {
+            "name": "Value 1"
+        }
+    },
+    {
+        "model": "virtual_field.model1",
+        "fields": {
+            "name": "Value 2"
+        }
+    },
+    {
+        "model": "virtual_field.model1",
+        "fields": {
+            "name": "Value 3"
+        }
+    },
+    {
+        "model": "virtual_field.model1",
+        "fields": {
+            "name": "Value 4"
+        }
+    },
+    {
+        "model": "virtual_field.model1",
+        "fields": {
+            "name": "Value 5"
+        }
+    },
+    {
+        "model": "virtual_field.master",
+        "fields": {
+            "name": "Master 1",
+            "models1": [2, 3, 4]
+        }
     }
 ]

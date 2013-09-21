@@ -12,8 +12,12 @@ class TestModel(models.Model):
 
     field2 = models.PropertyField(fget=get_field2, fset=set_field2)
 
+class Model1(models.Model):
+    name = models.CharField(max_length=32, null=False)
+
 class Master(models.Model):
     name = models.CharField(blank=False)
+    models1 = models.ManyToManyField(Model1)
     details = models.OneToManyField(related_name='detail_set')
 
 class Detail(models.Model):

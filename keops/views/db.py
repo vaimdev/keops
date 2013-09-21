@@ -6,6 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_text
 from keops.db import get_db, set_db
+from keops.http import HttpJsonResponse
 
 def index(request):
     """
@@ -22,7 +23,7 @@ def index(request):
     return HttpResponse(get_db())
 
 def get_model(context):
-    # Check permission
+    # TODO Check model permission
     # TODO CACHE PERMISSION
     model = context['model']
     if isinstance(model, str):
@@ -85,30 +86,60 @@ def grid(request):
     fields = ['pk'] + fields
     rows = [{f: smart_text(get_val(getattr(row, f))) for f in fields} for row in queryset]
     data = {'items': rows, 'total': count}
+    print(data)
     return HttpResponse(json.dumps(data), content_type='application/json')
 
 def _read(context, using):
     pk = context.get('pk')
-    model = get_model(context)
+    queryset = context.get('queryset')
+    if queryset:
+        # TODO Check queryset model permission
+        model = queryset.model
+    else:
+        model = get_model(context).objects
+    count = queryset
     start = int(context.get('start', '0'))
     limit = int(context.get('limit', '1')) + start # settings
-    count = None;
     if pk:
-        queryset = model.objects.using(using).filter(pk=pk)
+        queryset = queryset.using(using).filter(pk=pk)
     else:
-        queryset = model.objects.using(using).all()[start:limit]
+        queryset = queryset.using(using).all()
+        if not 'all' in context:
+            queryset = queryset[start:limit]
     if 'total' in context:
-        count = model.objects.using(using).all().count()
+        count = count.using(using).all().count()
+    else:
+        count = None
         
-    # TODO Check model permission
-    
-    fields = ['pk', '__str__'] + [f.name for f in model._meta.fields if not f.primary_key] + [f.attname for f in model._meta.fields if isinstance(f, models.ForeignKey)]
+    fields = ['pk', '__str__'] + context.get('fields', [f.name for f in model._meta.fields if not f.primary_key] + [f.attname for f in model._meta.fields if isinstance(f, models.ForeignKey)])
     rows = [{f: field_text(getattr(row, f)) for f in fields} for row in queryset]
     return {'items': rows, 'total': count}
     
 def read(request):
     using = get_db(request)
-    return HttpResponse(json.dumps(_read(request.GET, using)), content_type='application/json')
+    # Prevent user get all records
+    assert not 'all' in request.GET
+    return HttpJsonResponse(_read(request.GET, using))
+
+def _get_queryset_item(model, obj, attr):
+    # TODO get fields for relation attr
+    return getattr(obj, attr)
+
+def read_items(request):
+    using = get_db(request)
+    # Force get all items
+    context = {'all': None}
+    model = get_model(request.GET)
+    items = json.loads(request.GET['items'])
+    pk = request.GET['pk']
+    data = {}
+    # Select pk field only
+    obj = model.objects.using(using).only(model._meta.pk.name).get(pk=pk)
+    for item in items:
+        context['fields'] = [] # Select only pk, __str__ for now
+        context['queryset'] = _get_queryset_item(model, obj, item)
+        data[item] = _read(context, using)
+    return HttpJsonResponse(data)
 
 def lookup(request):
     context = request.GET
@@ -145,12 +176,12 @@ def _save(context, using):
         # submit related data
     related = context.get('related')
     if related:
-        _save_related(json.loads(related), obj, using)
+        _save_item(json.loads(related), obj, using)
     return True, obj
 
-def _save_related(data, parent, using):
+def _save_item(data, parent, using):
     """
-    Save nested/related data rows (ManyToMany/OneToMany).
+    Save item data rows (ManyToMany/OneToMany).
     """
     for obj in data:
         model = models.get_model(*obj['model'].split('.'))

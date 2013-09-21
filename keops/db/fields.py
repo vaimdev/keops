@@ -124,6 +124,7 @@ class VirtualField(models.Field):
     """
 
     def __init__(self, verbose_name=None, help_text=None, blank=None, editable=True, readonly=True, **options):
+        self.rel = None
         self.primary_key = False
         self.verbose_name = verbose_name
         self.help_text = help_text

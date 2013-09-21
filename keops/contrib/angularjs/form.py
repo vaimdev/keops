@@ -6,59 +6,67 @@ from django import forms
 import keops.forms.fields
 from keops.utils.html import *
 
-def get_widget(name, field):
-    d = {'tag': 'input'}
+def get_widget(field):
+    bound_field = field
+    field = bound_field.field
+    name = bound_field.name
+    d = {}
     s = {'tag': 'span', 'ng-bind': 'form.item.' + name}
     if field.required:
         d['ng-required'] = 1
-    if isinstance(field, forms.IntegerField):
-        d['type'] = 'number'
     elif isinstance(field, forms.BooleanField):
-        d['type'] = 'checkbox'
         s['ng-bind'] = 'form.item.' + name + " ? '%s': '%s'" % (capfirst(_('yes')), capfirst(_('no')))
-    elif isinstance(field, forms.EmailField):
-        d['type'] = 'email'
     elif isinstance(field, forms.ModelMultipleChoiceField):
+        # Adjust to show only selected values
         d['tag'] = 'div multiplechoice'
+        d['options'] = '{{form.item.%s}}' % name
     elif isinstance(field, forms.ModelChoiceField):
+        # Change to smart combobox widget
         meta = field.queryset.model._meta
-        d['tag'] = 'input combobox'
+        d['name'] = field.target_attr.attname
         d['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
         s['tag'] = 'a'
         s['ng-click'] = "openResource('%s', 'pk='%s)" % (field.target_attr.get_resource_url(), ' + form.item.%s' % field.target_attr.attname)
         s['style'] = 'cursor: pointer;'
 
     if not isinstance(field, forms.BooleanField):
-        d['class'] = 'char-field'
+        d['class'] = 'long-field'
     return d, s
 
-def get_field(name, field):
-    _id = 'id-' + name
-    label = LABEL(str(field.label), attrs={'for': _id, 'class': 'field-label'})
-    if isinstance(field, forms.ModelMultipleChoiceField):
+def get_field(field):
+    name = field.name
+    label = field.label_tag(attrs={'class': 'field-label'})
+    attrs, span = get_widget(field)
+    if isinstance(field.field, forms.ModelMultipleChoiceField):
         field_args = {'colspan': 2}
         args = [label]
         label = None
     else:
         field_args = {}
         args = []
-    attrs, span = get_widget(name, field)
+    attrs.update({'ng-show': 'form.write', 'ng-model': 'form.item.' + attrs.pop('name', name)})
+    if 'tag' in attrs:
+        widget = TAG(id=field.auto_id, name=name, **attrs)
+    else:
+        widget = field.as_widget(attrs=attrs)
     r = []
     if label:
         r = [TD(label, attrs={'class': 'label-cell'})]
-    args.append(TAG(id=_id, name=name, attrs={'ng-show': 'form.write', 'ng-model': 'form.item.' + name}, **attrs))
+    args.append(widget)
     args.append(TAG(attrs={'ng-show': '!form.write'}, **span))
     r.append(TD(attrs={'class': 'field-cell'}, *args, **field_args))
     return r
 
-def get_formfields(form):
+def get_form_fields(form):
     for k, v in form.widgets.items():
         yield k, get_field(v)
 
 def get_container(container):
     f = container[0]
-    label, field = get_field(*f)
-    return label + TD(DIV(TABLE(TR(field, *[''.join(get_field(*f)) for f in container[1:]]), attrs={'class': 'field-container'})), attrs={'class': 'field-cell'})
+    label, field = get_field(f)
+    return label + TD(DIV(TABLE(TR(field, *[''.join(get_field(*f)) for f in container[1:]]),
+                                attrs={'class': 'field-container'})),
+                      attrs={'class': 'field-cell'})
 
 def get_tables(items, cols=2):
     l = len(items)
@@ -98,7 +106,7 @@ def form_str(form, cols=2):
             for container in fieldset:
                 container = [f for f in container]
                 if len(container) == 1:
-                    fields.append(''.join(get_field(*container[0])))
+                    fields.append(''.join(get_field(container[0])))
                 else:
                     fields.append(get_container(container))
 
