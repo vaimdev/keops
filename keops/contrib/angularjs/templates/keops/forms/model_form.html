@@ -1,7 +1,7 @@
 <div ng-controller="FormController" ng-init="form.nextPage('{{ model_name }}')">
 <table style="width: 100%;">
     <tr>
-        <td class="form-header">
+        <td class="form-head">
             <table style="width: 100%; height: 70px">
                 <tr>
                     <td class="form-title">
@@ -20,7 +20,7 @@
                             <tr>
                                 <td ng-show="!form.write" style="text-align: right;" colspan="3">
                                     <input placeholder="{{ _("search")|capfirst }}" ng-model="searchField">
-                                    <a style="margin-bottom: 9px;" class="btn" ng-click="search('action/{{ action.pk }}/', 'view_type=list&query=' + searchField)">&gt;</a>
+                                    <a style="margin-bottom: 9px;" class="btn" ng-click="search('{{ action.get_absolute_url }}list', 'query=' + searchField)">&gt;</a>
                                 </td>
                             </tr>
                             <tr>

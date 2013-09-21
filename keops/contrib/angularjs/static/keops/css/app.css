@@ -14,7 +14,7 @@ body {
     margin: 0;
 }
 
-#keops-app-header {
+#keops-app-head {
     border-top: 2px solid #C71F27;
     height: 69px;
 	table-layout: fixed;
@@ -157,7 +157,7 @@ body {
     padding-left: 55px;
 }
 
-#keops-app .form-header {
+#keops-app .form-head {
     width: 100%;
     background-color: rgb(252, 252, 252);
     -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -178,15 +178,30 @@ body {
     border-collapse: collapse;
 }
 
-#keops-app .data-grid thead {
-    text-shadow: 0 1px 1px #fff;
+#keops-app .data-grid thead, #keops-app .multiplechoice thead {
     border-top: 1px solid #DDD;
     border-bottom: 2px solid #DDD;
     padding: 0;
     border-collapse: collapse;
     border-spacing: 0;
     background-color: #f5f5f5;
+}
+
+#keops-app .data-grid thead {
+    text-shadow: 0 1px 1px #fff;
     font-size: 12px;
+}
+
+#keops-app .multiplechoice-items {
+    max-height: 150px;
+}
+
+#keops-app .multiplechoice a {
+    cursor: pointer;
+}
+
+#keops-app .multiplechoice hr {
+    margin: 6px 0 2px 0;
 }
 
 #keops-app .data-grid th {
@@ -238,22 +253,25 @@ body {
     vertical-align: top;
 }
 
-#keops-app .form-view .label-cell {
+#keops-app .label-cell {
     width: 1%;
     max-width: 220px;
     border-right: 1px solid #dddddd;
     padding-right: 8px;
 }
 
-#keops-app .form-view .field-cell {
+#keops-app .field-cell {
     margin: 0;
     width: 99%;
     padding: 0 20px 4px 10px;
 }
 
 .label-cell label {
-    font-weight: bold;
     min-width: 120px;
+}
+
+#keops-app .field-label {
+    font-weight: bold;
 }
 
 .field-cell .char-field {
