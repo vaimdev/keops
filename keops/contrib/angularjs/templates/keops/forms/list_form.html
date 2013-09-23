@@ -4,18 +4,20 @@
         <td class="form-head">
             <table style="width: 100%; height: 70px">
                 <tr>
-                    <td class="form-title" style="width: 100%;"><b>{{ form.title|capfirst }}</b></td>
+                    <td class="form-title" style="width: 100%;">
+                        <span>
+                            <span style="display: inline-block; padding-right: 10px;"><b>{{ form.title|capfirst }}</b></span>
+                            <label style="display: inline-block;" class="form-data-info">{% verbatim %}{{list.start}} / {{list.total}}{% endverbatim %}</label>
+                        </span>
+                    </td>
                     <td style="float: right; width: auto;">
                         <table>
                             <tr>
-                                <td style="text-align: right" colspan="2">
+                                <td style="text-align: right">
                                     <input class="search-query" placeholder="{{ _("search")|capfirst }}" value="{{ query }}">
                                 </td>
                             </tr>
                             <tr>
-                                <td style="vertical-align: bottom;">
-                                    <label class="form-data-info">{% verbatim %}{{list.start}} / {{list.total}}{% endverbatim %}</label>
-                                </td>
                                 <td style="float: right;">
                                     <div class="btn-group" style="display: block">
                                         <a type="button" class="btn active">{{ _("list")|capfirst }}</a>

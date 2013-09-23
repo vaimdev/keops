@@ -1,6 +1,8 @@
 from django.forms import Field
 from . import widgets
 
+__all__ = ['GridField']
+
 class GridField(Field):
     widget = widgets.GridWidget
     input_direct = False

@@ -1,3 +1,4 @@
+from .fields import *
 
 def autodiscover():
     """

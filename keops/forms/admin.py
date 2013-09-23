@@ -152,14 +152,21 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
     def _prepare_form(self):
         self._prepare()
-        for field in self.model_fields:
-            if not field.name in self.fields:
-                continue
-            if not field.name in self.bound_fields:
-                f = self.form.fields[field.name] or field.formfield()
-                self.bound_fields[field.name] = self.form[field.name]
+        for name in self.fields:
+            field = None
+            for f in self.model_fields:
+                if f.name == name:
+                    field = f
+                    break
+
+            if field and not name in self.bound_fields:
+                if name in self.form.fields:
+                    f = self.form.fields[name]
+                else:
+                    f = field.formfield()
+                    self.form.fields[name] = f
+                self.bound_fields[name] = self.form[name]
                 f.target_attr = field
-                return f
         self._prepared = True
 
     def __iter__(self):
@@ -228,7 +235,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
     def get_form_field(self, field):
         if not field in self.bound_fields:
-            f = self.model._meta.get_field(field)
+            try:
+                f = self.model._meta.get_field(field)
+            except:
+                f = None
             if f:
                 form_field = f.formfield()
                 form_field.form_field = f

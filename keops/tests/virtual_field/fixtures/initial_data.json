@@ -42,5 +42,40 @@
             "name": "Master 1",
             "models1": [2, 3, 4]
         }
+    },
+    {
+        "model": "virtual_field.detail",
+        "fields": {
+            "name": "Detail 1",
+            "parent_id": 1
+        }
+    },
+    {
+        "model": "virtual_field.detail",
+        "fields": {
+            "name": "Detail 2",
+            "parent_id": 1
+        }
+    },
+    {
+        "model": "virtual_field.detail",
+        "fields": {
+            "name": "Detail 3",
+            "parent_id": 1
+        }
+    },
+    {
+        "model": "virtual_field.detail",
+        "fields": {
+            "name": "Detail 4",
+            "parent_id": 1
+        }
+    },
+    {
+        "model": "virtual_field.detail",
+        "fields": {
+            "name": "Detail 5",
+            "parent_id": 1
+        }
     }
 ]

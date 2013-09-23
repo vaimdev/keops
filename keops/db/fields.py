@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import signals
+from keops.forms.widgets import GridWidget
 
 __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey',
            'FileRelField', 'ImageRelField', 'VirtualField', 'PropertyField',
@@ -125,26 +126,21 @@ class VirtualField(models.Field):
 
     def __init__(self, verbose_name=None, help_text=None, blank=None, editable=True, readonly=True, **options):
         self.rel = None
-        self.primary_key = False
-        self.verbose_name = verbose_name
-        self.help_text = help_text
-        self.blank = blank
-        self.editable = editable
         self.readonly = readonly
-        self.custom_attrs = options.pop('custom_attrs', {})
-        for k, v in options.items():
-            setattr(self, k, v)
+        super(VirtualField, self).__init__(
+            verbose_name=verbose_name,
+            help_text=help_text,
+            blank=blank,
+            editable=editable,
+            **options)
+
 
     def contribute_to_class(self, cls, name):
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
         cls._meta.add_virtual_field(self)
-
-        # For some reason I don't totally understand, using weakrefs here doesn't work.
         #signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)
-
-        # Connect myself as the descriptor for this field
         setattr(cls, name, self)
 
 
@@ -171,6 +167,7 @@ class OneToManyField(VirtualField):
     """
     Provides a one-to-many field representation.
     """
+
     def __init__(self, related_name, to=None, to_field=None, pk_field=None, list_fields=None, **options):
         self.related_name = related_name
         self.to = to
@@ -181,7 +178,7 @@ class OneToManyField(VirtualField):
         self._list_fields = list_fields
         self._choices = None
         options.setdefault('default', models.NOT_PROVIDED)
-        super(OneToManyField, self).__init__(self, **options)
+        super(OneToManyField, self).__init__(**options)
 
     def contribute_to_class(self, cls, name):
         super(OneToManyField, self).contribute_to_class(cls, name)

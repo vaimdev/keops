@@ -18,7 +18,7 @@ class Model1(models.Model):
 class Master(models.Model):
     name = models.CharField(blank=False)
     models1 = models.ManyToManyField(Model1)
-    details = models.OneToManyField(related_name='detail_set')
+    details = models.OneToManyField(related_name='detail_set', verbose_name='Details')
 
 class Detail(models.Model):
     parent = models.ForeignKey(Master, null=False)

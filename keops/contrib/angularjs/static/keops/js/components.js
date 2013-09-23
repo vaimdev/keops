@@ -7,41 +7,27 @@ ui.directive('multiplechoice', function() {
         transclude: true,
         template: '<div>' +
             '<div class="multiplechoice">' +
-            '<div>' +
-            '<button class="btn" style="margin-right: 10px;">Add</button>' +
-            '<button class="btn">Remove</button>' +
+            '<div style="display: table;">' +
+            '<label style="display: table-cell"></label>' +
+            '<button class="btn" style="margin-left: 10px;">' + gettext('Add') + '</button>' +
             '</div>' +
             '<div>' +
             '<hr/>' +
-            '<a style="font-size: 10px">Select all</a>' +
-            '<hr/>' +
             '<div class="multiplechoice-items">' +
-            '<table style="padding: 5px 0 5px 4px; width: 100%">' +
-            '<tr><td style="width: 20px;"><input type="checkbox"></td>' +
-            '<td><a style="display: block;">object 1</a></td></tr>' +
-            '<tr><td><input type="checkbox"></td><td>object 2</td></tr>' +
-            '</table></div><div style="font-size: 11px;"><i>Field info.</i></div></div>',
+            '<table style="padding: 5px 0 5px 4px; width: 100%; table-layout: fixed;">' +
+            '<tr>' +
+            '<td style="width: 1px; padding-right: 10px;"><i style="cursor: pointer" title="' + gettext('Remove item') + '" class="icon-remove"></a></td>' +
+            '<td><a style="display: block;">{{item.__str__}}</a></td>' +
+            '</tr>' +
+            '</table></div>' +
+            '</div>',
         require: 'ngModel',
-        link: function (scope, element, attrs) {
-            console.log(element);
-
-            attrs.$observe('options', function (value) {
-                console.log(value);
-            });
-
-            var selectAll = angular.element(element.find('a')[0]);
-            selectAllClick = function () {
-                var items = element.find('input');
-                var ca = false;
-                for (var i = 0; i < items.length; i++) {
-                    if (!items[i].checked) {
-                        ca = true;
-                        break;
-                    }
-                }
-                for (var i = 0; i < items.length; i++) items[i].checked = ca;
-            };
-            selectAll.on('click', selectAllClick);
+        compile: function(element, attrs) {
+            var tr = angular.element(element.find('tr')[0]);
+            console.log(attrs);
+            tr.attr('ng-repeat', "item in " + attrs.ngModel);
+            var label = angular.element(element.find('label')[0]);
+            label.html(attrs.label);
         }
     }
 });

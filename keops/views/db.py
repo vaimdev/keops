@@ -87,7 +87,7 @@ def grid(request):
     rows = [{f: smart_text(get_val(getattr(row, f))) for f in fields} for row in queryset]
     data = {'items': rows, 'total': count}
     print(data)
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    return HttpJsonResponse(data)
 
 def _read(context, using):
     pk = context.get('pk')
@@ -96,7 +96,8 @@ def _read(context, using):
         # TODO Check queryset model permission
         model = queryset.model
     else:
-        model = get_model(context).objects
+        model = get_model(context)
+        queryset = model.objects
     count = queryset
     start = int(context.get('start', '0'))
     limit = int(context.get('limit', '1')) + start # settings
@@ -153,7 +154,7 @@ def lookup(request):
         queryset = model.objects.all()
         #queryset = search_text(model.objects.all(), query)
     data = [{'value': obj.pk, 'label': str(obj)} for obj in queryset[start:limit]]
-    return HttpResponse(json.dumps(data), content_type='application/json')
+    return HttpJsonResponse(data)
 
 def _save(context, using):
     """
@@ -223,4 +224,4 @@ def submit(request):
     else:
         success, obj = _save(request.POST, using)
         result = {'success': success, 'data': _read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]}
-    return HttpResponse(json.dumps(result), content_type='application/json')
+    return HttpJsonResponse(result)

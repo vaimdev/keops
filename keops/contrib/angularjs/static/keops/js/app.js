@@ -77,7 +77,7 @@ keopsApp.controller('ListController', function($scope, $location, List) {
 
 
 // Form factory/controller
-keopsApp.factory('Form', function($http, SharedData, $location, $window){
+keopsApp.factory('Form', function($http, SharedData, $location){
     var Form = function() {
         this.item = {};
         this.loading = false;
@@ -85,6 +85,8 @@ keopsApp.factory('Form', function($http, SharedData, $location, $window){
         this.total = null;
         this.loaded = false;
         this.write = false;
+        this.model = null;
+        this.element = null;
         this.pk = $location.search()['pk'];
         this.url = "/db/read/?limit=1&model=";
         if (SharedData.list) {
@@ -93,9 +95,10 @@ keopsApp.factory('Form', function($http, SharedData, $location, $window){
         }
     };
 
-    Form.prototype.nextPage = function(model) {
+    Form.prototype.nextPage = function() {
         if (this.loading || this.loaded) return;
         this.loading = true;
+        var model = this.model;
 
         this.start++;
         var url = this.url + model + '&start=' + this.start;
@@ -108,14 +111,16 @@ keopsApp.factory('Form', function($http, SharedData, $location, $window){
             this.pk = null;
             this.loading = false;
             this.loaded = this.start == this.total - 1;
+            this.masterChange();
             delete SharedData.list;
         }.bind(this));
     };
 
-    Form.prototype.prevPage = function(model) {
+    Form.prototype.prevPage = function() {
         if (this.start === 0) return;
         this.loading = true;
         this.loaded = false;
+        var model = this.model;
 
         this.start--;
         var url = this.url + model + '&start=' + this.start;
@@ -123,15 +128,46 @@ keopsApp.factory('Form', function($http, SharedData, $location, $window){
             if (this.total === null) this.total = data.total;
             this.item = data.items[0];
             $location.search('pk', this.item.pk);
-            console.log(this.items);
             this.loading = false;
+            this.masterChange();
         }.bind(this));
     };
+
+    Form.prototype.masterChange = function () {
+        // notify form remote items
+        var formItem = this.item;
+        formItem.items = {};
+        items = this.element.find('[remoteitem]');
+        remoteitems = [];
+        for (var i = 0; i < items.length; i++) remoteitems.push(angular.element(items[i]).attr('name'));
+        // make params
+        data = { model: this.model, pk: this.item.pk, items: angular.toJson(remoteitems) };
+        // load remote data
+        $http({
+            method: 'GET',
+            url: '/db/read/items',
+            params: data
+        }).
+        success(function (data) {
+            for (var i = 0; i < items.length; i++) {
+                var item = angular.element(items[i]);
+                var name = item.attr('name');
+                formItem[name] = data[name].items;
+            }
+        });
+    };
+
+    Form.prototype.initForm = function (model) {
+        this.model = model;
+        this.nextPage();
+    };
+
     return Form;
 });
 
-keopsApp.controller('FormController', function($scope, $http, Form, $location) {
+keopsApp.controller('FormController', function($scope, $http, Form, $location, $element) {
     $scope.form = new Form();
+    $scope.form.element = $element;
 
     $scope.search = function (url, search) {
         $location.path(url).search(search);

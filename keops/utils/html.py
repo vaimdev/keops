@@ -1,5 +1,5 @@
 
-def TAG(tag='html', *args, **kwargs):
+def TAG(tag=None, *args, **kwargs):
     s = '<' + tag
     attrs = kwargs.pop('attrs', None)
     if isinstance(attrs, dict):
@@ -88,6 +88,12 @@ def TABLE(*args, **kwargs):
 
 def TD(*args, **kwargs):
     return TAG('td', *args, **kwargs)
+
+def THEAD(*args, **kwargs):
+    return TAG('thead', *args, **kwargs)
+
+def TBODY(*args, **kwargs):
+    return TAG('tbody', *args, **kwargs)
 
 def TH(*args, **kwargs):
     return TAG('th', *args, **kwargs)
