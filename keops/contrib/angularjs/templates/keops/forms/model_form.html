@@ -22,8 +22,10 @@
                         <table style="float: right; height: 100%;">
                             <tr>
                                 <td ng-show="!form.write" style="text-align: right; height: 100%;" colspan="2">
-                                    <span class="input-add-on" ng-click="search('{{ action.get_absolute_url }}list', 'query=' + searchField)"><i class="icon-search"></i></span>
-                                    <input class="input-prepend" placeholder="{{ _("search")|capfirst }}">
+                                    <span style="cursor: pointer;" class="input-add-on" ng-click="search('{{ action.get_absolute_url }}list', 'query=' + searchField)">
+                                        <i class="icon-search"></i>
+                                    </span>
+                                    <input class="input-prepend" placeholder="{{ _("search")|capfirst }}" ng-model="searchField">
                                 </td>
                             </tr>
                             <tr>

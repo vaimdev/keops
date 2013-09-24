@@ -1,4 +1,4 @@
-<table class="data-grid" infinite-scroll="list.nextPage('{{ model_name }}')" infinite-scroll-distance="1">
+<table class="data-grid" infinite-scroll="list.nextPage('{{ model_name }}', '{{ query }}')" infinite-scroll-distance="1">
     <thead>
         <tr>
             {% for field in fields %}

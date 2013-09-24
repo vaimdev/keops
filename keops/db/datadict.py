@@ -9,7 +9,7 @@ from keops.forms.admin import ModelAdmin
 # Add data dict object to Django model (class Extra)
 dd_items = {
     # Extra attributes
-    'display_expression': None,
+    'default_fields': None,
     'status_field': None, # main model status field representation
     'field_groups': {
         'display_fields': None,
@@ -83,21 +83,24 @@ class ModelBase(object):
              if isinstance(f, models.ForeignKey) and not f.primary_key]
 
         # Auto detect display_expression
-        if extra.display_expression is None:
+        if extra.default_fields is None:
             fk = None
             for f in new_class._meta.fields:
                 if isinstance(f, models.CharField):
-                    extra.display_expression = (f.name,)
+                    extra.default_fields = (f.name,)
                     break
                 if isinstance(f, models.ForeignKey) and not fk:
                     fk = (f.name,)
-            extra.display_expression = extra.display_expression or fk
+            extra.default_fields = extra.default_fields or fk
 
         if not extra.field_groups.get('list_fields'):
             extra.field_groups['list_fields'] = [
                 f.name for f in new_class._meta.fields \
                 if not isinstance(f, (models.AutoField, models.ManyToManyField)) and\
                 getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
+
+        if not extra.field_groups.get('search_fields'):
+            extra.field_groups['search_fields'] = extra.default_fields
 
         # Auto detect status_field
         if extra.status_field is None:
@@ -272,13 +275,13 @@ class Model(object):
 
     def __str__(self):
         extra = self.__class__.Extra
-        if getattr(extra, 'display_expression', None):
+        if getattr(extra, 'default_fields', None):
             s = "class _C():\n    def __str__(self):\n        return %s"
             l = {}
-            if isinstance(extra.display_expression, str):
-                exec(s % extra.display_expression, globals(), l)
-            elif isinstance(extra.display_expression, (tuple, list)):
-                exec(s % ' + " - " + '.join(['str(self.%s)' % s for s in extra.display_expression]), globals(), l)
+            if isinstance(extra.default_fields, str):
+                exec(s % extra.default_fields, globals(), l)
+            elif isinstance(extra.default_fields, (tuple, list)):
+                exec(s % ' + " - " + '.join(['str(self.%s)' % s for s in extra.default_fields]), globals(), l)
             m = l.get('_C')
             if m:
                 setattr(self.__class__, '__str__', m.__str__)

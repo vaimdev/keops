@@ -14,8 +14,8 @@
                         <table style="height: 100%;">
                             <tr>
                                 <td style="float: right; height: 100%;">
-                                    <span class="input-add-on" ng-click=""><i class="icon-search"></i></span>
-                                    <input class="input-prepend" placeholder="{{ _("search")|capfirst }}">
+                                    <span style="cursor: pointer;" class="input-add-on" ng-click="list.query('{{ model_name }}', searchField)"><i class="icon-search"></i></span>
+                                    <input class="input-prepend" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" value="{{ query }}" ng-enter="list.query('{{ model_name }}', searchField)">
                                 </td>
                             </tr>
                             <tr>

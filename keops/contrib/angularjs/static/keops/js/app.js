@@ -45,14 +45,25 @@ keopsApp.factory('List', function($http, SharedData) {
         SharedData.list = this;
     };
 
-    List.prototype.nextPage = function(model) {
+    List.prototype.nextPage = function(model, query) {
         if (this.loading || this.loaded) return;
         this.loading = true;
 
+        var params = {
+            model: model,
+            start: this.start,
+            limit: 25
+        }
+
+        if (query) params['query'] = query;
+
         var url = "/db/grid/?model=" + model + '&start=' + this.start;
-        if (this.total === null) url += '&total=1&limit=200'
-        else url += '&limit=25';
-        $http.get(url).success(function(data) {
+        if (this.total === null) { params['total'] = 1; params['limit'] = 200; }
+        $http({
+            url: '/db/grid/',
+            method: 'GET',
+            params: params
+        }).success(function(data) {
             if (this.total == null) this.total = data.total;
             for (var i=0; i < data.items.length; i++)
                 this.items.push(data.items[i]);
@@ -60,6 +71,14 @@ keopsApp.factory('List', function($http, SharedData) {
             this.loading = false;
             this.loaded = this.items.length == this.total;
         }.bind(this));
+    };
+
+    List.prototype.query = function(model, query) {
+        this.total = null;
+        this.start = 0;
+        this.loaded = false;
+        this.items = [];
+        this.nextPage(model, query);
     };
 
     return List;

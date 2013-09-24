@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import smart_text
+from django.db.models import Q
 from keops.db import get_db, set_db
 from keops.http import HttpJsonResponse
 
@@ -41,20 +41,80 @@ def field_text(value):
     else:
         return str(value)
 
+
+def _get_filter_args(self, filter):
+    if isinstance(filter, (tuple, list)):
+        d = {}
+        for i in filter:
+            d[i[0] + '__exact'] = i[2]
+    elif isinstance(filter, dict):
+        return filter
+
+def _get_query_args(cls, search_fields, value, filter=None):
+    op = '__icontains'
+
+    def _get_filter_items(field, expr=None):
+        if expr:
+            rs = expr + '__' + field.name
+        else:
+            rs = field.name
+        if isinstance(field, models.ForeignKey):
+            if field.related.parent_model == cls:
+                return []
+            r = []
+            model = field.related.parent_model
+            d = model.Extra.field_groups['search_fields']
+            if isinstance(d, (tuple, list)):
+                for f in d:
+                    r.extend(_get_filter_items(model._meta.get_field(f), rs))
+                return r
+            else:
+                r.extend(_get_filter_items(model._meta.get_field(d), rs))
+                return r
+        else:
+            return [rs]
+
+    if filter:
+        d = _get_filter_args(filter)
+    else:
+        d = {}
+    filter_items = []
+    if isinstance(search_fields, (tuple, list)):
+        r = None
+        for f in search_fields:
+            field = cls._meta.get_field(f)
+            filter_items.extend(_get_filter_items(field))
+
+        for f in filter_items:
+            q = Q(**{f + op: value})
+            if r:
+                r = r | q
+            else:
+                r = q
+        if d:
+            r = Q(**d) & Q(r)
+        return r
+
+    else:
+        filter_items.extend(_get_filter_items(cls._meta.get_field(cls._meta.default_fields)))
+        d.update({f + op: value for f in filter_items})
+        return Q(**d)
+
 def search_text(queryset, text, search_fields=None):
     # Search by the search_fields property (Admin)
+    model = queryset.model
     if not search_fields:
-        search_fields = queryset.model._admin.search_fields
-    if hasattr(queryset.model, '_admin'):
-        filter = {f: text for f in search_fields}
-    else:
-        filter = {}
-    return queryset.filter(**filter)
+        search_fields = model.Extra.field_groups['search_fields']
+
+    query = _get_query_args(model, search_fields, text)
+
+    return queryset.filter(query)
 
 def grid(request):
     using = get_db(request)
     model = get_model(request.GET)
     pk = request.GET.get('pk')
+    query = request.GET.get('query')
     field = request.GET.get('field') # Check related field
     if field:
         obj = model.objects.using(using).get(pk=pk)
@@ -78,15 +138,18 @@ def grid(request):
         count = queryset.all().count()
     else:
         count = None
+
+    if query:
+        queryset = search_text(queryset, query)
+
     queryset = queryset.all()[start:limit]
 
     # TODO Check content type permissions permissions
 
     get_val = lambda x: '' if x is None else x
     fields = ['pk'] + fields
-    rows = [{f: smart_text(get_val(getattr(row, f))) for f in fields} for row in queryset]
+    rows = [{f: str(get_val(getattr(row, f))) for f in fields} for row in queryset]
     data = {'items': rows, 'total': count}
-    print(data)
     return HttpJsonResponse(data)
 
 def get_read_fields(model):
