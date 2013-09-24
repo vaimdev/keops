@@ -89,6 +89,12 @@ def grid(request):
     print(data)
     return HttpJsonResponse(data)
 
+def get_read_fields(model):
+    if not hasattr(model.Extra, '_cache_read_fields'):
+        model.Extra._cache_read_fields = [f.name for f in model._meta.fields if not f.primary_key] +\
+                                         [(isinstance(f, models.ForeignKey) and f.attname) or (f.choices and 'get_%s_display' % f.name) for f in model._meta.fields if isinstance(f, models.ForeignKey) or f.choices]
+    return model.Extra._cache_read_fields
+
 def _read(context, using):
     pk = context.get('pk')
     queryset = context.get('queryset')
@@ -111,8 +117,9 @@ def _read(context, using):
         count = count.using(using).all().count()
     else:
         count = None
-        
-    fields = ['pk', '__str__'] + context.get('fields', [f.name for f in model._meta.fields if not f.primary_key] + [f.attname for f in model._meta.fields if isinstance(f, models.ForeignKey)])
+
+    fields = ['pk', '__str__'] + context.get('fields', get_read_fields(model))
+    print(fields)
     rows = [{f: field_text(getattr(row, f)) for f in fields} for row in queryset]
     return {'items': rows, 'total': count}
     
@@ -122,7 +129,7 @@ def read(request):
     assert not 'all' in request.GET
     return HttpJsonResponse(_read(request.GET, using))
 
-def _get_queryset_item(model, obj, attr):
+def _get_queryset_fields(model, obj, attr):
     # TODO get fields for relation attr
     return getattr(obj, attr)
 
@@ -134,11 +141,11 @@ def read_items(request):
     items = json.loads(request.GET['items'])
     pk = request.GET['pk']
     data = {}
-    # Select pk field only
+    # Optimize selecting pk field only
     obj = model.objects.using(using).only(model._meta.pk.name).get(pk=pk)
     for item in items:
         context['fields'] = [] # Select only pk, __str__ for now
-        context['queryset'] = _get_queryset_item(model, obj, item)
+        context['queryset'] = _get_queryset_fields(model, obj, item)
         data[item] = _read(context, using)
     return HttpJsonResponse(data)
 

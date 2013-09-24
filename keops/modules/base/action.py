@@ -10,7 +10,10 @@ class ActionManager(ElementManager):
         ct = ContentType.objects.get(app_label=model[0], model=model[1])
         from .models import BaseModel
         model = BaseModel.objects.get(content_type=ct)
-        return FormAction.objects.get(model=model)
+        try:
+            return FormAction.objects.get(model=model)
+        except:
+            return
 
 class Action(ModuleElement):
     action_types = {}

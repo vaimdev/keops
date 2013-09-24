@@ -8,44 +8,61 @@ from keops.utils.html import *
 from keops.forms import widgets
 
 def get_field(field):
+    # TODO refactoring...
     bound_field = field
     field = bound_field.field
     name = bound_field.name
     attrs = {'ng-show': 'form.write', 'ng-model': 'form.item.' + name}
     span = {'ng-bind': 'form.item.' + name}
     widget_args = []
+    label = bound_field.label_tag(attrs={'class': 'field-label'}, label_suffix=' ')
+    args = []
+    span_args = []
+    field_args = {'class': 'field-cell'}
+    span_tag = 'span'
+
     if field.required:
         attrs['required'] = 1
-    if isinstance(field, forms.BooleanField):
-        span['ng-bind'] = "form.item.%s ? '%s': (form.item.%s == false ? '%s': '')" % (name, capfirst(_('yes')), name, capfirst(_('no')))
     elif isinstance(field, forms.ModelMultipleChoiceField):
-        attrs['tag'] = 'div multiplechoice remoteitem'
-        attrs['style'] = 'padding-top: 16px;';
-        attrs['name'] = name
-        attrs['label'] = bound_field.label
-        span['ng-bind'] = 'item.__str__'
-    elif isinstance(field, forms.ModelChoiceField):
-        # Change to smart combobox widget
-        meta = field.queryset.model._meta
-        attrs['name'] = field.target_attr.attname
-        attrs['ng-model'] = 'form.item.' + field.target_attr.attname
-        attrs['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
-        span['tag'] = 'a'
-        span['ng-click'] = "openResource('%s', 'pk='%s)" % (field.target_attr.get_resource_url(), ' + form.item.%s' % field.target_attr.attname)
-        span['style'] = 'cursor: pointer;'
+        pass
 
     if not isinstance(field, forms.BooleanField):
         attrs['class'] = 'long-field'
 
-    if isinstance(field, forms.ModelMultipleChoiceField):
+    if isinstance(field, forms.BooleanField):
+        attrs['tag'] = 'input'
+        attrs['type'] = 'checkbox'
+        span['ng-bind'] = "form.item.%s ? '%s': (form.item.%s == false ? '%s': '')" % (name, capfirst(_('yes')), name, capfirst(_('no')))
+    elif field.target_attr.choices:
+        print(name)
+        span['ng-bind'] = 'form.item.get_%s_display' % name
+    elif isinstance(field, forms.ModelMultipleChoiceField):
+        attrs['tag'] = 'div remoteitem'
+        attrs['name'] = name
         field_args = {'colspan': 2}
-        args = [bound_field.label_tag(attrs={'class': 'field-label', 'ng-show': '!form.write'}, label_suffix=' ')]
+        args = [
+            bound_field.label_tag(
+                attrs={'style': 'display: inline-block; padding-right: 10px;', 'class': 'field-label'},
+                label_suffix=' '
+            ),
+            '<a style="display: inline-block" ng-show="form.write" class="btn">%s</a>' % capfirst(_('add')),
+        ]
         label = None
-        bind = span.pop('ng-bind')
-        span['ng-repeat'] = 'item in form.item.' + name
-        span_args = [TAG('li', '<i class="icon-li icon-ok"></i><a ng-bind="%s"></a>' % bind, **span)]
-        span = {'class': 'icons-ul'}
-        span_tag = 'ul'
+        bind = 'item.__str__'
+        attrs.pop('ng-show')
+        args.append(
+            DIV(
+                LABEL(
+                    '''<a style="cursor: pointer;" ng-bind="%s"></a>
+                    <i ng-show="form.write" title="%s" style="margin-left: 10px; cursor: pointer;" class="icon-remove"></i>''' % (bind, capfirst(_('remove item'))),
+                    attrs={'class': 'multiplechoice-item', 'ng-repeat': 'item in form.item.' + name}),
+                attrs={'class': 'grid-field'}
+            )
+        )
+
+        span = {}
+        span_args = []
+        span_tag = None
     elif isinstance(field, keops.forms.GridField):
         field_args = {'colspan': 2, 'style': 'width: 100%;'}
 
@@ -55,25 +72,53 @@ def get_field(field):
         attrs.pop('ng-show')
         span['ng-bind'] = 'item.__str__'
         print(field.target_attr.list_fields)
-        widget_args = [TABLE(THEAD(TR(TH(''), TH('__str__'))),
-                             TBODY(TR(
-                                 '<td style="width: 1px; padding-right: 10px;"><i style="cursor: pointer" title="' + _('Remove item') + '" class="icon-remove"></a></td>',
-                                 TD('{{item.__str__}}'),
-                                      attrs={'ng-repeat': 'item in form.item.' + name})),
-                             attrs={'style': 'table-layout: inherit;'})]
+        widget_args = [
+            TABLE(
+                THEAD(
+                    TR(
+                        TH('__str__'),
+                        TH(''), # remove link column
+                    )
+                ),
+                TBODY(
+                    TR(
+                        TD('{{item.__str__}}'),
+                        TD(
+                            '<i ng-show="form.write" style="cursor: pointer" title="%s" class="icon-remove"></i>''' % capfirst(_('remove item')),
+                            style='width: 1px;'
+                        ),
+                        attrs={'ng-repeat': 'item in form.item.' + name}
+                    )
+                ),
+                attrs={'class': 'grid-field', 'style': 'table-layout: inherit;'}
+            )
+        ]
 
-        args = [bound_field.label_tag(attrs={'class': 'field-label', 'style': 'display: inline-block; padding-right: 10px;'}, label_suffix=' '), TAG('a', 'Add', attrs={'class': 'btn'})]
+        args = [
+            bound_field.label_tag(
+                attrs={'class': 'field-label', 'style': 'display: inline-block; padding-right: 10px;'},
+                label_suffix=' '
+            ),
+            TAG('a', capfirst(_('add')),
+                attrs={'ng-show': 'form.write', 'class': 'btn'}
+            )
+        ]
         label = None
         span = {}
         span_args = []
         span_tag = None
 
-    else:
-        label = bound_field.label_tag(attrs={'class': 'field-label'}, label_suffix=' ')
-        field_args = {'class': 'field-cell'}
-        args = []
-        span_args = []
-        span_tag = 'span'
+    elif isinstance(field, forms.ModelChoiceField):
+        # Change to remote combobox widget
+        meta = field.queryset.model._meta
+        attrs['name'] = field.target_attr.attname
+        attrs['ng-model'] = 'form.item.' + field.target_attr.attname
+        attrs['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
+        span_tag = 'a'
+        span['ng-click'] = "openResource('%s', 'pk='%s)" % (field.target_attr.get_resource_url(), ' + form.item.%s' % field.target_attr.attname)
+        span['style'] = 'cursor: pointer;'
+    elif isinstance(field.widget, widgets.widgets.Textarea):
+        attrs['style'] = 'height: 70px; margin: 0;'
 
     if 'tag' in attrs:
         widget = TAG(attrs.pop('tag'), id=bound_field.auto_id, name=attrs.pop('name', None) or name, *widget_args, **attrs)

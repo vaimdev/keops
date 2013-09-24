@@ -73,8 +73,11 @@ msgstr "imagem"
 msgid "Success"
 msgstr "Sucesso"
 
-msgid "Remove item"
-msgstr "Remover item"
+msgid "remove item"
+msgstr "remover item"
+
+msgid "add"
+msgstr "adicionar"
 
 msgid "Record sucessfully deleted!"
 msgstr "Registro excluído com sucesso!"

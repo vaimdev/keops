@@ -18,25 +18,25 @@
                             </div>
                         </div>
                     </td>
-                    <td style="width: 300px;">
-                        <table style="float: right">
+                    <td style="width: 250px;">
+                        <table style="float: right; height: 100%;">
                             <tr>
-                                <td ng-show="!form.write" style="text-align: right;" colspan="3">
-                                    <span class="add-on" ng-click="search('{{ action.get_absolute_url }}list', 'query=' + searchField)"><i class="icon-key"></i></span>
-                                    <input class="span2" placeholder="{{ _("search")|capfirst }}">
+                                <td ng-show="!form.write" style="text-align: right; height: 100%;" colspan="2">
+                                    <span class="input-add-on" ng-click="search('{{ action.get_absolute_url }}list', 'query=' + searchField)"><i class="icon-search"></i></span>
+                                    <input class="input-prepend" placeholder="{{ _("search")|capfirst }}">
                                 </td>
                             </tr>
                             <tr>
-                                <td style="padding-left: 10px;">
+                                <td style="height: auto;">
                                     <div ng-show="!form.write" class="btn-group">
-                                        <button type="button" class="btn" ng-click="form.prevPage()">&lt;</button>
-                                        <button type="button" class="btn" ng-click="form.nextPage()">&gt;</button>
+                                        <a class="btn" ng-click="form.prevPage()"><i class="icon-chevron-left"></i></a>
+                                        <a class="btn" ng-click="form.nextPage()"><i class="icon-chevron-right"></i></a>
                                     </div>
                                 </td>
-                                <td style="padding-left: 30px;">
+                                <td style="float: right; width: auto; height: auto;">
                                     <div ng-show="!form.write" class="btn-group">
-                                        <a type="button" class="btn" href="#{{ action.get_absolute_url }}list/">{{ _("list")|capfirst }}</a>
-                                        <a type="button" class="btn active">{{ _("form")|capfirst }}</a>
+                                        <a class="btn" href="#{{ action.get_absolute_url }}list/" title="{{ _("list")|capfirst }}"><i class="icon-reorder"></i></a>
+                                        <a class="btn active" title="{{ _("form")|capfirst }}"><i class="icon-edit"></i></a>
                                     </div>
                                 </td>
                             </tr>

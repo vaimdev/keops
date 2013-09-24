@@ -27,6 +27,9 @@ def BODY(*args, **kwargs):
 def SPAN(*args, **kwargs):
     return TAG('span', *args, **kwargs)
 
+def HR(*args, **kwargs):
+    return TAG('hr', *args, **kwargs)
+
 def BUTTON(*args, **kwargs):
     value = kwargs.pop('value', '')
     value = kwargs.pop('_value', value)
