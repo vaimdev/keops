@@ -84,6 +84,9 @@ def DecimalField(*args, **options):
 
 
 def get_resource_url(field, *args, **kwargs):
+    """
+    Auto detect resource url (ForeignKey fields).
+    """
     if not getattr(field, 'resource_url', None):
         from keops.modules.base import models
         meta = field.rel.to._meta

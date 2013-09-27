@@ -67,7 +67,6 @@ def get_field(field):
         field_args = {'colspan': 2, 'style': 'width: 100%;'}
 
         attrs['tag'] = 'table remoteitem'
-        #attrs['style'] = 'padding-top: 16px;';
         attrs['name'] = name
         attrs.pop('ng-show')
         span['ng-bind'] = 'item.__str__'
@@ -115,7 +114,9 @@ def get_field(field):
         attrs['ng-model'] = 'form.item.' + field.target_attr.attname
         attrs['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
         span_tag = 'a'
-        span['ng-click'] = "openResource('%s', 'pk='%s)" % (field.target_attr.get_resource_url(), ' + form.item.%s' % field.target_attr.attname)
+        url = field.target_attr.get_resource_url()
+        if url:
+            span['ng-click'] = "openResource('%s', 'pk='%s)" % (url, ' + form.item.%s' % field.target_attr.attname)
         span['style'] = 'cursor: pointer;'
     elif isinstance(field.widget, widgets.widgets.Textarea):
         attrs['style'] = 'height: 70px; margin: 0;'

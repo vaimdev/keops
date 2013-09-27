@@ -52,6 +52,7 @@ def _get_filter_args(self, filter):
 
 def _get_query_args(cls, search_fields, value, filter=None):
     op = '__icontains'
+    # TODO add unaccent
 
     def _get_filter_items(field, expr=None):
         if expr:
@@ -102,6 +103,7 @@ def _get_query_args(cls, search_fields, value, filter=None):
 
 def search_text(queryset, text, search_fields=None):
     # Search by the search_fields property (Admin)
+    # TODO add query on form view
     model = queryset.model
     if not search_fields:
         search_fields = model.Extra.field_groups['search_fields']
@@ -134,13 +136,14 @@ def grid(request):
     start = int(request.GET.get('start', '0'))
     limit = int(request.GET.get('limit', '50')) + start # settings
     count = request.GET.get('total', False)
+
+    if query:
+        queryset = search_text(queryset, query)
+
     if count:
         count = queryset.all().count()
     else:
         count = None
-
-    if query:
-        queryset = search_text(queryset, query)
 
     queryset = queryset.all()[start:limit]
 
@@ -182,7 +185,6 @@ def _read(context, using):
         count = None
 
     fields = ['pk', '__str__'] + context.get('fields', get_read_fields(model))
-    print(fields)
     rows = [{f: field_text(getattr(row, f)) for f in fields} for row in queryset]
     return {'items': rows, 'total': count}
     

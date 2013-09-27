@@ -25,7 +25,7 @@
                                     <span style="cursor: pointer;" class="input-add-on" ng-click="search('{{ action.get_absolute_url }}list', 'query=' + searchField)">
                                         <i class="icon-search"></i>
                                     </span>
-                                    <input class="input-prepend" placeholder="{{ _("search")|capfirst }}" ng-model="searchField">
+                                    <input class="input-prepend" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" ng-enter="search('{{ action.get_absolute_url }}list', 'query=' + searchField)">
                                 </td>
                             </tr>
                             <tr>

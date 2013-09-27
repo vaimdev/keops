@@ -1,4 +1,4 @@
-<div ng-controller="ListController">
+<div ng-controller="ListController" ng-init="searchField = '{{ query }}'">
 <table style="width: 100%;">
     <tr>
         <td class="form-head">
@@ -10,17 +10,17 @@
                             <label style="display: inline-block;" class="form-data-info">{% verbatim %}{{list.start}} / {{list.total}}{% endverbatim %}</label>
                         </span>
                     </td>
-                    <td style="float: right; width: 250px; height: 100%; margin-right: -1px;">
-                        <table style="height: 100%;">
+                    <td style="float: right; width: 400px; height: 100%; margin-right: -1px;">
+                        <table style="height: 100%; float: right;">
                             <tr>
-                                <td style="float: right; height: 100%;">
+                                <td style="height: 100%;">
                                     <span style="cursor: pointer;" class="input-add-on" ng-click="list.query('{{ model_name }}', searchField)"><i class="icon-search"></i></span>
-                                    <input class="input-prepend" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" value="{{ query }}" ng-enter="list.query('{{ model_name }}', searchField)">
+                                    <input style="width: 350px;" class="input-prepend" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" value="{{ query }}" ng-enter="list.query('{{ model_name }}', searchField)">
                                 </td>
                             </tr>
                             <tr>
-                                <td style="float: right; height: 12px;">
-                                    <div class="btn-group" style="display: block">
+                                <td>
+                                    <div class="btn-group" style="float: right;">
                                         <a class="btn active" title="{{ _("list")|capfirst }}"><i class="icon-reorder"></i></a>
                                         <a class="btn" href="#{{ action.get_absolute_url }}form/" title="{{ _("form")|capfirst }}"><i class="icon-edit"></i></a>
                                     </div>
