@@ -3,6 +3,7 @@ from django.utils import formats
 from django.utils.text import capfirst
 from django.core.urlresolvers import reverse
 from django import forms
+import django.forms.widgets
 import keops.forms
 from keops.utils.html import *
 from keops.forms import widgets
@@ -23,18 +24,18 @@ def get_field(field):
 
     if field.required:
         attrs['required'] = 1
-    elif isinstance(field, forms.ModelMultipleChoiceField):
-        pass
 
-    if not isinstance(field, forms.BooleanField):
+    if not isinstance(field, (forms.BooleanField, forms.DateTimeField)):
         attrs['class'] = 'long-field'
 
     if isinstance(field, forms.BooleanField):
         attrs['tag'] = 'input'
         attrs['type'] = 'checkbox'
         span['ng-bind'] = "form.item.%s ? '%s': (form.item.%s == false ? '%s': '')" % (name, capfirst(_('yes')), name, capfirst(_('no')))
+    elif isinstance(field, forms.EmailField):
+        span_tag = 'a'
+        span['ng-href'] = 'mailto:{{form.item.%s}}' % name
     elif field.target_attr.choices:
-        print(name)
         span['ng-bind'] = 'form.item.get_%s_display' % name
     elif isinstance(field, forms.ModelMultipleChoiceField):
         attrs['tag'] = 'div remoteitem'
@@ -75,7 +76,7 @@ def get_field(field):
             TABLE(
                 THEAD(
                     TR(
-                        TH('__str__'),
+                        TH(''),
                         TH(''), # remove link column
                     )
                 ),
@@ -142,7 +143,7 @@ def get_form_fields(form):
 def get_container(container):
     f = container[0]
     label, field = get_field(f)
-    return label + TD(DIV(TABLE(TR(field, *[''.join(get_field(*f)) for f in container[1:]]),
+    return label + TD(DIV(TABLE(TR(field, *[''.join(get_field(f)) for f in container[1:]]),
                                 attrs={'class': 'field-container'})),
                       attrs={'class': 'field-cell'})
 

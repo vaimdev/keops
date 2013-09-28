@@ -13,7 +13,7 @@ class FieldLine(object):
     
     def __iter__(self):
         for field in self.fields:
-            yield self.form.get_form_field(field)
+            yield self.form.get_formfield(field)
 
 class Fieldset(object):
     def __init__(self, name, form, fieldset):
@@ -173,10 +173,6 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         for page, fieldsets in self.pages:
             yield TabPage(page, self, fieldsets)
 
-    def as_table(self):
-        # To implement
-        pass
-
     @property
     def form(self):
         """
@@ -216,7 +212,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
     def list_view(self, request, **kwargs):
         kwargs['query'] = request.GET.get('query', '')
-        kwargs['fields'] = [self.get_form_field(f) for f in self.list_display]
+        kwargs['fields'] = [self.get_formfield(f) for f in self.list_display]
         kwargs['list_display'] = ['{{item.%s}}' % f for f in self.list_display]
         self._prepare_context(request, kwargs)
         kwargs.setdefault('pagesize', 50)
@@ -230,10 +226,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         kwargs['state'] = 'write'
         self.view(request, **kwargs)
         
-    def get_queryset(self, request):
+    def queryset(self, request):
         return self.model.objects.all()
 
-    def get_form_field(self, field):
+    def get_formfield(self, field):
         if not field in self.bound_fields:
             try:
                 f = self.model._meta.get_field(field)
