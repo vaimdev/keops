@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy as _
 from keops.db import models
 from keops.modules.base import models as base
 
@@ -9,8 +10,7 @@ class Bank(models.Model):
     email = models.EmailField('e-mail')
 
     class Meta:
-        db_table = 'base_bank'
+        db_table = 'bank'
 
     class Extra:
-        display_expression = ('code', 'name')
-
+        default_fields = ('code', 'name')

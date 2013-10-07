@@ -81,3 +81,12 @@ msgstr "adicionar"
 
 msgid "Record sucessfully deleted!"
 msgstr "Registro excluído com sucesso!"
+
+msgid "9999-99-99 99:99 AA"
+msgstr "99/99/9999 99:99"
+
+msgid "9999-99-99"
+msgstr "99/99/9999"
+
+msgid "yy-mm-dd"
+msgstr "dd/mm/yy"

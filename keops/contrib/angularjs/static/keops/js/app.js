@@ -1,4 +1,6 @@
-var keopsApp = angular.module('keopsApp', ['ngRoute', 'ui.bootstrap', 'infinite-scroll', 'ui.keops']).config(
+$.datepicker.setDefaults($.datepicker.regional[document.documentElement.lang]);
+
+var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ui.bootstrap', 'infinite-scroll', 'ui.keops']).config(
     function($routeProvider, $locationProvider) {
         $routeProvider.
             when('/action/:id/',
@@ -192,7 +194,18 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         $location.path(url).search(search);
     };
 
+    $scope.lookupData = function (url, model, query) {
+        var promise = $http({
+            method: 'GET',
+            url: url,
+            params: { query: query, model: model }
+        })
+            .then(function (response) { return response.data; });
+        promise.$$v = promise;
+        return promise
+    };
+
     $scope.openResource = function (url, search) {
         $location.path(url).search(search).replace();
-    }
+    };
 });

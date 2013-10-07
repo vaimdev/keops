@@ -13,37 +13,71 @@ ui.directive('ngEnter', function() {
     };
 });
 
-ui.directive('combobox', function() {
+ui.directive('uiMask', function() {
     return {
         restrict: 'A',
         require : 'ngModel',
-        link : function (scope, element, attrs, ngModelCtrl) {
-            $(function() {
-                element.autocomplete({
-                    source: function (request, response) {
-                        $.ajax({
-                             url: "/db/lookup/?model=base.module",
-                             data: { query: request.term },
-                             dataType: "json",
-                             success: function() {
-                                 return response(arguments[0]);
-                             },
-                             error: function () {
-                                 response([]);
-                             }
-                        });
-                    },
-                    change: function (e, ui) {
-                        if (!ui.item) $(this).val('');
-                    }
-                }).on('autocompleteselect', function (e, ui) {
-                        e.preventDefault();
+        link : function (scope, element, attrs, controller) {
+            var maskStore = attrs['uiMaskStore'];
 
-                        this.value = ui.item.label;
-                        this.rawValue = ui.item.value;
-                    });
+            $(function() {
+                element.mask(attrs['uiMask']);
+                return element.bind('keyup blur', function(event) {
+                    if (maskStore)
+                        return controller.$setViewValue(element.val());
+                    else
+                        return controller.$setViewValue(element.mask());
+                });
             });
         }
     }
 });
 
+ui.directive('datePicker', function() {
+    return {
+        restrict: 'A',
+        //require : 'ngModel',
+        link: function(scope, element, attrs, controller) {
+            element.datepicker({
+                dateFormat: attrs.dateFormat,
+                onSelect: function(dateText, datepicker) {
+                    scope.date = dateText;
+                    scope.$apply();
+                }
+            });
+        }
+    }
+});
+
+ui.directive('dateTimePicker', function() {
+    return {
+        restrict: 'A',
+        //require : 'ngModel',
+        link: function(scope, element, attrs, controller) {
+            var el = element.datetimepicker({
+                dateFormat: attrs.dateFormat,
+                timeFormat: attrs.timeFormat,
+                alwaysSetTime: false,
+                showOn: 'button',
+                onSelect: function(dateText, datepicker) {
+                    scope.date = dateText;
+                    scope.$apply();
+                }
+            });
+            el = el.next('.ui-datepicker-trigger');
+            el.addClass('btn').html('<i class="icon-calendar"></i>');
+        }
+    }
+});
+
+ui.filter('dateFromNow', function ($locale) {
+    return function (dateString) {
+        // TODO adjust to get current locale short date time format
+        if (dateString) {
+            var fmt = $locale.DATETIME_FORMATS.mediumDate.toUpperCase() + ' ' + $locale.DATETIME_FORMATS.shortTime;
+            var m = moment(dateString, fmt)
+            return m.format('LLLL') + ' (' + m.fromNow() + ')';
+        }
+        else return '';
+    };
+});

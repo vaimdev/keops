@@ -1,10 +1,12 @@
 import decimal
+import datetime
 import json
 from django.utils.translation import ugettext as _
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
+from django.utils import formats
 from keops.db import get_db, set_db
 from keops.http import HttpJsonResponse
 
@@ -37,7 +39,11 @@ def field_text(value):
     elif callable(value):
         return value()
     elif isinstance(value, (int, str, float, decimal.Decimal)):
-        return value
+        return formats.localize(value)
+    elif isinstance(value, datetime.datetime):
+        return formats.date_format(value, 'SHORT_DATETIME_FORMAT')
+    elif isinstance(value, models.Model):
+        return {'label': str(value), 'value': value.pk}
     else:
         return str(value)
 
@@ -158,7 +164,7 @@ def grid(request):
 def get_read_fields(model):
     if not hasattr(model.Extra, '_cache_read_fields'):
         model.Extra._cache_read_fields = [f.name for f in model._meta.fields if not f.primary_key] +\
-                                         [(isinstance(f, models.ForeignKey) and f.attname) or (f.choices and 'get_%s_display' % f.name) for f in model._meta.fields if isinstance(f, models.ForeignKey) or f.choices]
+                                         [(f.choices and 'get_%s_display' % f.name) for f in model._meta.fields if f.choices]
     return model.Extra._cache_read_fields
 
 def _read(context, using):

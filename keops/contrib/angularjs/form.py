@@ -9,7 +9,6 @@ from keops.utils.html import *
 from keops.forms import widgets
 
 def get_field(field):
-    # TODO refactoring...
     bound_field = field
     field = bound_field.field
     name = bound_field.name
@@ -25,13 +24,31 @@ def get_field(field):
     if field.required:
         attrs['required'] = 1
 
-    if not isinstance(field, (forms.BooleanField, forms.DateTimeField)):
+    if isinstance(field, (forms.DateField, forms.IntegerField)):
+        attrs['class'] = 'small-field'
+    elif isinstance(field, forms.DateTimeField):
+        attrs['class'] = 'normal-field'
+    else:
         attrs['class'] = 'long-field'
 
     if isinstance(field, forms.BooleanField):
-        attrs['tag'] = 'input'
-        attrs['type'] = 'checkbox'
-        span['ng-bind'] = "form.item.%s ? '%s': (form.item.%s == false ? '%s': '')" % (name, capfirst(_('yes')), name, capfirst(_('no')))
+        attrs = {'tag': 'label', 'ng-show': attrs.pop('ng-show'), 'style': 'cursor: pointer;'}
+        widget_args = [TAG('input type="checkbox"', ngModel='form.item.' + name)]
+        span['ng-bind'] = "form.item.%s" % name
+        #span['ng-bind'] = "form.item.%s === 'True' ? '%s': '%s'" % (name, capfirst(_('yes')), capfirst(_('no')))
+    elif isinstance(field, forms.DateTimeField):
+        attrs['ui-mask'] = _('9999-99-99 99:99 AA')
+        attrs['date-format'] = _('yy-mm-dd')
+        attrs['time-format'] = _('HH:mm')
+        span_args.append('{{%s | dateFromNow}}' % span.pop('ng-bind'))
+        show = attrs.pop('ng-show')
+        widget_args.append(TAG('input type="text" date-time-picker', **attrs))
+        attrs = {'tag': 'div', 'ng-show': show, 'class': 'input-append date'}
+    elif isinstance(field, forms.DateField):
+        attrs['ui-mask'] = _('9999-99-99')
+        attrs['date-format'] = _('yy-mm-dd')
+        widget_args = ['<button class="btn" ng-show="form.write"><i class="icon-calendar"></i></button>']
+        attrs['tag'] = 'input type="text"'
     elif isinstance(field, forms.EmailField):
         span_tag = 'a'
         span['ng-href'] = 'mailto:{{form.item.%s}}' % name
@@ -71,7 +88,6 @@ def get_field(field):
         attrs['name'] = name
         attrs.pop('ng-show')
         span['ng-bind'] = 'item.__str__'
-        print(field.target_attr.list_fields)
         widget_args = [
             TABLE(
                 THEAD(
@@ -109,15 +125,16 @@ def get_field(field):
         span_tag = None
 
     elif isinstance(field, forms.ModelChoiceField):
-        # Change to remote combobox widget
         meta = field.queryset.model._meta
-        attrs['name'] = field.target_attr.attname
-        attrs['ng-model'] = 'form.item.' + field.target_attr.attname
-        attrs['model-name'] = '%s.%s' % (meta.app_label, meta.model_name)
+        attrs['tag'] = 'input'
+        attrs['typeahead'] = "item as item.label for item in lookupData('/db/lookup/', '%s.%s', $viewValue)" % (meta.app_label, meta.model_name)
+        attrs['typeahead-wait-ms'] = 500
+        span['ng-bind'] += '.label'
+        # Change to remote combobox widget
         span_tag = 'a'
         url = field.target_attr.get_resource_url()
         if url:
-            span['ng-click'] = "openResource('%s', 'pk='%s)" % (url, ' + form.item.%s' % field.target_attr.attname)
+            span['ng-click'] = "openResource('%s', 'pk='%s)" % (url, ' + form.item.%s.value' % name)
         span['style'] = 'cursor: pointer;'
     elif isinstance(field.widget, widgets.widgets.Textarea):
         attrs['style'] = 'height: 70px; margin: 0;'
