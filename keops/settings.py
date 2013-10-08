@@ -48,6 +48,8 @@ SERIALIZATION_MODULES = {
     'json' : 'keops.core.serializers.json',
     'xml' : 'keops.core.serializers.xml_serializer',
     'yaml' : 'keops.core.serializers.pyyaml',
+    'csv' : 'keops.core.serializers.csv_serializer',
+    'txt' : 'keops.core.serializers.txt_serializer',
 }
 
 TEMPLATE_PROCESSORS = (
@@ -89,6 +91,8 @@ LOGGING = {
         },
         'django.db.backends': {
             'handlers': ['console'],
+            #'level': 'DEBUG',
+            'propagate': True,
         },
         'app': {
             'handlers': ['console'],

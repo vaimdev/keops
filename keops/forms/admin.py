@@ -59,7 +59,6 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     pages = ()
     search_fields = ()
     columns = 2
-    bound_fields = {}
     formfield_overrides = None
 
     toolbar_actions = ['create', 'read', 'update', 'delete', 'print', 'delete', 'search']
@@ -73,6 +72,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     model_form = None
 
     def __init__(self, admin=None):
+        self.bound_fields = {}
         self.admin = admin
         self._prepared = False
         self._form = None

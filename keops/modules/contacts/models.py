@@ -17,7 +17,7 @@ class Contact(base.CompanyModel):
     image = models.ImageRelField(verbose_name=_('image'))
     active = models.BooleanField(_('active'), default=True)
     parent = models.ForeignKey('self')
-    category = models.ForeignKey(Category, verbose_name=_('partner category'))
+    category = models.ForeignKey(Category, verbose_name=_('Contact Category'))
     language = models.ForeignKey('base.Language')
     time_zone = models.CharField(_('time zone'), max_length=32)
     comments = models.TextField(_('comments'))

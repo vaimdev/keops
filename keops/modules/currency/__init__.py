@@ -6,6 +6,5 @@ app_info = {
     'short_description': _('ERP integration module'),
     'description': _('ERP integration module'),
     'category': _('Business'),
-    'dependencies': ['keops.modules.communication'],
     'version': '0.1',
 }

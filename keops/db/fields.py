@@ -6,10 +6,12 @@ from keops.forms.widgets import GridWidget
 
 __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey',
            'FileRelField', 'ImageRelField', 'VirtualField', 'PropertyField',
-           'OneToManyField']
+           'OneToManyField', 'get_model_url']
 
 FIELD_BASIC_SEARCH = "basic"
 FIELD_ADVANCED_SEARCH = "advanced"
+
+_COMMON_ATTRS = ('mask', 'page', 'visible', 'fieldset', 'mask_re')
 
 # Add custom_attrs to field instances
 # custom_attrs items:
@@ -42,6 +44,16 @@ class Field(object):
             kwargs.pop('blank', None)
         # Add custom_attrs to field
         self.custom_attrs = kwargs.pop('custom_attrs', {})
+        if 'mask' in kwargs:
+            self.custom_attrs['mask'] = kwargs.pop('mask')
+        if 'page' in kwargs:
+            self.custom_attrs['page'] = kwargs.pop('page')
+        if 'visible' in kwargs:
+            self.custom_attrs['visible'] = kwargs.pop('visible')
+        if 'fieldset' in kwargs:
+            self.custom_attrs['fieldset'] = kwargs.pop('fieldset')
+        if 'mask_re' in kwargs:
+            self.custom_attrs['mask_re'] = kwargs.pop('mask_re')
         self.readonly = kwargs.pop('readonly', False)
         Field._init(self, *args, **kwargs)
 
@@ -82,19 +94,24 @@ def DecimalField(*args, **options):
     options.setdefault('decimal_places', 4)
     return models.DecimalField(*args, **options)
 
+def get_model_url(cls):
+    """
+    Get action resource url from a model class.
+    """
+    from keops.modules.base import models
+    meta = cls._meta
+    action = models.Action.objects.get_by_model_name('%s.%s' % (meta.app_label, meta.model_name))
+    if action:
+        return action.get_absolute_url() + 'form/'
+    else:
+        return ''
 
 def get_resource_url(field, *args, **kwargs):
     """
-    Auto detect resource url (ForeignKey fields).
+    Auto detect resource url from a foreignkey field.
     """
     if not getattr(field, 'resource_url', None):
-        from keops.modules.base import models
-        meta = field.rel.to._meta
-        action = models.Action.objects.get_by_model_name('%s.%s' % (meta.app_label, meta.model_name))
-        if action:
-            field.resource_url = action.get_absolute_url() + 'form/'
-        else:
-            return ''
+        field.resource_url = get_model_url(field.rel.to)
     return field.resource_url
 
 models.ForeignKey.get_resource_url = get_resource_url

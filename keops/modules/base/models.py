@@ -51,7 +51,7 @@ class Company(Element):
         }
 
 class CompanyModel(models.Model):
-    company = models.ForeignKey(Company, verbose_name=_('company'), null=False)
+    company = models.ForeignKey(Company, visible=False, null=False)
 
     class Meta:
         abstract = True
@@ -126,7 +126,7 @@ class Default(models.Model):
     class Meta:
         db_table = 'base_default'
         verbose_name = _('default field value')
-        verbose_name_plural = _('default fields values')
+        verbose_name_plural = _('default field value')
 
 class Attribute(models.Model):
     """

@@ -43,10 +43,11 @@ class Country(models.Model):
 
     class Meta:
         verbose_name = _('country')
+        verbose_name_plural = _('countries')
 
 class State(models.Model):
     country = models.ForeignKey(Country, verbose_name=_('country'), null=False)
-    code = models.CharField(_('code'), max_length=3, null=False)
+    code = models.CharField(_('state code'), max_length=3, null=False)
     name = models.CharField(_('name'), max_length=64, null=False)
 
     class Meta:

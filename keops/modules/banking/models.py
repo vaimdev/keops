@@ -10,7 +10,7 @@ class Bank(models.Model):
     email = models.EmailField('e-mail')
 
     class Meta:
-        db_table = 'bank'
+        db_table = 'banking_bank'
 
     class Extra:
         default_fields = ('code', 'name')

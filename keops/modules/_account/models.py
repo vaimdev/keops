@@ -32,7 +32,7 @@ class FiscalPeriod(models.Model):
     status = models.CharField(max_length=8, choices=FiscalYear.STATUS, readonly=True)
 
 class Account(models.Model):
-    code = models.CharField(_('code'), max_length=32, help_text=_('Account code'), null=False, db_index=True, custom_attrs={'mask': AccountConfig.account_mask})
+    #code = models.CharField(_('code'), max_length=32, help_text=_('Account code'), null=False, db_index=True, custom_attrs={'mask': AccountConfig.account_mask})
     name = models.CharField(_('name'), max_length=64, help_text=_('Account name'), null=False, db_index=True)
     parent = models.ForeignKey('self', verbose_name=_('Parent'), help_text=_('Parent account'))
     active = models.BooleanField()
@@ -70,10 +70,6 @@ class Move(models.Model):
     debit = models.MoneyField(_('debit'), default=0, readonly=True)
     credit = models.MoneyField(_('credit'), default=0, readonly=True)
     balance = models.MoneyField(_('balance'), default=0, readonly=True)
-    content_type = models.ForeignKey(ContentType, visible=False)
-    object_id = models.PositiveIntegerField(visible=False, db_index=True)
-    content_object = GenericForeignKey('content_type', 'object_id')
-    internal = models.BooleanField(default=False, visible=False)
 
     def __str__(self):
         return '%s - %s' % (str(self.id), self.description)
@@ -87,8 +83,8 @@ class Move(models.Model):
 class MoveLine(models.Model):
     account_move = models.ForeignKey(Move, null=False)
     document = models.CharField(max_length=32, db_index=True)
-    debit_account = models.ForeignKey(Account, 'debit account')
-    credit_account = models.ForeignKey(Account, 'credit account')
+    #debit_account = models.ForeignKey(Account, 'debit account')
+    #credit_account = models.ForeignKey(Account, 'credit account')
     value = models.MoneyField(blank=False)
     debit = models.MoneyField(default=0)
     credit = models.MoneyField(default=0)

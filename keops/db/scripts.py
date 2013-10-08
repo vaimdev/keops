@@ -1,4 +1,3 @@
-
 import os
 from importlib import import_module
 from django.db import connections
@@ -14,7 +13,7 @@ def _create_connection(db):
     if db_engine == 'sqlite3':
         import sqlite3
         return sqlite3.connect(db_settings['NAME'])
-    elif db_engine.startswith('postgres'):
+    elif 'postgres' in db_engine:
         return backend.psycopg2.connect("host='%s'  dbname='postgres' user='%s' password='%s'" %
             (db_settings['HOST'], db_settings['USER'], db_settings['PASSWORD']))
     elif db_engine == 'pyodbc':
@@ -37,7 +36,7 @@ def createdb(db):
 
     if db_engine == 'sqlite3':
         pass
-    elif db_engine.startswith('postgresql'):
+    elif 'postgres' in db_engine:
         conn.autocommit = True
         conn.cursor().execute('''CREATE DATABASE %s ENCODING='UTF-8' ''' % db_name)
     elif db_engine == 'pyodbc':
@@ -101,9 +100,15 @@ def runfile(filename, db):
 
 
 def install(app_name, db, demo=True):
-    app_label = app_name.split('.')[-1]
-    
-    def install_app():
+    from keops.modules.base import models as base
+    app_list = []
+
+    def install_app(app_name):
+        app_label = app_name.split('.')[-1]
+        if app_name in app_list or base.Module.objects.using(db).filter(app_label=app_label):
+            #print('Application "%s" already installed on database "%s".' % (app_label, db))
+            return
+        app_list.append(app_name)
         try:
             app = import_module(app_name)
             path = os.path.dirname(app.__file__)
@@ -111,24 +116,22 @@ def install(app_name, db, demo=True):
                 info = app.app_info
             else:
                 info = { 'name': app_label, 'description': '', 'version': '0.1' }
-            from keops.modules.base import models as base
-            if base.Module.objects.using(db).filter(app_label=app_label):
-                print('Application "%s" already installed on database "%s".' % (app_label, db))
-                return
-            else:
-                base.Module.objects.using(db).create(
-                    module_name=app_name,
-                    name=info['name'],
-                    app_label=app_label,
-                    description=info['description'],
-                    version=info.get('version', None),
-                    dependencies=info.get('dependencies'),
-                    icon=info.get('icon'),
-                    visible=info.get('visible'),
-                    tooltip=info.get('tooltip', ''),
-                    category=base.ModuleCategory.objects.get_category(info.get('category', None))
-                )
-                return True
+            dependencies = info.get('dependencies', [])
+            for dep in dependencies:
+                install_app(dep)
+            base.Module.objects.using(db).create(
+                module_name=app_name,
+                name=info['name'],
+                app_label=app_label,
+                description=info['description'],
+                version=info.get('version', None),
+                dependencies=info.get('dependencies'),
+                icon=info.get('icon'),
+                visible=info.get('visible'),
+                tooltip=info.get('tooltip', ''),
+                category=base.ModuleCategory.objects.get_category(info.get('category', None))
+            )
+            return True
         except Exception as e:
             raise
             import traceback
@@ -136,4 +139,4 @@ def install(app_name, db, demo=True):
             traceback.print_exc()
 
     from django.conf import settings
-    return install_app()
+    return install_app(app_name)

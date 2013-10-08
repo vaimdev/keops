@@ -216,7 +216,7 @@ class Command(BaseCommand):
                         self.stdout.write("Installing %s fixture '%s' from %s." % \
                             (format, fixture_name, humanize(fixture_dir)))
 
-                    objects = serializers.deserialize(format, Template(fixture.read()).render(Context({})), using=self.using, ignorenonexistent=self.ignore)
+                    objects = serializers.deserialize(format, Template(fixture.read()).render(Context({})), using=self.using, ignorenonexistent=self.ignore, filepath=full_path)
 
                     for obj in objects:
                         objects_in_fixture += 1

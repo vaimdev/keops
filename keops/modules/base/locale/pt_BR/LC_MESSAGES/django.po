@@ -40,6 +40,9 @@ msgstr "código"
 msgid "country"
 msgstr "país"
 
+msgid "countries"
+msgstr "países"
+
 msgid "administration"
 msgstr "administração"
 
@@ -196,5 +199,32 @@ msgstr "configuração"
 msgid "settings"
 msgstr "configurações"
 
-msgid "users"
-msgstr "usuários"
+msgid "zip"
+msgstr "cep"
+
+msgid "address"
+msgstr "endereço"
+
+msgid "comments"
+msgstr "comentários"
+
+msgid "is customer"
+msgstr "é cliente"
+
+msgid "is supplier"
+msgstr "é fornecedor"
+
+msgid "is employee"
+msgstr "é funcionário"
+
+msgid "is company"
+msgstr "é empresa"
+
+msgid "country code"
+msgstr "sigla"
+
+msgid "state code"
+msgstr "sigla"
+
+msgid "language"
+msgstr "idioma"

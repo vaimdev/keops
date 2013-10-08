@@ -60,7 +60,7 @@ keopsApp.factory('List', function($http, SharedData) {
         if (query) params['query'] = query;
 
         var url = "/db/grid/?model=" + model + '&start=' + this.start;
-        if (this.total === null) { params['total'] = 1; params['limit'] = 200; }
+        if (this.total === null) { params['total'] = 1; params['limit'] = 100; }
         $http({
             url: '/db/grid/',
             method: 'GET',
