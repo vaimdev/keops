@@ -57,11 +57,11 @@ class Menu(ModuleElement):
         for item in parents[:-1]:
             parent = menu
             try:
-                menu = cls.objects.get(parent_id=menu, name=item)
+                menu = cls.objects.using(self._state.db).filter(parent_id=menu, name=item)[0]
             except:
                 menu = None
             if not menu:
-                menu = cls.objects.create(name=item.replace('\\', '/'), parent=parent, module_id=self.module_id)
+                menu = cls.objects.using(self._state.db).create(name=item.replace('\\', '/'), parent=parent, module_id=self.module_id)
         self.parent = menu
 
     full_name = property(get_full_name, set_full_name)

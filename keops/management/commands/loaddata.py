@@ -169,8 +169,6 @@ class Command(BaseCommand):
     def process_dir(self, fixture_dir, fixture_name, compression_formats,
                     serialization_formats):
 
-        from django.template import Context, Template
-        # TODO check if translation is needed
         # Support for fixtures translation
         from django.utils import translation
         
@@ -216,7 +214,7 @@ class Command(BaseCommand):
                         self.stdout.write("Installing %s fixture '%s' from %s." % \
                             (format, fixture_name, humanize(fixture_dir)))
 
-                    objects = serializers.deserialize(format, Template(fixture.read()).render(Context({})), using=self.using, ignorenonexistent=self.ignore, filepath=full_path)
+                    objects = serializers.deserialize(format, fixture, using=self.using, ignorenonexistent=self.ignore, filepath=full_path)
 
                     for obj in objects:
                         objects_in_fixture += 1

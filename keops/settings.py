@@ -33,7 +33,7 @@ INSTALLED_APPS = [
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware', TODO: implement csrf on extjs
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'keops.middleware.threadlocal.ThreadLocalMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -50,6 +50,8 @@ SERIALIZATION_MODULES = {
     'yaml' : 'keops.core.serializers.pyyaml',
     'csv' : 'keops.core.serializers.csv_serializer',
     'txt' : 'keops.core.serializers.txt_serializer',
+    'django' : 'keops.core.serializers.django_serializer',
+    'mako' : 'keops.core.serializers.mako_serializer',
 }
 
 TEMPLATE_PROCESSORS = (

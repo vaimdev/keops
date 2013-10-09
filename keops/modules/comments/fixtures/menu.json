@@ -51,14 +51,5 @@
             "parent": ["menu-messaging-messaging"],
             "sequence": 130
         }
-    },
-    {
-        "model": "base.menu",
-        "id": "menu-messaging-mygroups",
-    	"fields" : {
-            "name": "{{ _('my groups')|capfirst }}",
-            "parent": ["menu-messaging-mygroups"],
-            "sequence": 110
-        }
     }
 ]
