@@ -22,7 +22,7 @@ def Deserializer(stream_or_string, **options):
             cols = []
             row = 0
             objects = []
-            for line in stream_or_string.splitlines():
+            for line in stream_or_string.read().splitlines():
                 pk = None
                 row += 1
                 line = line.replace(chr(9), ';').split(';')

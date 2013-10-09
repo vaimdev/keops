@@ -16,4 +16,4 @@ def Deserializer(stream_or_string, **options):
     # adjust filepath
     options['filepath'] = filepath
     stream_or_string = Template(stream_or_string.read()).render(Context({}))
-    serializers.deserialize(os.path.splitext(filepath)[1], stream_or_string, **options)
+    return serializers.deserialize(filepath.split('.')[-1], stream_or_string, **options)
