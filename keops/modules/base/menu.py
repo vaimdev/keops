@@ -24,7 +24,7 @@ class Menu(ModuleElement):
         db_table = 'base_menu'
         verbose_name = _('menu item')
         verbose_name_plural = _('menu items')
-        ordering = ['sequence', 'id']
+        ordering = ('sequence', 'id')
 
     class Extra:
         field_groups = {
@@ -50,7 +50,7 @@ class Menu(ModuleElement):
         return ' / '.join(parents)
 
     def set_full_name(self, path):
-        cls = self.__class__
+        cls = Menu
         menu = None
         parents = path.split('/')
         self.name = parents[-1]
@@ -71,11 +71,17 @@ class Menu(ModuleElement):
         if self.action and self.action.action_type == 'form':
             return FormAction.objects.using(self._state.db).get(pk=self.action.pk).model
     def set_model(self, model):
+        db = self._state.db
         from keops.modules.base.models import BaseModel
         if isinstance(model, str):
             model = model.split('.')
-            model = BaseModel.objects.using(self._state.db).get(content_type__app_label=model[0], content_type__model=model[1])
-        action = FormAction.objects.using(self._state.db).create(name='%s "%s.%s"' % (('showmodel',) + model.content_type.natural_key()), model=model)
+            model = BaseModel.objects.using(db).get(content_type__app_label=model[0], content_type__model=model[1])
+        action_name = '%s "%s.%s"' % (('showmodel',) + model.content_type.natural_key())
+        action = FormAction.objects.using(db).filter(name=action_name)
+        if action:
+            action = action[0]
+        else:
+            action = FormAction.objects.using(db).create(name=action_name, model=model)
         self.action = action
         self.image = '/static/keops/icons/page.png'
     model = property(get_model, set_model)

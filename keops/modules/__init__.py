@@ -14,26 +14,28 @@ def register_modules(prefix, path):
                 settings.INSTALLED_APPS.append(mod)
             except:
                 pass
-    # adjust module priority
+
+    # adjust module dependency priority
     apps = settings.INSTALLED_APPS
     for app in apps:
         mod = import_module(app)
         info = getattr(mod, 'app_info', None)
-        i = 0
         if info and 'dependencies' in info:
             apps.remove(app)
             deps = info.get('dependencies')
+            i = 0
             for dep in deps:
+                dep = dep.replace('-', '_')
                 if not dep in apps:
                     apps.append(dep)
-                    i = len(apps) -1
+                    i = len(apps) - 1
                     continue
                 i = max(i, apps.index(dep))
             if i == 0:
                 apps.append(app)
             else:
                 apps.insert(i + 1, app)
-
+    print(apps)
 
 # Auto register modules on settings.INSTALLED_APPS
 register_modules('keops.modules', os.path.dirname(__file__))

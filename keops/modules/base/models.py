@@ -51,7 +51,7 @@ class Company(Element):
         }
 
 class CompanyModel(models.Model):
-    company = models.ForeignKey(Company, visible=False, null=False)
+    company = models.ForeignKey(Company, visible=False)
 
     class Meta:
         abstract = True

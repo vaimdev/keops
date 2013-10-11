@@ -149,6 +149,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             
         self.title = self.title or self.model._meta.verbose_name_plural
         self.label = self.label or self.model._meta.verbose_name
+        self.help_text = self.help_text or getattr(self.model.Extra, 'help_text', '')
 
     def _prepare_form(self):
         self._prepare()

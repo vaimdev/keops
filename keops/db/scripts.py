@@ -99,44 +99,38 @@ def runfile(filename, db):
     conn.cursor().execute(f.read())
 
 
-def install(app_name, db, demo=True):
+def install(app_name, db):
     from keops.modules.base import models as base
     app_list = []
 
     def install_app(app_name):
+        app_name = app_name.replace('-', '_')
         app_label = app_name.split('.')[-1]
         if app_name in app_list or base.Module.objects.using(db).filter(app_label=app_label):
             #print('Application "%s" already installed on database "%s".' % (app_label, db))
             return
         app_list.append(app_name)
-        try:
-            app = import_module(app_name)
-            path = os.path.dirname(app.__file__)
-            if hasattr(app, 'app_info'):
-                info = app.app_info
-            else:
-                info = { 'name': app_label, 'description': '', 'version': '0.1' }
-            dependencies = info.get('dependencies', [])
-            for dep in dependencies:
-                install_app(dep)
-            base.Module.objects.using(db).create(
-                module_name=app_name,
-                name=info['name'],
-                app_label=app_label,
-                description=info['description'],
-                version=info.get('version', None),
-                dependencies=info.get('dependencies'),
-                icon=info.get('icon'),
-                visible=info.get('visible'),
-                tooltip=info.get('tooltip', ''),
-                category=base.ModuleCategory.objects.get_category(info.get('category', None))
-            )
-            return True
-        except Exception as e:
-            raise
-            import traceback
-            print(e)
-            traceback.print_exc()
+        app = import_module(app_name)
+        path = os.path.dirname(app.__file__)
+        if hasattr(app, 'app_info'):
+            info = app.app_info
+        else:
+            info = {'name': app_label, 'description': '', 'version': '0.1'}
+        dependencies = info.get('dependencies', [])
+        for dep in dependencies:
+            install_app(dep)
+        base.Module.objects.using(db).create(
+            module_name=app_name,
+            name=info['name'],
+            app_label=app_label,
+            description=info['description'],
+            version=info.get('version', None),
+            dependencies=info.get('dependencies'),
+            icon=info.get('icon'),
+            visible=info.get('visible'),
+            tooltip=info.get('tooltip', ''),
+            category=base.ModuleCategory.objects.get_category(info.get('category', None))
+        )
+        return True
 
-    from django.conf import settings
     return install_app(app_name)

@@ -4,7 +4,7 @@
         "id": "menu-settings",
     	"fields" : {
             "name": "{{ _('settings')|capfirst }}",
-            "sequence": 900
+            "sequence": 9000
         }
     },
     {
@@ -31,7 +31,7 @@
         "id": "menu-sys",
     	"fields" : {
             "name": "{{ _('system')|capfirst }}",
-            "sequence": 910
+            "sequence": 9100
         }
     },
     {

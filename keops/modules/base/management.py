@@ -34,7 +34,7 @@ def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwarg
         module = module[0]
     else:
         from keops.db import scripts
-        scripts.install(mod_name, db, False)
+        scripts.install(mod_name, db)
         module = Module.objects.using(db).get(app_label=app_label)
 
     # Get all the content types

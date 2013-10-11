@@ -1,10 +1,10 @@
 import os
 from importlib import import_module
 from optparse import make_option
-
 from django.core.management import call_command
 from django.core.management.commands import syncdb
 from django.db import models
+from django.conf import settings
 
 class Command(syncdb.Command):
 
@@ -29,7 +29,10 @@ class Command(syncdb.Command):
         # Load initial data from sync apps
         if load_initial_data:
             fixtures = []
-            for app in apps:
+            for app in settings.INSTALLED_APPS:
+                if not app in apps:
+                    # Preserve apps priority
+                    continue
                 mod = import_module(app)
                 dname = os.path.dirname(mod.__file__)
                 fname = os.path.join(dname, 'fixtures', 'initial_data.json')

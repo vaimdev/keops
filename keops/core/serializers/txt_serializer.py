@@ -1,6 +1,5 @@
 import os
 from django.core.serializers.python import Serializer as PythonSerializer
-from django.core.serializers.python import Deserializer as PythonDeserializer
 
 
 class Serializer(PythonSerializer):
@@ -22,6 +21,7 @@ def Deserializer(stream_or_string, **options):
             cols = []
             row = 0
             objects = []
+            adv = False
             for line in stream_or_string.read().splitlines():
                 pk = None
                 row += 1
@@ -36,7 +36,14 @@ def Deserializer(stream_or_string, **options):
                     for col in cols:
                         if cell > len(data):
                             break
-                        kwargs[col] = data[cell].strip()
+                        val = data[cell].strip()
+
+                        # Check foreign key dependency value
+                        if '__' in col:
+                            adv = True
+                            val = {col[col.index('__') + 2:]: val}
+                            col = col[0:col.index('__')]
+                        kwargs[col] = val
                         cell += 1
                     if len(kwargs) > 0:
                         pk = kwargs.pop('pk', None)
@@ -45,7 +52,12 @@ def Deserializer(stream_or_string, **options):
                             obj['pk'] = pk
                         objects.append(obj)
             if objects:
-                return PythonDeserializer(objects, **options)
+                if adv:
+                    from keops.core.serializers.python import Deserializer as PythonDeserializer
+                    return PythonDeserializer(objects, **options)
+                else:
+                    from django.core.serializers.python import Deserializer as PythonDeserializer
+                    return PythonDeserializer(objects, **options)
         except Exception as e:
             print('Error importing file: "%s", line: %i' % (filename, row), e)
             raise
