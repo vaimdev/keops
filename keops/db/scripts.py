@@ -61,7 +61,8 @@ def dropdb(db):
 
     if db_engine == 'sqlite3':
         del conn
-        os.remove(db_name)
+        if db_name != ':memory:':
+            os.remove(db_name)
     elif db_engine.startswith('postgres'):
         conn.autocommit = True
         try:

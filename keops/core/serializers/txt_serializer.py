@@ -39,6 +39,8 @@ def Deserializer(stream_or_string, **options):
                         val = data[cell].strip()
 
                         # Check foreign key dependency value
+                        if val == '':
+                            val = None
                         if '__' in col:
                             adv = True
                             val = {col[col.index('__') + 2:]: val}

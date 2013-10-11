@@ -213,7 +213,7 @@ class Command(BaseCommand):
                     if self.verbosity >= 2:
                         self.stdout.write("Installing %s fixture '%s' from %s." % \
                             (format, fixture_name, humanize(fixture_dir)))
-                    print('full path', full_path)
+
                     objects = serializers.deserialize(format, fixture, using=self.using, ignorenonexistent=self.ignore, filepath=full_path)
 
                     for obj in objects:
