@@ -1,7 +1,7 @@
 [
     {
         "model": "base.menu",
-        "id": "menu-settings",
+        "data-id": "menu-settings",
     	"fields" : {
             "name": "{{ _('settings')|capfirst }}",
             "sequence": 9000
@@ -9,7 +9,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-settings-companies",
+        "data-id": "menu-settings-companies",
     	"fields" : {
             "name": "{{ _('companies')|capfirst }}",
             "parent": ["menu-settings"],
@@ -18,7 +18,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-settings-companies-companies",
+        "data-id": "menu-settings-companies-companies",
     	"fields" : {
             "name": "{{ _('companies')|capfirst }}",
             "parent": ["menu-settings-companies"],
@@ -28,7 +28,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys",
+        "data-id": "menu-sys",
     	"fields" : {
             "name": "{{ _('system')|capfirst }}",
             "sequence": 9100
@@ -36,7 +36,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-adm",
+        "data-id": "menu-sys-adm",
     	"fields" : {
             "name": "{{ _('administration')|capfirst }}",
             "parent": ["menu-sys"],
@@ -45,7 +45,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-settings",
+        "data-id": "menu-sys-settings",
     	"fields" : {
             "name": "{{ _('settings')|capfirst }}",
             "parent": ["menu-sys-adm"],
@@ -54,7 +54,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-settings-users",
+        "data-id": "menu-settings-users",
     	"fields" : {
             "name": "{{ _('users')|capfirst }}",
             "parent": ["menu-settings"],
@@ -63,7 +63,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-ui",
+        "data-id": "menu-sys-ui",
     	"fields" : {
             "name": "{{ _('User Interface') }}",
             "parent": ["menu-sys"],
@@ -72,7 +72,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-menu",
+        "data-id": "menu-sys-menu",
     	"fields" : {
             "name": "{{ _('menu')|capfirst }}",
             "parent": ["menu-sys-ui"],
@@ -82,7 +82,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-forms",
+        "data-id": "menu-sys-forms",
     	"fields" : {
             "name": "{{ _('views')|capfirst }}",
             "parent": ["menu-sys-ui"],
@@ -92,7 +92,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-reports",
+        "data-id": "menu-sys-reports",
     	"fields" : {
             "name": "{{ _('reports')|capfirst }}",
             "parent": ["menu-sys-ui"],
@@ -102,7 +102,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-actions",
+        "data-id": "menu-sys-actions",
     	"fields" : {
             "name": "{{ _('actions')|capfirst }}",
             "parent": ["menu-sys-ui"],
@@ -112,7 +112,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-form-actions",
+        "data-id": "menu-sys-form-actions",
     	"fields" : {
             "name": "{{ _('form actions')|capfirst }}",
             "parent": ["menu-sys-actions"],
@@ -122,7 +122,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-report-actions",
+        "data-id": "menu-sys-report-actions",
     	"fields" : {
             "name": "{{ _('report actions')|capfirst }}",
             "parent": ["menu-sys-actions"],
@@ -132,7 +132,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-settings-users-users",
+        "data-id": "menu-settings-users-users",
     	"fields" : {
             "name": "{{ _('users')|capfirst }}",
             "parent": ["menu-settings-users"],
@@ -142,7 +142,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-settings-users-group",
+        "data-id": "menu-settings-users-group",
     	"fields" : {
             "name": "{{ _('groups')|capfirst }}",
             "parent": ["menu-settings-users"],
@@ -152,7 +152,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-datadict",
+        "data-id": "menu-sys-datadict",
     	"fields" : {
             "name": "{{ _('Data Dictionary') }}",
             "parent": ["menu-sys"],
@@ -161,7 +161,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-module",
+        "data-id": "menu-sys-module",
     	"fields" : {
             "name": "{{ _('modules')|capfirst }}",
             "parent": ["menu-sys-datadict"],
@@ -171,7 +171,7 @@
     },
     {
         "model": "base.menu",
-        "id": "menu-sys-model",
+        "data-id": "menu-sys-model",
     	"fields" : {
 			"name": "{{ _('models')|capfirst }}",
 			"parent": ["menu-sys-datadict"],

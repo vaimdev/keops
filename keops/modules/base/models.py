@@ -19,7 +19,7 @@ class File(models.Model):
     """
     name = models.CharField(_('name'))
     file_format = models.CharField(max_length=10, null=False) # document file format
-    image = models.BinaryField(null=False)
+    body = models.BinaryField(null=False)
 
 # Company/data context
 class Company(Element):

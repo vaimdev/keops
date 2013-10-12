@@ -1,3 +1,4 @@
+import sys
 import os
 from importlib import import_module
 from optparse import make_option
@@ -5,6 +6,7 @@ from django.core.management import call_command
 from django.core.management.commands import syncdb
 from django.db import models
 from django.conf import settings
+from keops.db import scripts
 
 class Command(syncdb.Command):
 
@@ -44,3 +46,27 @@ class Command(syncdb.Command):
             if fixtures:
                 call_command('loaddata', *fixtures, verbosity=verbosity,
                              database=db, skip_validation=False)
+
+            # Load custom sql
+            for app in settings.INSTALLED_APPS:
+                if not app in apps:
+                    # Preserve apps priority
+                    continue
+                engine = settings.DATABASES[db]['ENGINE'].split('.')[-1]
+                mod = import_module(app)
+                dname = os.path.dirname(mod.__file__)
+                app_dir = os.path.normpath(os.path.join(dname, 'sql'))
+                custom_files = [
+                    os.path.join(app_dir, "custom.%s.sql" % engine),
+                    os.path.join(app_dir, "custom.sql")
+                ]
+
+                for custom_file in custom_files:
+                    if os.path.exists(custom_file):
+                        print('Loading custom SQL for %s' % app)
+                        try:
+                            scripts.runfile(custom_file, db)
+                        except Exception as e:
+                            sys.stderr.write('Couldn\'t execute custom SQL for %s' % app)
+                            import traceback
+                            traceback.print_exc()

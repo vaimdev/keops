@@ -1,0 +1,11 @@
+[
+    {
+        "model": "base.company",
+        "data-id": "main-company",
+        "fields": {
+            "name": "My Company",
+            "report_header": "My Company",
+            "report_footer": "http://example.com"
+        }
+    }
+]

@@ -1,7 +1,7 @@
 [
     {
         "model": "sites.site",
-        "id": "site-main",
+        "data-id": "site-main",
     	"fields" : {
             "domain": "domain.com",
             "name": "domain.com"
@@ -9,7 +9,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-basic",
+        "data-id": "module-category-basic",
     	"fields" : {
             "name": "{{ _('basic')|capfirst }}",
             "visible": false
@@ -17,7 +17,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-localization",
+        "data-id": "module-category-localization",
     	"fields" : {
             "name": "{{ _('localization')|capfirst }}",
             "visible": false
@@ -25,7 +25,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-crm",
+        "data-id": "module-category-crm",
     	"fields" : {
             "name": "{{ _('Customer Relationship Management') }}",
             "sequence": 100
@@ -33,7 +33,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-sales",
+        "data-id": "module-category-sales",
     	"fields" : {
             "name": "{{ _('sales')|capfirst }}",
             "sequence": 110
@@ -41,7 +41,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-project",
+        "data-id": "module-category-project",
     	"fields" : {
             "name": "{{ _('project')|capfirst }}",
             "sequence": 120
@@ -49,7 +49,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-knowledge",
+        "data-id": "module-category-knowledge",
     	"fields" : {
             "name": "{{ _('knowledge')|capfirst }}",
             "sequence": 130
@@ -57,7 +57,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-warehouse",
+        "data-id": "module-category-warehouse",
     	"fields" : {
             "name": "{{ _('warehouse')|capfirst }}",
             "sequence": 140
@@ -65,7 +65,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-manufacturing",
+        "data-id": "module-category-manufacturing",
     	"fields" : {
             "name": "{{ _('manufacturing')|capfirst }}",
             "sequence": 150
@@ -73,7 +73,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-invoicing-payments",
+        "data-id": "module-category-invoicing-payments",
     	"fields" : {
             "name": "{{ _('Invoicing & Payments') }}",
             "sequence": 160
@@ -81,7 +81,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-account-finance",
+        "data-id": "module-category-account-finance",
     	"fields" : {
             "name": "{{ _('Accounting & Finance') }}",
             "sequence": 170
@@ -89,7 +89,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-purchase",
+        "data-id": "module-category-purchase",
     	"fields" : {
             "name": "{{ _('purchases')|capfirst }}",
             "sequence": 180
@@ -97,7 +97,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-human-resources",
+        "data-id": "module-category-human-resources",
     	"fields" : {
             "name": "{{ _('Human Resources') }}",
             "sequence": 190
@@ -105,7 +105,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-purchase",
+        "data-id": "module-category-purchase",
     	"fields" : {
             "name": "{{ _('Additional Tools') }}",
             "sequence": 200
@@ -113,7 +113,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-marketing",
+        "data-id": "module-category-marketing",
     	"fields" : {
             "name": "{{ _('marketing')|capfirst }}",
             "sequence": 210
@@ -121,7 +121,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-industry",
+        "data-id": "module-category-industry",
     	"fields" : {
             "name": "{{ _('industry')|capfirst }}",
             "sequence": 220
@@ -129,7 +129,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-reporting",
+        "data-id": "module-category-reporting",
     	"fields" : {
             "name": "{{ _('reporting')|capfirst }}",
             "sequence": 230
@@ -137,7 +137,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-vehicles",
+        "data-id": "module-category-vehicles",
     	"fields" : {
             "name": "{{ _('vehicles')|capfirst }}",
             "sequence": 230
@@ -145,7 +145,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-communication",
+        "data-id": "module-category-communication",
     	"fields" : {
             "name": "{{ _('communication')|capfirst }}",
             "sequence": 240
@@ -153,7 +153,7 @@
     },
     {
         "model": "base.modulecategory",
-        "id": "module-category-administration",
+        "data-id": "module-category-administration",
     	"fields" : {
             "name": "{{ _('administration')|capfirst }}",
             "sequence": 900

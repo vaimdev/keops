@@ -110,12 +110,10 @@ class BaseDatabaseCreation(object):
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%s' % (
                     r_col, col, self._digest(r_table, table))
-                print('relation', r_name)
                 if f.rel.on_delete == models.CASCADE:
                     cascade = ' ON DELETE CASCADE '
                 else:
                     cascade = ''
-                print(f, cascade)
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') +
                     ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s%s;' %
                     (qn(r_table), qn(truncate_name(

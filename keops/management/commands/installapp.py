@@ -1,9 +1,6 @@
 from optparse import make_option
-
 from django.core.management.base import AppCommand
-from django.core.management.sql import sql_create
-from django.db import connections, DEFAULT_DB_ALIAS
-from django.conf import settings
+from django.db import DEFAULT_DB_ALIAS
 
 class Command(AppCommand):
     help = "Install modules for the given app name(s)."

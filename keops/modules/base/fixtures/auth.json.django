@@ -1,14 +1,14 @@
 [
     {
         "model": "auth.group",
-        "id": "auth-group-admin",
+        "data-id": "auth-group-admin",
     	"fields" : {
             "name": "{{ _('administrators')|capfirst }}"
         }
     },
     {
         "model": "base.user",
-        "id": "auth-user-admin",
+        "data-id": "auth-user-admin",
     	"fields" : {
             "username": "{{ _('admin') }}",
             "first_name": "{{ _('administrator')|capfirst }}",
