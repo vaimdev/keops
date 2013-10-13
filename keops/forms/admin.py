@@ -1,9 +1,10 @@
 from collections import OrderedDict
-import json
+from importlib import import_module
 from django.utils import six
 from django import forms
 from keops.utils.html import *
 from keops.contrib.angularjs import form
+from keops.contrib.reports import Reports, ReportLink
 from .forms import View
 
 class FieldLine(object):
@@ -59,6 +60,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     pages = ()
     search_fields = ()
     columns = 2
+    printable_fields = ()
+    reports = ()
     formfield_overrides = None
 
     toolbar_actions = ['create', 'read', 'update', 'delete', 'print', 'delete', 'search']
@@ -74,6 +77,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def __init__(self, admin=None):
         self.bound_fields = {}
         self.admin = admin
+        self.model_fields = []
         self._prepared = False
         self._form = None
         self._model_form = None
@@ -102,6 +106,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 self.fields = extra.field_groups['display_fields']
             if not self.list_display and extra.field_groups and extra.field_groups.get('list_fields', None):
                 self.list_display = extra.field_groups['list_fields']
+            if not self.printable_fields and extra.field_groups and extra.field_groups.get('printable_fields', None):
+                self.printable_fields = extra.field_groups['printable_fields']
+            if not self.reports and getattr(extra, 'reports', None):
+                self.reports = Reports([ReportLink(report, import_module(self.model.__module__)) for report in extra.reports])
         if self.model._meta.abstract:
             return
         from django.db import models
@@ -115,6 +123,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not\
                 isinstance(f, (models.AutoField, models.ManyToManyField)) and\
                 getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
+        if not self.printable_fields:
+            self.printable_fields = self.list_display
 
         if not self.pages:
             pages = OrderedDict()
@@ -188,6 +198,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if not self._model_form:
             self._model_form = forms.models.modelform_factory(self.model)
         return self._model_form
+
+    def get_printable_fields(self):
+        self._prepare()
+        return self.printable_fields
 
     def _prepare_context(self, request, context):
         context.update({

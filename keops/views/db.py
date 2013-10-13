@@ -28,6 +28,7 @@ def get_model(context):
     # TODO Check model permission
     # TODO CACHE PERMISSION
     model = context['model']
+    return models.get_model(*model.split('.'))
     if isinstance(model, str):
         return ContentType.objects.get_by_natural_key(*model.split('.')).model_class()
     else:

@@ -1,4 +1,4 @@
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
 from threading import local
 
 SESSION_DB_KEY = '_db_alias'
@@ -18,6 +18,9 @@ def get_db(request=None):
         request = get_current_request()
     if request:
         return request.session.setdefault(SESSION_DB_KEY, DEFAULT_DB_ALIAS)
+
+def get_connection(request=None):
+    return connections[get_db(request)]
 
 def set_db(alias, request=None):
     if not request:

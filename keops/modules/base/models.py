@@ -28,8 +28,6 @@ class Company(Element):
     """
     name = models.CharField(_('name'), max_length=128, help_text=_('Company name'), null=False)
     parent = models.ForeignKey('self')
-    report_header = models.TextField(_('report header'))
-    report_footer = models.TextField(_('report footer'))
     currency = models.ForeignKey('base.Currency', verbose_name=_('currency'))
     zip_code = models.CharField(_('zip'), max_length=24)
     country = models.ForeignKey('base.Country')
@@ -39,6 +37,9 @@ class Company(Element):
     fax = models.CharField(_('fax'), max_length=64)
     website = models.URLField('website')
     comment = models.TextField(_('comments'), help_text=_('Company comments'))
+    report_style = models.CharField(_('report style'), max_length=64, page=_('Report Configurations'))
+    report_header = models.TextField(_('report header'), page=_('Report Configurations'))
+    report_footer = models.TextField(_('report footer'), page=_('Report Configurations'))
 
     class Meta:
         verbose_name_plural = _('companies')

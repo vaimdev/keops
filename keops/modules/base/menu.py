@@ -111,6 +111,6 @@ class Menu(ModuleElement):
             report = rep
         action = ReportAction.objects.using(self._state.db).create(name='%s "%s"' % ('showreport', report.name), report=report)
         self.action = action
-        self.image = '/static/keops/icons/page.png'
+        self.image = '/static/keops/icons/report.png'
     report = property(get_report, set_report)
 

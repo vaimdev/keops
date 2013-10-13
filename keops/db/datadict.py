@@ -13,10 +13,10 @@ dd_items = {
     'status_field': None, # main model status field representation
     'field_groups': {
         'display_fields': None,
-        'edit_fields': None,
-        'print_fields': None,
+        'editable_fields': None,
+        'printable_fields': None,
         'list_fields': None,
-        'search_fields': None,
+        'searchable_fields': None,
         'filter_fields': None,
     },
 
