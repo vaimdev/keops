@@ -23,6 +23,22 @@ class User(auth.AbstractUser):
             'search_fields': ('username', 'email', 'first_name', 'last_name'),
         }
 
+    def get_user_data(self, key, default=None):
+        data = UserData.objects.using(self._state.db).filter(user=self, key=key)
+        if data:
+            return data[0]
+        else:
+            return default
+
+    def set_user_data(self, key, value):
+        data = UserData.objects.using(self._state.db).filter(user=self, key=key)
+        if data:
+            data = data[0]
+        else:
+            data = UserData(key=key)
+        data.value = value
+        data.save(db=db)
+
     def __str__(self):
         return self.username + (self.first_name and (' (' + self.first_name + (self.last_name and (' ' + self.last_name) or '') + ')') or '')
 
@@ -39,7 +55,7 @@ class UserContent(models.Model):
     modified_on = models.DateTimeField(auto_now=True, verbose_name=_('modified on'))
 
     class Meta:
-        db_table = 'base_user_content'
+        db_table = 'auth_user_content'
 
 class UserLog(models.Model):
     """
@@ -54,5 +70,13 @@ class UserLog(models.Model):
     log_time = models.DateTimeField(_('date/time'), null=False, auto_now_add=True)
 
     class Meta:
-        db_table = 'base_user_log'
+        db_table = 'auth_log'
 
+class UserData(models.Model):
+    user = models.ForeignKey(User, null=False)
+    key = models.CharField(max_length=64)
+    value = models.TextField()
+
+    class Meta:
+        unique_together = (('user', 'key'),)
+        db_table = 'auth_user_data'

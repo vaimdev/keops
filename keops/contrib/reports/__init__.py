@@ -2,6 +2,7 @@ import os
 import urllib.parse
 
 BASE_REPORT_URL = '/report'
+_cwd = os.getcwd() # prevent cwd change when load external pyd/dll modules
 
 class Reports(list):
     pass
@@ -34,12 +35,13 @@ class ReportLink(object):
                     self.filename = os.path.join(dirname, self.title)
                     self.title = self.title.split('.')[0]
                 self.absolute_url = filename.get('absolute_url')
-        self.relpath = os.path.relpath(self.filename)
+        self.relpath = os.path.relpath(self.filename, _cwd)
+
+    def get_url(self):
+        return BASE_REPORT_URL + '/showreport/?report=%s&pk={{form.item.pk}}' % urllib.parse.quote(self.relpath)
 
     def __str__(self):
         if self.absolute_url:
             return self.absolute_url
         else:
-            return '<a ng-href="%s">%s</a>' % (
-                BASE_REPORT_URL + '/showreport/?report=%s&pk={{form.item.pk}}' + urllib.parse.quote(self.relpath),
-                self.title)
+            return '<a ng-href="%s" target="_blank">%s</a>' % (self.get_url(), self.title)

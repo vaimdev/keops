@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+import django.contrib.auth.signals
 from keops.db import models
 from .element import *
 from .module import *
@@ -163,7 +164,7 @@ class AttributeValue(models.Model):
     """
     Define model extension attributes values.
     """
-    attribute = models.ForeignKey(Attribute)
+    attribute = models.ForeignKey(Attribute, null=False)
     object_id = models.PositiveIntegerField()
     text_value = models.CharField(max_length=1024)
     texta_value = models.TextField()
@@ -183,3 +184,8 @@ class AttributeValue(models.Model):
 # TODO: Build a content translation structure
 # TODO: Build a module/app installer
 # TODO: Implement cron jobs
+
+def user_logged_in(sender, *args, **kwargs):
+    print('user logged in')
+
+django.contrib.auth.user_logged_in.connect(user_logged_in)

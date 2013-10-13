@@ -21,7 +21,7 @@
                             <td>
                                 {% if form.reports %}
                                 <div class="btn-group">
-                                <button class="btn button-label" style="margin-left: 20px;">{{ _('print')|capfirst }}</button>
+                                <a class="btn button-label" style="margin-left: 20px;"  href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
                                 <button class="btn dropdown-toggle"><span class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">
                                 {% for report in form.reports %}

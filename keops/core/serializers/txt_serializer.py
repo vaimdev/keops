@@ -41,10 +41,10 @@ def Deserializer(stream_or_string, **options):
                         # Check foreign key dependency value
                         if val == '':
                             val = None
-                        if '__' in col:
+                        if '.' in col:
                             adv = True
-                            val = {col[col.index('__') + 2:]: val}
-                            col = col[0:col.index('__')]
+                            val = {col[col.index('.') + 1:]: val}
+                            col = col[0:col.index('.')]
                         kwargs[col] = val
                         cell += 1
                     if len(kwargs) > 0:
