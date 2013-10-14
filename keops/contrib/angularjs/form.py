@@ -174,7 +174,10 @@ def get_tables(items, cols=2):
         for n in range(c):
             idx = i * c + n
             if idx < l:
-                table.append(TR(items[idx]))
+                f = items[idx]
+                if isinstance(f, dict):
+                    f = TAG('fieldset', TAG('legend', f['title']), TABLE(TR(*f['items'])))
+                table.append(TR(f))
             else:
                 table.append(TR(TD()))
         tables.append(TABLE(*table))
