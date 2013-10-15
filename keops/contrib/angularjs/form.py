@@ -26,10 +26,12 @@ def get_field(field, form=None):
     if field.required:
         attrs['required'] = 1
 
-    if isinstance(field, (forms.DateField, forms.IntegerField)):
+    if isinstance(field, (forms.DateField, forms.IntegerField)) or (isinstance(field, forms.CharField) and field.max_length < 10):
         attrs['class'] = 'small-field'
-    elif isinstance(field, forms.DateTimeField):
+    elif isinstance(field, forms.DateTimeField) or (isinstance(field, forms.CharField) and field.max_length <= 15):
         attrs['class'] = 'normal-field'
+    elif isinstance(field, forms.CharField) and field.max_length <= 20:
+        attrs['class'] = 'normal-20c-field'
     else:
         attrs['class'] = 'long-field'
 
@@ -199,7 +201,7 @@ def get_tables(items, cols=2):
             if idx < l:
                 f = items[idx]
                 if isinstance(f, dict):
-                    f = TD(TAG('fieldset', TAG('legend', f['title']), TABLE(*[TR(i) for i in f['items']])))
+                    f = TD(TAG('fieldset', TAG('legend', f['title']), TABLE(*[TR(i) for i in f['items']])), colspan=2)
                     print(f)
                 table.append(TR(f))
             else:

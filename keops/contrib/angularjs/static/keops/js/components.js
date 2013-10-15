@@ -96,8 +96,8 @@ ui.directive('dateTimePicker', function() {
     }
 });
 
-var s = $.fn.select2.defaults.formatNoMatches();
-$.fn.select2.defaults.formatNoMatches = function () { return s + ' <a style="margin-left: 20px;" class="btn btn-info">' + gettext('Create New...') + '</a>'; },
+//var s = $.fn.select2.defaults.formatNoMatches();
+//$.fn.select2.defaults.formatNoMatches = function () { return s + ' <a style="position: absolute; right: 10px; cursor: pointer;">' + gettext('Create...') + '</a>'; },
 
 ui.directive('combobox', function() {
     return {
@@ -128,7 +128,6 @@ ui.directive('combobox', function() {
             }
             else
             var el = element.select2();
-
             ngModel.$render = function () {
                 if (typeof ngModel.$viewValue === 'object')
                 element.select2('data', ngModel.$viewValue);

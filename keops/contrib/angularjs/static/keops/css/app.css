@@ -323,6 +323,11 @@ legend {
     margin-bottom: 0;
 }
 
+.field-cell .normal-20c-field {
+    width: 216px;
+    margin-bottom: 0;
+}
+
 .form-view .field-container {
     display: block !important;
     table-layout: fixed;

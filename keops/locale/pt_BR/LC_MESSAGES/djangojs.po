@@ -40,5 +40,5 @@ msgstr "Remover item"
 msgid "INTERNAL SERVER ERROR"
 msgstr "ERRO INTERNO DO SERVIDOR"
 
-msgid "Create New..."
-msgstr "Criar Novo..."
+msgid "Create..."
+msgstr "Criar..."
