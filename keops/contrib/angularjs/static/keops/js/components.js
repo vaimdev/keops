@@ -96,6 +96,49 @@ ui.directive('dateTimePicker', function() {
     }
 });
 
+var s = $.fn.select2.defaults.formatNoMatches();
+$.fn.select2.defaults.formatNoMatches = function () { return s + ' <a style="margin-left: 20px;" class="btn btn-info">' + gettext('Create New...') + '</a>'; },
+
+ui.directive('combobox', function() {
+    return {
+        restrict: 'A',
+        require : 'ngModel',
+        link: function(scope, element, attrs, ngModel, controller) {
+            var url = attrs.lookupUrl;
+
+            if (url) {
+                var el = element.select2({
+                    ajax: {
+                        url: url,
+                        dataType: 'json',
+                        quietMillis: 500,
+                        data: function (term, page) {
+                            return {
+                                query: term,
+                                limit: 10,
+                                start: page - 1
+                            }
+                        },
+                        results: function (data, page) {
+                            var more = (page * 10) < data.total;
+                            return { results: data.data, more: more };
+                        }
+                    }
+                });
+            }
+            else
+            var el = element.select2();
+
+            ngModel.$render = function () {
+                if (typeof ngModel.$viewValue === 'object')
+                element.select2('data', ngModel.$viewValue);
+                else
+                element.select2('val', ngModel.$viewValue);
+            };
+        }
+    }
+});
+
 ui.filter('dateFromNow', function ($locale) {
     return function (dateString) {
         // TODO adjust to get current locale short date time format

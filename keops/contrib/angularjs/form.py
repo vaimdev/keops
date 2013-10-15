@@ -33,6 +33,9 @@ def get_field(field, form=None):
     else:
         attrs['class'] = 'long-field'
 
+    if isinstance(field, forms.ChoiceField):
+        attrs['combobox'] = ''
+
     if isinstance(field, forms.BooleanField):
         attrs = {'tag': 'label', 'ng-show': attrs.pop('ng-show'), 'style': 'cursor: pointer;'}
         widget_args = [TAG('input type="checkbox"', ngModel='form.item.' + name)]
@@ -129,16 +132,21 @@ def get_field(field, form=None):
         span_tag = None
 
     elif isinstance(field, forms.ModelChoiceField):
-        meta = field.queryset.model._meta
-        attrs['tag'] = 'input'
-        attrs['typeahead'] = "item as item.label for item in lookupData('/db/lookup/', '%s.%s', $viewValue)" % (meta.app_label, meta.model_name)
-        attrs['typeahead-wait-ms'] = 500
-        span['ng-bind'] += '.label'
+        widget_args.append(
+            TAG('input combobox type="hidden" ng-model="%s"' % attrs.pop('ng-model'),
+                **{
+                    'class': attrs.get('class'),
+                    'lookup-url': '/db/lookup/?model=%s.%s&field=%s' %
+                                  (field.target_attr.model._meta.app_label,
+                                   field.target_attr.model._meta.model_name,
+                                   name)}))
+        attrs = {'tag': 'div', 'ng-show': 'form.write'}
+        span['ng-bind'] += '.text'
         # Change to remote combobox widget
         span_tag = 'a'
         url = field.target_attr.get_resource_url()
         if url:
-            span['ng-click'] = "openResource('%s', 'pk='%s)" % (url, ' + form.item.%s.value' % name)
+            span['ng-click'] = "openResource('%s', 'pk='%s)" % (url, ' + form.item.%s.id' % name)
         span['style'] = 'cursor: pointer;'
     elif isinstance(field.widget, widgets.widgets.Textarea):
         attrs['style'] = 'height: 70px; margin: 0;'

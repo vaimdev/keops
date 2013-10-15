@@ -47,7 +47,7 @@ def field_text(value):
     elif isinstance(value, datetime.datetime):
         return formats.date_format(value, 'SHORT_DATETIME_FORMAT')
     elif isinstance(value, models.Model):
-        return {'label': str(value), 'value': value.pk}
+        return {'id': value.pk, 'text': str(value)}
     else:
         return str(value)
 
@@ -62,7 +62,6 @@ def _get_filter_args(self, filter):
 
 def _get_query_args(cls, search_fields, value, filter=None):
     op = '__icontains'
-    # TODO add unaccent
 
     def _get_filter_items(field, expr=None):
         if expr:
@@ -181,7 +180,6 @@ def prepare_read(context, using):
         model = get_model(context)
         queryset = model.objects
     count = queryset
-    print(context)
     start = int(context.get('start', '0'))
     limit = int(context.get('limit', '1')) + start # settings
     if pk:
@@ -232,6 +230,7 @@ def submit(request):
     """
     Default data submit view.
     """
+    print(request.POST)
     if len(request.POST) == 1:
         for d in request.POST:
             data = json.loads(d)

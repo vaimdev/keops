@@ -275,16 +275,19 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         return self.bound_fields[field]
 
     def lookup(self, request):
+        from keops.views import db
         context = request.GET
+        field = context.get('field')
+        queryset = self.get_formfield(field).field.queryset
         start = int(context.get('start', '0'))
         limit = int(context.get('limit', '25')) + start # settings
         query = context.get('query', '')
-        if query == '':
-            queryset = self.model.objects.all()
-        else:
-            queryset = self.model.objects.all()
-            #queryset = search_text(model.objects.all(), query)
-        data = [{'value': obj.pk, 'label': str(obj)} for obj in queryset[start:limit]]
+        if query:
+            queryset = db.search_text(queryset, query)
+        data = {
+            'data': [{'id': obj.pk, 'text': str(obj)} for obj in queryset[start:limit]],
+            'total': queryset.count()
+        }
         return HttpJsonResponse(data)
 
     def delete(self, context, using):
