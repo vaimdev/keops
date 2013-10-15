@@ -18,7 +18,7 @@ ui.directive('uiMask', function() {
         restrict: 'A',
         require : 'ngModel',
         link : function (scope, element, attrs, controller) {
-            var maskStore = attrs['uiMaskStore'];
+            var maskStore = attrs.uiMaskStore;
 
             $(function() {
                 element.mask(attrs['uiMask']);
@@ -33,18 +33,44 @@ ui.directive('uiMask', function() {
     }
 });
 
+ui.directive('uiMoney', function($filter) {
+    return {
+        restrict: 'A',
+        require : 'ngModel',
+        link : function (scope, element, attrs, ngModel) {
+
+            var precision = attrs.uiMoneyPrecision || 2;
+            $(function() {
+                var thousands = attrs.uiMoneyThousands;
+                var decimal = attrs.uiMoneyDecimal;
+                var symbol = attrs.uiMoneySymbol;
+                var negative = attrs.uiMoneyNegative;
+                element.maskMoney({symbol: symbol, thousands: thousands, decimal: decimal, precision: precision, allowNegative: negative, allowZero: true});
+            });
+
+            ngModel.$render = function () {
+                if (ngModel.$viewValue) {
+                element.val($filter('number')(ngModel.$viewValue, precision));
+                }
+            };
+        }
+    }
+});
+
 ui.directive('datePicker', function() {
     return {
         restrict: 'A',
-        //require : 'ngModel',
+        require : 'ngModel',
         link: function(scope, element, attrs, controller) {
-            element.datepicker({
+            var el = element.datepicker({
                 dateFormat: attrs.dateFormat,
+                showOn: 'button',
                 onSelect: function(dateText, datepicker) {
-                    scope.date = dateText;
-                    scope.$apply();
+                    controller.$setViewValue(dateText);
                 }
             });
+            el = el.next('.ui-datepicker-trigger');
+            el.addClass('btn').html('<i class="icon-calendar"></i>');
         }
     }
 });
@@ -77,6 +103,18 @@ ui.filter('dateFromNow', function ($locale) {
             var fmt = $locale.DATETIME_FORMATS.mediumDate.toUpperCase() + ' ' + $locale.DATETIME_FORMATS.shortTime;
             var m = moment(dateString, fmt)
             return m.format('LLLL') + ' (' + m.fromNow() + ')';
+        }
+        else return '';
+    };
+});
+
+ui.filter('dateFrom', function ($locale) {
+    return function (dateString) {
+        // TODO adjust to get current locale short date time format
+        if (dateString) {
+            var fmt = $locale.DATETIME_FORMATS.mediumDate.toUpperCase();
+            var m = moment(dateString, fmt)
+            return m.format('LL') + ' (' + m.fromNow() + ')';
         }
         else return '';
     };

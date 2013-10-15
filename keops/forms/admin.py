@@ -1,10 +1,13 @@
 from collections import OrderedDict
 from importlib import import_module
+import json
 from django.utils import six
 from django import forms
+from django.utils.translation import ugettext as _
 from keops.utils.html import *
 from keops.contrib.angularjs import form
 from keops.contrib.reports import Reports, ReportLink
+from keops.http import HttpJsonResponse
 from .forms import View
 
 class FieldLine(object):
@@ -129,6 +132,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if not self.pages:
             pages = OrderedDict()
 
+        if not self.readonly_fields:
+            readonly_fields = []
+
         for field in model_fields:
             if not field.name in self.fields:
                 continue
@@ -137,11 +143,16 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 page = pages.setdefault(str(attrs.get('page', None) or ''), OrderedDict())
                 fieldset = page.setdefault(str(attrs.get('fieldset', None) or ''), {'fields': []})
                 fieldset['fields'].append(field.name)
+            if not self.readonly_fields and field.readonly:
+                readonly_fields.append(field.name)
 
         if not self.pages and pages:
             for page, fieldsets in pages.items():
                 pages[page] = tuple(fieldsets.items())
             self.pages = tuple(pages.items())
+
+        if not self.readonly_fields and readonly_fields:
+            self.readonly_fields = readonly_fields
 
         if self.search_fields:
             # set search field to __icontains
@@ -262,3 +273,92 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             form_field.target_attr = f
             self.bound_fields[field] = bound_field
         return self.bound_fields[field]
+
+    def lookup(self, request):
+        context = request.GET
+        start = int(context.get('start', '0'))
+        limit = int(context.get('limit', '25')) + start # settings
+        query = context.get('query', '')
+        if query == '':
+            queryset = self.model.objects.all()
+        else:
+            queryset = self.model.objects.all()
+            #queryset = search_text(model.objects.all(), query)
+        data = [{'value': obj.pk, 'label': str(obj)} for obj in queryset[start:limit]]
+        return HttpJsonResponse(data)
+
+    def delete(self, context, using):
+        """
+        Default delete operation.
+        """
+        obj = self.model.objects.using(using).get(pk=context['pk'])
+        obj.delete(using=using)
+        return {
+            'success': True,
+            'action': 'DELETE',
+            'label': _('Success'),
+            'msg': _('Record successfully deleted!'),
+        }
+
+    def read(self, request):
+        from keops.views import db
+        using = db.get_db(request)
+        return HttpJsonResponse(db.prepare_read(request.GET, using))
+
+    def save(self, context, using):
+        """
+        Save context data on using specified database.
+        """
+        from keops.views import db
+        pk = context.get('pk')
+        if 'model' in context:
+            model = db.get_model(context)
+        else:
+            model = self.model
+        data = context.get('data')
+        obj = None
+        if pk:
+            obj = model.objects.using(using).get(pk=pk)
+        if data:
+            if isinstance(data, str):
+                data = json.loads(data)
+            obj = obj or model()
+            for k, v in data.items():
+                setattr(obj, k, v)
+            obj.save(using=using)
+
+            # submit related data
+        related = context.get('related')
+        if related:
+            self.save_item(json.loads(related), obj, using)
+        return True, obj
+
+    def save_item(self, data, parent, using):
+        """
+        Save item data rows (ManyToMany/OneToMany).
+        """
+        for obj in data:
+            model = self.model
+            link_field = obj['linkField']
+            rows = obj['data']
+            for row in rows:
+                action = row.get('action')
+                record = row.get('data')
+                pk = row.get('pk')
+                if action == 'DELETE':
+                    model.objects.using(using).get(pk=pk).delete()
+                    continue
+                elif action == 'CREATE':
+                    record[link_field] = parent.pk
+                context = {'pk': pk, 'model': model, 'data': record}
+                self.save(context, using)
+
+    def submit(self, request):
+        from keops.views import db
+        using = db.get_db(request)
+        if request.method == 'DELETE':
+            result = self.delete(request.GET, using)
+        else:
+            success, obj = self.save(request.POST, using)
+            result = {'success': success, 'data': db.prepare_read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]}
+        return HttpJsonResponse(result)

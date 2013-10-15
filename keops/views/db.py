@@ -1,7 +1,6 @@
 import decimal
 import datetime
 import json
-from django.utils.translation import ugettext as _
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
@@ -39,8 +38,12 @@ def field_text(value):
         return ''
     elif callable(value):
         return value()
-    elif isinstance(value, (int, str, float, decimal.Decimal)):
-        return formats.localize(value)
+    elif isinstance(value, (float, decimal.Decimal)):
+        return str(value)
+    elif isinstance(value, (int, str)):
+        return value
+    elif isinstance(value, datetime.date):
+        return formats.date_format(value, 'SHORT_DATE_FORMAT')
     elif isinstance(value, datetime.datetime):
         return formats.date_format(value, 'SHORT_DATETIME_FORMAT')
     elif isinstance(value, models.Model):
@@ -168,7 +171,7 @@ def get_read_fields(model):
                                          [(f.choices and 'get_%s_display' % f.name) for f in model._meta.fields if f.choices]
     return model.Extra._cache_read_fields
 
-def _read(context, using):
+def prepare_read(context, using):
     pk = context.get('pk')
     queryset = context.get('queryset')
     if queryset:
@@ -178,6 +181,7 @@ def _read(context, using):
         model = get_model(context)
         queryset = model.objects
     count = queryset
+    print(context)
     start = int(context.get('start', '0'))
     limit = int(context.get('limit', '1')) + start # settings
     if pk:
@@ -196,10 +200,10 @@ def _read(context, using):
     return {'items': rows, 'total': count}
     
 def read(request):
-    using = get_db(request)
-    # Prevent user get all records
+    # Prevent get all records
     assert not 'all' in request.GET
-    return HttpJsonResponse(_read(request.GET, using))
+    model = get_model(request.GET)
+    return model._admin.read(request)
 
 def _get_queryset_fields(model, obj, attr):
     # TODO get fields for relation attr
@@ -218,89 +222,20 @@ def read_items(request):
     for item in items:
         context['fields'] = [] # Select only pk, __str__ for now
         context['queryset'] = _get_queryset_fields(model, obj, item)
-        data[item] = _read(context, using)
+        data[item] = prepare_read(context, using)
     return HttpJsonResponse(data)
 
 def lookup(request):
-    context = request.GET
-    model = get_model(context)
-    start = int(context.get('start', '0'))
-    limit = int(context.get('limit', '25')) + start # settings
-    query = context.get('query', '')
-    if query == '':
-        queryset = model.objects.all()
-    else:
-        queryset = model.objects.all()
-        #queryset = search_text(model.objects.all(), query)
-    data = [{'value': obj.pk, 'label': str(obj)} for obj in queryset[start:limit]]
-    return HttpJsonResponse(data)
-
-def _save(context, using):
-    """
-    Save context data on using specified database.
-    """
-    pk = context.get('pk')
-    model = get_model(context)
-    data = context.get('data')
-    obj = None
-    if pk:
-        obj = model.objects.using(using).get(pk=pk)
-    if data:
-        if isinstance(data, str):
-            data = json.loads(data)
-        obj = obj or model()
-        for k, v in data.items():
-            setattr(obj, k, v)
-        obj.save(using=using)
-
-        # submit related data
-    related = context.get('related')
-    if related:
-        _save_item(json.loads(related), obj, using)
-    return True, obj
-
-def _save_item(data, parent, using):
-    """
-    Save item data rows (ManyToMany/OneToMany).
-    """
-    for obj in data:
-        model = models.get_model(*obj['model'].split('.'))
-        link_field = obj['linkField']
-        rows = obj['data']
-        for row in rows:
-            action = row.get('action')
-            record = row.get('data')
-            pk = row.get('pk')
-            if action == 'DELETE':
-                model.objects.using(using).get(pk=pk).delete()
-                continue
-            elif action == 'CREATE':
-                record[link_field] = parent.pk
-            context = {'pk': pk, 'model': model, 'data': record}
-            _save(context, using)
-
-def _delete(context, using):
-    """
-    Default delete operation.
-    """
-    model = get_model(context)
-    obj = model.objects.using(using).get(pk=context['pk'])
-    obj.delete(using=using)
-    return {
-        'success': True,
-        'action': 'DELETE',
-        'label': _('Success'),
-        'msg': _('Record successfully deleted!'),
-    }
+    return get_model(request.GET)._admin.lookup(request)
 
 def submit(request):
     """
     Default data submit view.
     """
-    using = get_db(request)
-    if request.method == 'DELETE':
-        result = _delete(request.GET, using)
-    else:
-        success, obj = _save(request.POST, using)
-        result = {'success': success, 'data': _read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]}
-    return HttpJsonResponse(result)
+    if len(request.POST) == 1:
+        for d in request.POST:
+            data = json.loads(d)
+            break
+        request.POST = data
+    model = get_model(data)
+    return model._admin.submit(request)

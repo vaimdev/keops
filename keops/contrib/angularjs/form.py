@@ -8,7 +8,7 @@ import keops.forms
 from keops.utils.html import *
 from keops.forms import widgets
 
-def get_field(field):
+def get_field(field, form=None):
     bound_field = field
     field = bound_field.field
     name = bound_field.name
@@ -20,6 +20,8 @@ def get_field(field):
     span_args = []
     field_args = {'class': 'field-cell'}
     span_tag = 'span'
+
+    readonly = name in form.readonly_fields
 
     if field.required:
         attrs['required'] = 1
@@ -47,8 +49,10 @@ def get_field(field):
     elif isinstance(field, forms.DateField):
         attrs['ui-mask'] = _('9999-99-99')
         attrs['date-format'] = _('yy-mm-dd')
-        widget_args = ['<button class="btn" ng-show="form.write"><i class="icon-calendar"></i></button>']
-        attrs['tag'] = 'input type="text"'
+        span_args.append('{{%s | dateFrom}}' % span.pop('ng-bind'))
+        show = attrs.pop('ng-show')
+        widget_args.append(TAG('input type="text" date-picker', **attrs))
+        attrs = {'tag': 'div', 'ng-show': show, 'class': 'input-append date'}
     elif isinstance(field, forms.EmailField):
         span_tag = 'a'
         span['ng-href'] = 'mailto:{{form.item.%s}}' % name
@@ -138,6 +142,17 @@ def get_field(field):
         span['style'] = 'cursor: pointer;'
     elif isinstance(field.widget, widgets.widgets.Textarea):
         attrs['style'] = 'height: 70px; margin: 0;'
+    elif isinstance(field, forms.DecimalField):
+        attrs['tag'] = 'input ui-money'
+        attrs['ui-money-thousands'] = formats.get_format('THOUSAND_SEPARATOR')
+        attrs['ui-money-decimal'] = formats.get_format('DECIMAL_SEPARATOR')
+        attrs['ui-money-negative'] = True
+        span_args.append('{{%s | number:2}}' % span.pop('ng-bind'))
+
+    if readonly:
+        attrs['ng-init'] = 'form.readonly.%s = true' % name
+        if 'ng-show' in attrs:
+            attrs['ng-show'] += ' && !form.readonly.%s' % name
 
     if 'tag' in attrs:
         widget = TAG(attrs.pop('tag'), id=bound_field.auto_id, name=attrs.pop('name', None) or name, *widget_args, **attrs)
@@ -149,7 +164,7 @@ def get_field(field):
         r = [TD(label, attrs={'class': 'label-cell'})]
     args.append(widget)
     if span_tag:
-        args.append(TAG(span_tag, attrs={'ng-show': '!form.write'}, *span_args, **span))
+        args.append(TAG(span_tag, attrs={'ng-show': '!form.write || form.readonly.' + name}, *span_args, **span))
     r.append(TD(*args, **field_args))
     return r
 
@@ -176,7 +191,8 @@ def get_tables(items, cols=2):
             if idx < l:
                 f = items[idx]
                 if isinstance(f, dict):
-                    f = TAG('fieldset', TAG('legend', f['title']), TABLE(TR(*f['items'])))
+                    f = TD(TAG('fieldset', TAG('legend', f['title']), TABLE(*[TR(i) for i in f['items']])))
+                    print(f)
                 table.append(TR(f))
             else:
                 table.append(TR(TD()))
@@ -205,7 +221,7 @@ def form_str(form, cols=2):
             for container in fieldset:
                 container = [f for f in container]
                 if len(container) == 1:
-                    fields.append(''.join(get_field(container[0])))
+                    fields.append(''.join(get_field(container[0], form)))
                 else:
                     fields.append(get_container(container))
 
@@ -215,5 +231,4 @@ def form_str(form, cols=2):
     else:
         pages = ''
     items = DIV(items, pages, attrs={'class': 'form-view'})
-    print(items)
     return items

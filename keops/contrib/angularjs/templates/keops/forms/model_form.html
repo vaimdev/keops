@@ -1,4 +1,4 @@
-<div ng-controller="FormController" ng-init="form.initForm('{{ model_name }}')">
+<form name="dataForm" ng-controller="FormController" ng-init="form.initForm('{{ model_name }}')" ng-submit="submit()">
 <table style="width: 100%;">
     <tr>
         <td class="form-head">
@@ -9,17 +9,20 @@
                             <span style="display: inline-block; padding-right: 10px;"><b><a href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a></b> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</span>
                             <label style="display: inline-block" class="form-data-info">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</label>
                         </span>
+                        <div style="font-size: 8pt; min-height: 10px; color: GrayText;">
+                            {{ form.help_text }}
+                        </div>
                         <table>
                             <tr><td>
                                 <button type="button" ng-show="!form.write" class="btn btn-info" ng-click="form.write = true">{{ _('create')|capfirst }}</button>
                                 <button type="button" ng-show="!form.write" class="btn" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
-                                <button type="button" ng-show="form.write" class="btn btn-danger" ng-click="form.write = false">{{ _('save')|capfirst }}</button>
+                                <input type="submit" ng-show="form.write" class="btn btn-danger" ng-click="form.write = false" value="{{ _('save')|capfirst }}">
                                 <button type="button" ng-show="form.write" class="btn" ng-click="form.write = false">{{ _('cancel')|capfirst }}</button>
-                            </td><td>
+                            </td><td ng-show="!form.write">
                                 {% if form.reports %}
                                 <div class="btn-group">
                                 {% with form.reports.0 as first_report %}
-                                <a class="btn button-label" style="margin-left: 20px;" ng-show="!form.write" href="{{ first_report.get_url }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <a class="btn button-label" style="margin-left: 20px;" href="{{ first_report.get_url }}" target="_blank">{{ _('print')|capfirst }}</a>
                                 {% endwith %}
                                 <button class="btn dropdown-toggle"><span class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">
@@ -66,4 +69,4 @@
     </tr>
 </table>
 {{ form_view|safe }}
-</div>
+</form>

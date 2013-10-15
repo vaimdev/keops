@@ -108,6 +108,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         this.write = false;
         this.model = null;
         this.element = null;
+        this.readonly = null;
         this.pk = $location.search()['pk'];
         this.url = "/db/read/?limit=1&model=";
         if (SharedData.list) {
@@ -202,10 +203,33 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         })
             .then(function (response) { return response.data; });
         promise.$$v = promise;
-        return promise
+        return promise;
     };
 
     $scope.openResource = function (url, search) {
         $location.path(url).search(search).replace();
     };
+
+    $scope.submit = function () {
+        var form = this.dataForm;
+        if (form.$dirty) {
+            var data = {};
+            for (var i in form) {
+                if (i[0] !== '$') {
+                    var el = form[i];
+                    if (el.$dirty) data[el.$name] = typeof el.$modelValue === 'object' ? el.$modelValue['value'] : el.$modelValue;
+                }
+            }
+            console.log('pk', this.form.item.pk);
+            $http({
+                method: 'POST',
+                url: '/db/submit/',
+                headers: { 'Content-Type': "application/x-www-form-urlencoded" },
+                data: { model: this.form.model, pk: this.form.item.pk, data: data }
+            }).
+            success(function (data, status, headers, config) {
+                console.log(data);
+            });
+        }
+    }
 });
