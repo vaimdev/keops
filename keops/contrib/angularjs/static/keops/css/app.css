@@ -141,6 +141,7 @@ legend {
     display: block;
     padding: 2px 0 2px 25px;
     text-decoration: none;
+    cursor: pointer;
 }
 
 #keops-app-left-menu .menu-level-1 {
@@ -410,4 +411,8 @@ legend {
 
 input, textarea, select, .uneditable-input {
     color: #313131;
+}
+
+.menu-list a {
+    cursor: pointer;
 }

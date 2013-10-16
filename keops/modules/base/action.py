@@ -22,6 +22,7 @@ class Action(ModuleElement):
     description = models.CharField(max_length=256, verbose_name=_('description'))
     action_type = models.CharField(_('type'), max_length=32, null=False)
     context = models.TextField(_('context'))
+    dialog = models.BooleanField()
 
     objects = ActionManager()
 
@@ -122,6 +123,11 @@ class FormAction(Action):
 
 class ReportAction(Action):
     report = models.ForeignKey(Report, verbose_name=_('report'))
+
+    def save(self, *args, **kwargs):
+        if self.dialog is None:
+            self.dialog = True
+        super(ReportAction, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'base_report_action'

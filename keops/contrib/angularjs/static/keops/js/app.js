@@ -29,8 +29,12 @@ var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ui.bootstra
                     return '?menulist=' + params.id;
                 }
             }).
-            otherwise({
-                redirectTo: '/'
+            when('/report/:option',
+            {
+                templateUrl: function (params) {
+                    console.log('report', params);
+                    return '/report/' + params.option + '/?' + $.param(params);
+                }
             });
 
 });
@@ -245,6 +249,17 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
 
 keopsApp.controller('MenuController', function($scope, $http, Form, $location, $element) {
     $scope.closedMenuClick = function (url) {
+        $location.path(url);
+    }
+
+    $scope.itemClick = function (url, dialog) {
+        if (dialog) console.log(dialog)
+        else $location.url(url);
+    }
+});
+
+keopsApp.controller('ModalController', function($scope, $http, Form, $location, $modal) {
+    $scope.open = function (url) {
         $location.path(url);
     }
 });
