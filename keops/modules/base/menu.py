@@ -17,6 +17,8 @@ class Menu(ModuleElement):
     action = models.ForeignKey(Action, verbose_name=_('action'))
     image = models.CharField(_('image'), max_length=256, help_text=_('menu image file path'))
     sequence = models.PositiveIntegerField(_('sequence'), help_text=_('menu item sequence'), default=0, db_index=True)
+    closed = models.BooleanField(_('close'), default=False) # dont show sub items
+    #direct_url = models.URLField('url')
 
     objects = MenuManager()
 
@@ -35,7 +37,12 @@ class Menu(ModuleElement):
         return self.get_full_name()
 
     def get_absolute_url(self):
-        return 'action/%d' % self.action_id
+        #if self.direct_url:
+        #    return self.direct_url
+        if self.closed:
+            return 'menulist/%i' % self.id
+        else:
+            return 'action/%i' % self.action_id
 
     @property
     def is_leaf(self):

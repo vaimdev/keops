@@ -50,3 +50,9 @@ class Report(ModuleElement):
 
     class Meta:
         verbose_name = _('report')
+
+    class Extra:
+        default_fields = ('name', 'description')
+        field_groups = {
+            'list_fields': ('name', 'description')
+        }

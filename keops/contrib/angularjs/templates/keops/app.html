@@ -53,20 +53,24 @@
                 </td>
             </tr>
             <tr>
-                <td id="keops-app-left-menu">
+                <td id="keops-app-left-menu" ng-controller="MenuController">
                     <h4><span>{{ menu.name|upper }}</span></h4>
                     <ul>
                         {% for m in menu.menu_set.all %}
+                        {% if m.closed %}
+                        <a class="menu-level-1" ng-click="closedMenuClick('{{ m.get_absolute_url }}')" style="cursor: pointer;">{{ m.name }}</a>
+                        {% else %}
                         <il>{{ m.name }}</il>
-                            {% for sm in m.menu_set.all %}
+                        {% endif %}
+                            {% if not m.closed %}{% for sm in m.menu_set.all %}
                             <a href="#{{ sm.get_absolute_url }}">{{ sm.name }}</a>
-                                {% for sm2 in sm.menu_set.all %}
+                                {% if not sm.closed %}{% for sm2 in sm.menu_set.all %}
                                 <a class="menu-level-3" href="#{{ sm2.get_absolute_url }}">{{ sm2.name }}</a>
-                                    {% for sm3 in sm2.menu_set.all %}
+                                    {% if not sm2.closed %}{% for sm3 in sm2.menu_set.all %}
                                     <a class="menu-level-4" href="#{{ sm3.get_absolute_url }}">{{ sm3.name }}</a>
-                                    {% endfor %}
-                                {% endfor %}
-                            {% endfor %}
+                                    {% endfor %}{% endif %}
+                                {% endfor %}{% endif %}
+                            {% endfor %}{% endif %}
                         {% endfor %}
                     </ul>
                 </td>

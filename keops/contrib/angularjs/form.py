@@ -26,11 +26,11 @@ def get_field(field, form=None):
     if field.required:
         attrs['required'] = 1
 
-    if isinstance(field, (forms.DateField, forms.IntegerField)) or (isinstance(field, forms.CharField) and field.max_length < 10):
+    if isinstance(field, (forms.DateField, forms.IntegerField)) or (isinstance(field, forms.CharField) and field.max_length and field.max_length < 10):
         attrs['class'] = 'small-field'
-    elif isinstance(field, forms.DateTimeField) or (isinstance(field, forms.CharField) and field.max_length <= 15):
+    elif isinstance(field, forms.DateTimeField) or (isinstance(field, forms.CharField) and field.max_length and field.max_length <= 15):
         attrs['class'] = 'normal-field'
-    elif isinstance(field, forms.CharField) and field.max_length <= 20:
+    elif isinstance(field, forms.CharField) and field.max_length and field.max_length <= 20:
         attrs['class'] = 'normal-20c-field'
     else:
         attrs['class'] = 'long-field'
@@ -41,8 +41,8 @@ def get_field(field, form=None):
     if isinstance(field, forms.BooleanField):
         attrs = {'tag': 'label', 'ng-show': attrs.pop('ng-show'), 'style': 'cursor: pointer;'}
         widget_args = [TAG('input type="checkbox"', ngModel='form.item.' + name)]
-        span['ng-bind'] = "form.item.%s" % name
-        #span['ng-bind'] = "form.item.%s === 'True' ? '%s': '%s'" % (name, capfirst(_('yes')), capfirst(_('no')))
+        #span['ng-bind'] = "form.item.%s" % name
+        span['ng-bind'] = "form.item.%s ? '%s': '%s'" % (name, capfirst(_('yes')), capfirst(_('no')))
     elif isinstance(field, forms.DateTimeField):
         attrs['ui-mask'] = _('9999-99-99 99:99 AA')
         attrs['date-format'] = _('yy-mm-dd')
@@ -202,7 +202,6 @@ def get_tables(items, cols=2):
                 f = items[idx]
                 if isinstance(f, dict):
                     f = TD(TAG('fieldset', TAG('legend', f['title']), TABLE(*[TR(i) for i in f['items']])), colspan=2)
-                    print(f)
                 table.append(TR(f))
             else:
                 table.append(TR(TD()))

@@ -6,6 +6,8 @@ from keops import forms
 def index(request, menu_id):
     if 'action' in request.GET:
         return response_action(request)
+    elif 'menulist' in request.GET:
+        return response_menu_list(request)
 
     return render(request, 'keops/app.html', {
         'app_menu': base.Menu.objects.filter(parent=None),
@@ -18,3 +20,8 @@ def response_action(request):
     from keops.modules.base.models import Action
     action = Action.objects.get(pk=request.GET.get('action'))
     return action.execute(request, view_type=request.GET.get('view_type'))
+
+def response_menu_list(request):
+    from keops.modules.base.models import Menu
+    menu = Menu.objects.get(pk=request.GET['menulist'])
+    return render(request, 'keops/menu_list.html', {'menu': menu})
