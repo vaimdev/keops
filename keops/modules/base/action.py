@@ -138,7 +138,8 @@ class ReportAction(Action):
         return 'report'
 
     def execute(self, request, *args, **kwargs):
-        pass
+        from django.http import HttpResponseRedirect
+        return HttpResponseRedirect('/report/form/?id=%i' % self.report_id)
 
 # Register form action types
 Action.action_types['view'] = ViewAction

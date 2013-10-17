@@ -288,28 +288,32 @@ legend {
     vertical-align: top;
 }
 
-#keops-app .label-cell {
+.label-cell {
     width: auto;
     min-width: 100px;
     border-right: 1px solid #dddddd;
     padding-right: 8px;
 }
 
-#keops-app .label-cell label {
+.label-cell label {
     white-space: nowrap;
 }
 
-#keops-app .field-cell {
+.field-cell, .form-field-cell {
     margin: 0;
     width: 99%;
     padding: 0 20px 4px 10px;
+}
+
+.form-field-cell div {
+    width: 100%;
 }
 
 .label-cell label {
     min-width: 120px;
 }
 
-#keops-app .field-label {
+.field-label {
     font-weight: bold;
 }
 

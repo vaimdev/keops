@@ -247,19 +247,34 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
     }
 });
 
-keopsApp.controller('MenuController', function($scope, $http, Form, $location, $element) {
+keopsApp.controller('MenuController', function($scope, $http, Form, $location, $modal, $route) {
     $scope.closedMenuClick = function (url) {
         $location.path(url);
     }
 
+    $scope.showDialog = function (template) {
+        template = template.replace('/', '=');
+        var options = {
+            controller: 'DialogController',
+            templateUrl: '?' + template,
+        };
+        var dialog = $modal.open(options);
+
+        //dialog.open(template, 'DialogController');
+    };
+
     $scope.itemClick = function (url, dialog) {
-        if (dialog) console.log(dialog)
+        if (dialog) $scope.showDialog(url)
         else $location.url(url);
     }
 });
 
-keopsApp.controller('ModalController', function($scope, $http, Form, $location, $modal) {
-    $scope.open = function (url) {
-        $location.path(url);
+keopsApp.controller('DialogController', function($scope, $http, Form, $location, $modalInstance) {
+    $scope.ok = function () {
+        $modalInstance.close(true);
+    }
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
     }
 });

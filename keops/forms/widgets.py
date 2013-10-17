@@ -5,3 +5,11 @@ from django.forms import widgets
 
 class GridWidget(widgets.Widget):
     pass
+
+class BetweenDateWidget(widgets.MultiWidget):
+    def __init__(self, attrs=None):
+        self.widgets = [widgets.DateInput(), widgets.DateInput()]
+        super(BetweenDateWidget, self).__init__(attrs)
+
+    def decompress(self, value):
+        return [None, None]
