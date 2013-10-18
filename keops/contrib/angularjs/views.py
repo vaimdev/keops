@@ -104,7 +104,6 @@ def get_field(field, form=None):
         head = [ '<th%s>%s</th>' % (get_filter(f)[0], capfirst(f.verbose_name)) for f in fields ] + [TH('', style='width: 10px;')]
         cols = [ '<td%s>{{item.%s}}</td>' % ((isinstance(f, models.ForeignKey) and ('', f.name + '.text')) or (f.choices and ('', 'get_%s_display' % f.name)) or get_filter(f)) for f in fields ] +\
             [TD('<i ng-show="form.write" style="cursor: pointer" title="%s" class="icon-remove"></i>''' % capfirst(_('remove item')), style='padding-right: 5px;')]
-        print(cols)
         widget_args = [
             TABLE(
                 THEAD(
@@ -126,7 +125,7 @@ def get_field(field, form=None):
                 label_suffix=' '
             ),
             TAG('a', capfirst(_('add')),
-                attrs={'ng-show': 'form.write', 'class': 'btn'}
+                attrs={'ng-show': 'form.write', 'class': 'btn', 'ng-click': 'showDetail(\'%s.%s\', \'%s\')' % (field.target_attr.model._meta.app_label, field.target_attr.model._meta.model_name, name)}
             )
         ]
         label = None

@@ -200,7 +200,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
     return Form;
 });
 
-keopsApp.controller('FormController', function($scope, $http, Form, $location, $element) {
+keopsApp.controller('FormController', function($scope, $http, Form, $location, $element, $modal) {
     $scope.form = new Form();
     $scope.form.element = $element;
 
@@ -221,6 +221,14 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
 
     $scope.openResource = function (url, search) {
         $location.path(url).search(search).replace();
+    };
+
+    $scope.showDetail = function (model, detail) {
+        var options = {
+            controller: 'DialogController',
+            templateUrl: '/admin/detail/?model=' + model + '&field=' + detail
+        };
+        var dialog = $modal.open(options);
     };
 
     $scope.submit = function () {

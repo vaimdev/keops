@@ -13,7 +13,7 @@ class View(object):
         from django.shortcuts import render
         context['form'] = self
         return render(request, template, context)
-    
+
     def view(self, request, **kwargs):
         """
         Render a form instance.

@@ -198,6 +198,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         for page, fieldsets in self.pages:
             yield TabPage(page, self, fieldsets)
 
+    def render_form(self, exclude=[]):
+        self._prepare()
+        return views.render_form(self)
+
     @property
     def form(self):
         """
@@ -233,7 +237,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         return v(request, **kwargs)
     
     def _prepare_change_view(self, request, context):
-        context['form_view'] = views.render_form(self)
+        context['form_view'] = self.render_form()
         pk = request.GET.get('pk')
         if pk:
             context['pk'] = pk
