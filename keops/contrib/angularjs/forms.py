@@ -10,13 +10,13 @@ class Select(widgets.Select):
     def render(self, name, value, attrs=None, choices=()):
         if not attrs:
             attrs = {}
-        if value:
+        if value and not 'ng-model' in attrs:
             attrs['ng-init'] = "%s = '%s'" % (name, value)
         return super(Select, self).render(name, value, attrs, choices)
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         attrs = super(Select, self).build_attrs(extra_attrs, **kwargs)
-        attrs['ng-model'] = kwargs.get('name')
+        attrs.setdefault('ng-model', kwargs.get('name'))
         attrs['combobox'] = 'combobox'
         return attrs
 
@@ -31,8 +31,7 @@ class DateInput(widgets.DateInput):
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         attrs = super(DateInput, self).build_attrs(extra_attrs, **kwargs)
-        if not 'ng-model' in attrs:
-            attrs['ng-model'] = kwargs.get('name')
+        attrs.setdefault('ng-model', kwargs.get('name'))
         attrs['date-picker'] = 'date-picker'
         attrs['date-format'] = _('yy-mm-dd')
         attrs['ui-mask'] = _('9999-99-99')

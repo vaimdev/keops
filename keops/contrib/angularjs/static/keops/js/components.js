@@ -104,7 +104,7 @@ ui.directive('combobox', function() {
     return {
         restrict: 'A',
         require : 'ngModel',
-        link: function(scope, element, attrs, ngModel, controller) {
+        link: function(scope, element, attrs, controller) {
             var url = attrs.lookupUrl;
 
             if (url) {
@@ -129,12 +129,18 @@ ui.directive('combobox', function() {
             }
             else
             var el = element.select2();
-            ngModel.$render = function () {
-                if (typeof ngModel.$viewValue === 'object')
-                element.select2('data', ngModel.$viewValue);
+            controller.$render = function () {
+                if (typeof controller.$viewValue === 'object')
+                element.select2('data', controller.$viewValue);
                 else
-                element.select2('val', ngModel.$viewValue);
+                element.select2('val', controller.$viewValue);
             };
+            el.on('change', function () {
+                scope.$apply(function () {
+                    console.log(el.select2('data'));
+                    controller.$setViewValue(el.select2('data'));
+                });
+            });
         }
     }
 });

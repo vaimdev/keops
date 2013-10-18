@@ -229,12 +229,11 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             windowClass: 'modal-huge',
             resolve: {
                 form: function () {
-                    form = {}
+                    form = { item: {} }
                     if (item) {
-                        form.item = Object.create(item);
+                        jQuery.extend(form.item, item);
                         form.ref = item;
                     }
-                    else form.item = {};
                     return form;
                 }
             },

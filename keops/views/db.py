@@ -85,9 +85,7 @@ def grid(request):
 
 def _read_fields(model):
     if not hasattr(model.Extra, '_cache_read_fields'):
-        model.Extra._cache_read_fields = \
-            [ f.name for f in model._meta.fields if not f.primary_key ] +\
-            [ v for k, v in _choice_fields(model).items() ]
+        model.Extra._cache_read_fields = [ f.name for f in model._meta.fields if not f.primary_key ]
     return model.Extra._cache_read_fields
 
 def prepare_read(context, using):
@@ -112,9 +110,9 @@ def prepare_read(context, using):
         count = count.using(using).all().count()
     else:
         count = None
-
     fields = ['pk', '__str__'] + context.get('fields', _read_fields(model))
-    rows = [ { f: field_text(getattr(row, f)) for f in fields } for row in queryset ]
+    disp_fields = _choice_fields(model)
+    rows = [ { f: field_text(getattr(row, f), row, f, disp_fields.get(f, f)) for f in fields } for row in queryset ]
     return {'items': rows, 'total': count}
     
 def read(request):
@@ -139,7 +137,7 @@ def read_items(request):
     obj = model.objects.using(using).only(model._meta.pk.name).get(pk=pk)
     for item in items:
         field = getattr(model, item)
-        context['fields'] = field.list_fields + [ v for k, v in _choice_fields(field.related.model).items() ]
+        context['fields'] = field.list_fields
         context['queryset'] = _get_queryset_fields(model, obj, item)
         data[item] = prepare_read(context, using)
     return HttpJsonResponse(data)

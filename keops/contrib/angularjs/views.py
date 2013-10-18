@@ -64,7 +64,7 @@ def get_field(field, form=None, exclude=[], state=None):
         span_tag = 'a'
         span['ng-href'] = 'mailto:{{form.item.%s}}' % name
     elif field.target_attr.choices:
-        span['ng-bind'] = 'form.item.get_%s_display' % name
+        span['ng-bind'] = 'form.item.%s.text' % name
     elif isinstance(field, forms.ModelMultipleChoiceField):
         attrs['tag'] = 'div remoteitem'
         attrs['name'] = name
@@ -105,7 +105,7 @@ def get_field(field, form=None, exclude=[], state=None):
         model_name = field.target_attr.model._meta.app_label + '.' + field.target_attr.model._meta.model_name
         fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
         head = [ '<th%s>%s</th>' % (get_filter(f)[0], capfirst(f.verbose_name)) for f in fields ] + [TH('', style='width: 10px;')]
-        cols = [ '<td%s>{{item.%s}}</td>' % ((isinstance(f, models.ForeignKey) and ('', f.name + '.text')) or (f.choices and ('', 'get_%s_display' % f.name)) or get_filter(f)) for f in fields ] +\
+        cols = [ '<td%s>{{item.%s}}</td>' % (((isinstance(f, models.ForeignKey) or f.choices) and ('', f.name + '.text')) or get_filter(f)) for f in fields ] +\
             [TD('<i ng-show="form.write" style="cursor: pointer" title="%s" class="icon-remove"></i>''' % capfirst(_('remove item')), style='padding-right: 5px;')]
         widget_args = [
             TABLE(
@@ -135,7 +135,6 @@ def get_field(field, form=None, exclude=[], state=None):
         span = {}
         span_args = []
         span_tag = None
-
     elif isinstance(field, forms.ModelChoiceField):
         widget_args.append(
             TAG('input combobox type="hidden" ng-model="%s" id="%s"' % (attrs.pop('ng-model'), bound_field.auto_id),
