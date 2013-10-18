@@ -1,6 +1,7 @@
-
 from django.utils import six
 from django.forms import forms
+from django.views.generic import TemplateView
+from django.views.generic.edit import CreateView
 
 class View(object):
     template_name = 'keops/forms/view.html'
@@ -18,6 +19,12 @@ class View(object):
         Render a form instance.
         """
         return self.render(request, self.template_name, kwargs)
+
+    def submit(self, request, **kwargs):
+        """
+        Receive data.
+        """
+        pass
 
 class BaseForm(forms.BaseForm, View):
     pass

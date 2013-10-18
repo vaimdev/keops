@@ -31,7 +31,7 @@ _COMMON_ATTRS = ('mask', 'page', 'visible', 'fieldset', 'mask_re')
 #   update_default -> default value for updated objects
 #   translate -> field content translation (True/False)
 #   select -> field search type: None = no search, "basic" = basic search, "advanced" = advanced filter
-#   widget_attrs -> client side widget attributes (all extjs compatible attributes are supported)
+#   widget_attrs -> client side widget attributes (all html5, angular, jquery compatible attributes are supported)
 class Field(object):
     _init = models.Field.__init__
 

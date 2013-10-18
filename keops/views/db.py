@@ -4,10 +4,10 @@ import json
 from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
-from django.utils import formats
 from keops.db import get_db, set_db
 from keops.http import HttpJsonResponse
+from keops.utils import field_text
+from keops.utils.filter import search_text
 
 def index(request):
     """
@@ -33,93 +33,10 @@ def get_model(context):
     else:
         return model
 
-def field_text(value):
-    if value is None:
-        return ''
-    elif callable(value):
-        return value()
-    elif isinstance(value, (float, decimal.Decimal)):
-        return str(value)
-    elif isinstance(value, (int, str)):
-        return value
-    elif isinstance(value, datetime.date):
-        return formats.date_format(value, 'SHORT_DATE_FORMAT')
-    elif isinstance(value, datetime.datetime):
-        return formats.date_format(value, 'SHORT_DATETIME_FORMAT')
-    elif isinstance(value, models.Model):
-        return {'id': value.pk, 'text': str(value)}
-    else:
-        return str(value)
-
-
-def _get_filter_args(self, filter):
-    if isinstance(filter, (tuple, list)):
-        d = {}
-        for i in filter:
-            d[i[0] + '__exact'] = i[2]
-    elif isinstance(filter, dict):
-        return filter
-
-def _get_query_args(cls, search_fields, value, filter=None):
-    op = '__icontains'
-
-    def _get_filter_items(field, expr=None):
-        if expr:
-            rs = expr + '__' + field.name
-        else:
-            rs = field.name
-        if isinstance(field, models.ForeignKey):
-            if field.related.parent_model == cls:
-                return []
-            r = []
-            model = field.related.parent_model
-            d = model.Extra.field_groups['search_fields']
-            if isinstance(d, (tuple, list)):
-                for f in d:
-                    r.extend(_get_filter_items(model._meta.get_field(f), rs))
-                return r
-            else:
-                r.extend(_get_filter_items(model._meta.get_field(d), rs))
-                return r
-        else:
-            return [rs]
-
-    if filter:
-        d = _get_filter_args(filter)
-    else:
-        d = {}
-    filter_items = []
-    if isinstance(search_fields, (tuple, list)):
-        r = None
-        for f in search_fields:
-            field = cls._meta.get_field(f)
-            filter_items.extend(_get_filter_items(field))
-
-        for f in filter_items:
-            q = Q(**{f + op: value})
-            if r:
-                r = r | q
-            else:
-                r = q
-        if d:
-            r = Q(**d) & Q(r)
-        return r
-
-    else:
-        filter_items.extend(_get_filter_items(cls._meta.get_field(cls._meta.default_fields)))
-        d.update({f + op: value for f in filter_items})
-        return Q(**d)
-
-def search_text(queryset, text, search_fields=None):
-    # Search by the search_fields property (Admin)
-    # TODO add query on form view
-    model = queryset.model
-    if not search_fields:
-        search_fields = model.Extra.field_groups['search_fields']
-
-    query = _get_query_args(model, search_fields, text)
-
-    return queryset.filter(query)
+def _choice_fields(model):
+    if not hasattr(model.Extra, '_cache_choice_fields'):
+        model.Extra._cache_choice_fields = { f.name: 'get_%s_display' % f.name for f in model._meta.fields if f.choices }
+    return model.Extra._cache_choice_fields
 
 def grid(request):
     using = get_db(request)
@@ -127,6 +44,7 @@ def grid(request):
     pk = request.GET.get('pk')
     query = request.GET.get('query')
     field = request.GET.get('field') # Check related field
+    disp_fields = {}
     if field:
         obj = model.objects.using(using).get(pk=pk)
         queryset = getattr(obj, field)
@@ -137,11 +55,12 @@ def grid(request):
         queryset = model.objects.using(using)
         if hasattr(model, 'Extra'):
             fields = model.Extra.field_groups.get('list_fields')
+            disp_fields = _choice_fields(model)
         else:
             fields = None
         if isinstance(fields, tuple):
             fields = list(fields)
-    fields = fields or [f.name for f in model._meta.concrete_fields if not f.primary_key]
+    fields = fields or [ f.name for f in model._meta.concrete_fields if not f.primary_key ]
     start = int(request.GET.get('start', '0'))
     limit = int(request.GET.get('limit', '50')) + start # settings
     count = request.GET.get('total', False)
@@ -158,16 +77,17 @@ def grid(request):
 
     # TODO Check content type permissions permissions
 
-    get_val = lambda x: '' if x is None else x
+    get_val = lambda x: '' if x is None else (callable(x) and str(x())) or str(x)
     fields = ['pk'] + fields
-    rows = [{f: str(get_val(getattr(row, f))) for f in fields} for row in queryset]
+    rows = [ { f: str(get_val(getattr(row, disp_fields.get(f, f)))) for f in fields } for row in queryset ]
     data = {'items': rows, 'total': count}
     return HttpJsonResponse(data)
 
-def get_read_fields(model):
+def _read_fields(model):
     if not hasattr(model.Extra, '_cache_read_fields'):
-        model.Extra._cache_read_fields = [f.name for f in model._meta.fields if not f.primary_key] +\
-                                         [(f.choices and 'get_%s_display' % f.name) for f in model._meta.fields if f.choices]
+        model.Extra._cache_read_fields = \
+            [ f.name for f in model._meta.fields if not f.primary_key ] +\
+            [ v for k, v in _choice_fields(model).items() ]
     return model.Extra._cache_read_fields
 
 def prepare_read(context, using):
@@ -193,8 +113,8 @@ def prepare_read(context, using):
     else:
         count = None
 
-    fields = ['pk', '__str__'] + context.get('fields', get_read_fields(model))
-    rows = [{f: field_text(getattr(row, f)) for f in fields} for row in queryset]
+    fields = ['pk', '__str__'] + context.get('fields', _read_fields(model))
+    rows = [ { f: field_text(getattr(row, f)) for f in fields } for row in queryset ]
     return {'items': rows, 'total': count}
     
 def read(request):
@@ -204,7 +124,7 @@ def read(request):
     return model._admin.read(request)
 
 def _get_queryset_fields(model, obj, attr):
-    # TODO get fields for relation attr
+    # TODO get select fields for relation attr
     return getattr(obj, attr)
 
 def read_items(request):
@@ -218,7 +138,8 @@ def read_items(request):
     # Optimize selecting pk field only
     obj = model.objects.using(using).only(model._meta.pk.name).get(pk=pk)
     for item in items:
-        context['fields'] = [] # Select only pk, __str__ for now
+        field = getattr(model, item)
+        context['fields'] = field.list_fields + [ v for k, v in _choice_fields(field.related.model).items() ]
         context['queryset'] = _get_queryset_fields(model, obj, item)
         data[item] = prepare_read(context, using)
     return HttpJsonResponse(data)

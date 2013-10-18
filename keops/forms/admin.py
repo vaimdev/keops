@@ -5,7 +5,7 @@ from django.utils import six
 from django import forms
 from django.utils.translation import ugettext as _
 from keops.utils.html import *
-from keops.contrib.angularjs import form
+from keops.contrib.angularjs import views
 from keops.contrib.reports import Reports, ReportLink
 from keops.http import HttpJsonResponse
 from .forms import View
@@ -161,11 +161,14 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                     self.search_fields[i] = '%s__icontains' % f
         elif not self.search_fields or not self.display_expression:
             search_fields = ''
-            for f in self.fields:
-                field = self.model._meta.get_field(f)
-                if isinstance(field, models.CharField):
-                    search_fields = ['%s__icontains']
-                    break
+            for f in self.model_fields:
+                try:
+                    field = self.model._meta.get_field(f.name)
+                    if isinstance(field, models.CharField):
+                        search_fields = ['%s__icontains']
+                        break
+                except:
+                    pass
             self.search_fields = self.search_fields or search_fields or (self.fields and [self.fields[0]]) or ()
             
         self.title = self.title or self.model._meta.verbose_name_plural
@@ -230,25 +233,26 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         return v(request, **kwargs)
     
     def _prepare_change_view(self, request, context):
-        context['form_view'] = form.form_str(self)
+        context['form_view'] = views.render_form(self)
         pk = request.GET.get('pk')
         if pk:
             context['pk'] = pk
         self._prepare_context(request, context)
 
     def list_view(self, request, **kwargs):
+        from django.db import models
         kwargs['query'] = request.GET.get('query', '')
-        kwargs['fields'] = [self.get_formfield(f) for f in self.list_display]
-        kwargs['list_display'] = ['{{item.%s}}' % f for f in self.list_display]
+        kwargs['fields'] = [ (views.get_filter(f, self.model)[0], self.get_formfield(f).label) for f in self.list_display ]
+        kwargs['list_display'] = [ '<td%s>{{item.%s}}</td>' % views.get_filter(f, self.model) for f in self.list_display ]
         self._prepare_context(request, kwargs)
         kwargs.setdefault('pagesize', 50)
         return self.render(request, self.list_template, kwargs)
 
-    def add_view(self, request, **kwargs):
+    def create_view(self, request, **kwargs):
         kwargs['state'] = 'create'
         self.view(request, **kwargs)
 
-    def edit_view(self, request, **kwargs):
+    def update_view(self, request, **kwargs):
         kwargs['state'] = 'write'
         self.view(request, **kwargs)
         
@@ -275,6 +279,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         return self.bound_fields[field]
 
     def lookup(self, request):
+        """
+        Read lookup data list.
+        """
         from keops.views import db
         context = request.GET
         field = context.get('field')
@@ -304,6 +311,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         }
 
     def read(self, request):
+        """
+        Return JSON serialized data.
+        """
         from keops.views import db
         using = db.get_db(request)
         return HttpJsonResponse(db.prepare_read(request.GET, using))
@@ -356,7 +366,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 context = {'pk': pk, 'model': model, 'data': record}
                 self.save(context, using)
 
-    def submit(self, request):
+    def submit(self, request, **kwargs):
+        """
+        Receive submit data.
+        """
         from keops.views import db
         using = db.get_db(request)
         if request.method == 'DELETE':

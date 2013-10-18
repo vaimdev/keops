@@ -2,14 +2,14 @@
     <thead>
         <tr>
             {% for field in fields %}
-            <th>{{ field.label }}</th>
+            <th{{ field.0|safe }}>{{ field.1 }}</th>
             {% endfor %}
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="item in list.items" ng-class-odd="'data-grid-row-odd'" ng-class-even="'data-grid-row-even'" ng-click="itemClick('action/{{ action.pk }}/form/', 'pk={% verbatim %}{{item.pk}}{% endverbatim %}', $index)">
             {% for field in list_display %}
-            <td>{{ field }}</td>
+            {{ field|safe }}
             {% endfor %}
         </tr>
     </tbody>

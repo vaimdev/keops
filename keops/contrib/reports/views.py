@@ -7,12 +7,19 @@ from django.conf import settings
 from keops.db import models
 from keops.db import get_connection
 from keops.modules.base.models import Report
+import keops.forms
+from keops.utils import field_text
 
 __all__ = ['ReportForm', 'form', 'find_report_file', 'get_form']
 
+# Cache prepared form report class
 FORM_CACHE = {}
 
 class ReportForm(forms.Form):
+    """
+    Represent a generic report params dialog.
+    """
+    # Form private attrs
     _report_file = ''
     _params_file = ''
     _report_id = None
@@ -29,10 +36,15 @@ def _get_initial_data(form):
     items = form._params['items']
     initial = {}
     for param in items:
+        v = None
         if 'default' in param:
-            initial[param['name']] = str(eval_default(param['default']))
+            v = eval_default(param['default'])
         elif 'value' in param:
-            initial[param['name']] = param['value']
+            v = param['value']
+        if isinstance(v, (list, tuple)):
+            v = [field_text(x) for x in v]
+        if not v is None:
+            initial[param['name']] = v
     return initial
 
 def find_report_file(name):
@@ -55,7 +67,7 @@ def get_field(param):
             c = conn.cursor()
             c.execute(param[p])
             attrs['choices'] = [[r[0], (len(r) == 1 and r[0]) or r[1]] for r in c.fetchall()]
-    return getattr(forms, field_type, None)(**attrs)
+    return getattr(forms, field_type, getattr(keops.forms, field_type, None))(**attrs)
 
 
 def get_form(report, params):
@@ -72,7 +84,6 @@ def get_form(report, params):
         form._params_file = params
         form._params = data
         FORM_CACHE[params] = form
-
     return form(initial=_get_initial_data(form))
 
 def form(request):
@@ -83,7 +94,6 @@ def form(request):
     report._report_file = find_report_file(report.name)
     params = report._report_file.split('.')[0] + '.json'
     form = get_form(report, params)
-    print(str(form))
     return render(request, 'keops/forms/filter_form.html', {
         'header': os.path.basename(params).split('.')[0],
         'form': form,

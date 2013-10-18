@@ -3,10 +3,25 @@ from django.utils import formats
 from django.utils.text import capfirst
 from django.core.urlresolvers import reverse
 from django import forms
+from django.db import models
 import django.forms.widgets
 import keops.forms
 from keops.utils.html import *
 from keops.forms import widgets
+
+def get_filter(field, model=None):
+    try:
+        if isinstance(field, str):
+            field = model._meta.get_field(field)
+        if isinstance(field, models.DateField):
+            return '', field.name + '|date'
+        elif isinstance(field, models.DecimalField):
+            return ' style="text-align: right;"', field.name + '|number:2'
+        else:
+            return '', field.name
+    except:
+        pass
+    return '', field
 
 def get_field(field, form=None):
     bound_field = field
@@ -35,29 +50,14 @@ def get_field(field, form=None):
     else:
         attrs['class'] = 'long-field'
 
-    if isinstance(field, forms.ChoiceField):
-        attrs['combobox'] = ''
-
     if isinstance(field, forms.BooleanField):
         attrs = {'tag': 'label', 'ng-show': attrs.pop('ng-show'), 'style': 'cursor: pointer;'}
-        widget_args = [TAG('input type="checkbox"', ngModel='form.item.' + name)]
-        #span['ng-bind'] = "form.item.%s" % name
+        widget_args = [TAG('input type="checkbox"', ngModel='form.item.' + name, id=bound_field.auto_id)]
         span['ng-bind'] = "form.item.%s ? '%s': '%s'" % (name, capfirst(_('yes')), capfirst(_('no')))
     elif isinstance(field, forms.DateTimeField):
-        attrs['ui-mask'] = _('9999-99-99 99:99 AA')
-        attrs['date-format'] = _('yy-mm-dd')
-        attrs['time-format'] = _('HH:mm')
         span_args.append('{{%s | dateFromNow}}' % span.pop('ng-bind'))
-        show = attrs.pop('ng-show')
-        widget_args.append(TAG('input type="text" date-time-picker', **attrs))
-        attrs = {'tag': 'div', 'ng-show': show, 'class': 'input-append date'}
     elif isinstance(field, forms.DateField):
-        attrs['ui-mask'] = _('9999-99-99')
-        attrs['date-format'] = _('yy-mm-dd')
         span_args.append('{{%s | dateFrom}}' % span.pop('ng-bind'))
-        show = attrs.pop('ng-show')
-        widget_args.append(TAG('input type="text" date-picker', **attrs))
-        attrs = {'tag': 'div', 'ng-show': show, 'class': 'input-append date'}
     elif isinstance(field, forms.EmailField):
         span_tag = 'a'
         span['ng-href'] = 'mailto:{{form.item.%s}}' % name
@@ -97,22 +97,23 @@ def get_field(field, form=None):
         attrs['name'] = name
         attrs.pop('ng-show')
         span['ng-bind'] = 'item.__str__'
+        model = field.target_attr.related.model
+        related = field.target_attr.related
+        list_fields = field.target_attr.list_fields
+        fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
+        head = [ '<th%s>%s</th>' % (get_filter(f)[0], capfirst(f.verbose_name)) for f in fields ] + [TH('', style='width: 10px;')]
+        cols = [ '<td%s>{{item.%s}}</td>' % ((isinstance(f, models.ForeignKey) and ('', f.name + '.text')) or (f.choices and ('', 'get_%s_display' % f.name)) or get_filter(f)) for f in fields ] +\
+            [TD('<i ng-show="form.write" style="cursor: pointer" title="%s" class="icon-remove"></i>''' % capfirst(_('remove item')), style='padding-right: 5px;')]
+        print(cols)
         widget_args = [
             TABLE(
                 THEAD(
-                    TR(
-                        TH(''),
-                        TH(''), # remove link column
-                    )
+                    TR(*head)
                 ),
                 TBODY(
                     TR(
-                        TD('{{item.__str__}}'),
-                        TD(
-                            '<i ng-show="form.write" style="cursor: pointer" title="%s" class="icon-remove"></i>''' % capfirst(_('remove item')),
-                            style='width: 1px;'
-                        ),
-                        attrs={'ng-repeat': 'item in form.item.' + name}
+                        attrs={'ng-repeat': 'item in form.item.' + name},
+                        *cols
                     )
                 ),
                 attrs={'class': 'grid-field', 'style': 'table-layout: inherit;'}
@@ -135,7 +136,7 @@ def get_field(field, form=None):
 
     elif isinstance(field, forms.ModelChoiceField):
         widget_args.append(
-            TAG('input combobox type="hidden" ng-model="%s"' % attrs.pop('ng-model'),
+            TAG('input combobox type="hidden" ng-model="%s" id="%s"' % (attrs.pop('ng-model'), bound_field.auto_id),
                 **{
                     'class': attrs.get('class'),
                     'lookup-url': '/db/lookup/?model=%s.%s&field=%s' %
@@ -151,12 +152,13 @@ def get_field(field, form=None):
             span['ng-click'] = "openResource('%s', 'pk='%s)" % (url, ' + form.item.%s.id' % name)
         span['style'] = 'cursor: pointer;'
     elif isinstance(field.widget, widgets.widgets.Textarea):
-        attrs['style'] = 'height: 70px; margin: 0;'
+        attrs['style'] = 'height: 70px; margin: 0; resize: none;'
     elif isinstance(field, forms.DecimalField):
         attrs['tag'] = 'input ui-money'
         attrs['ui-money-thousands'] = formats.get_format('THOUSAND_SEPARATOR')
         attrs['ui-money-decimal'] = formats.get_format('DECIMAL_SEPARATOR')
         attrs['ui-money-negative'] = True
+        attrs['id'] = bound_field.auto_id
         span_args.append('{{%s | number:2}}' % span.pop('ng-bind'))
 
     if readonly:
@@ -165,7 +167,7 @@ def get_field(field, form=None):
             attrs['ng-show'] += ' && !form.readonly.%s' % name
 
     if 'tag' in attrs:
-        widget = TAG(attrs.pop('tag'), id=bound_field.auto_id, name=attrs.pop('name', None) or name, *widget_args, **attrs)
+        widget = TAG(attrs.pop('tag'), name=attrs.pop('name', None) or name, *widget_args, **attrs)
     else:
         widget = bound_field.as_widget(attrs=attrs)
 
@@ -209,7 +211,7 @@ def get_tables(items, cols=2):
 
     return TABLE(TR(*[TD(t, style='width: 50%') for t in tables]))
 
-def form_str(form, cols=2):
+def render_form(form, cols=2):
     items = []
     pages = []
     for page in form:
