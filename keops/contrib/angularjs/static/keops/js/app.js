@@ -223,12 +223,33 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         $location.path(url).search(search).replace();
     };
 
-    $scope.showDetail = function (model, detail) {
+    $scope.showDetail = function (model, detail, item) {
         var options = {
             controller: 'DialogController',
+            windowClass: 'modal-huge',
+            resolve: {
+                form: function () {
+                    form = {}
+                    if (item) {
+                        form.item = Object.create(item);
+                        form.ref = item;
+                    }
+                    else form.item = {};
+                    return form;
+                }
+            },
             templateUrl: '/admin/detail/?model=' + model + '&field=' + detail
         };
         var dialog = $modal.open(options);
+
+        dialog.result.then(function (form) {
+            console.log(form);
+            if (form.ref) {
+                jQuery.extend(form.ref, form.item);
+            }
+        }, function () {
+            console.log('cancel');
+        });
     };
 
     $scope.submit = function () {
@@ -277,9 +298,13 @@ keopsApp.controller('MenuController', function($scope, $http, Form, $location, $
     }
 });
 
-keopsApp.controller('DialogController', function($scope, $http, Form, $location, $modalInstance) {
+keopsApp.controller('DialogController', function($scope, $http, Form, $location, $modalInstance, form) {
+    $scope.form = form;
+
     $scope.ok = function () {
-        $modalInstance.close(true);
+        var v = true;
+        if ($scope.form) v = $scope.form;
+        $modalInstance.close(v);
     }
 
     $scope.cancel = function () {

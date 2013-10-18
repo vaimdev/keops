@@ -23,11 +23,13 @@ def get_filter(field, model=None):
         pass
     return '', field
 
-def get_field(field, form=None):
+def get_field(field, form=None, exclude=[], state=None):
     bound_field = field
     field = bound_field.field
     name = bound_field.name
-    attrs = {'ng-show': 'form.write', 'ng-model': 'form.item.' + name}
+    if name in exclude:
+        return []
+    attrs = {'ng-model': 'form.item.' + name, 'ng-show': 'form.write'}
     span = {'ng-bind': 'form.item.' + name}
     widget_args = []
     label = bound_field.label_tag(attrs={'class': 'field-label'}, label_suffix=' ')
@@ -100,6 +102,7 @@ def get_field(field, form=None):
         model = field.target_attr.related.model
         related = field.target_attr.related
         list_fields = field.target_attr.list_fields
+        model_name = field.target_attr.model._meta.app_label + '.' + field.target_attr.model._meta.model_name
         fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
         head = [ '<th%s>%s</th>' % (get_filter(f)[0], capfirst(f.verbose_name)) for f in fields ] + [TH('', style='width: 10px;')]
         cols = [ '<td%s>{{item.%s}}</td>' % ((isinstance(f, models.ForeignKey) and ('', f.name + '.text')) or (f.choices and ('', 'get_%s_display' % f.name)) or get_filter(f)) for f in fields ] +\
@@ -111,7 +114,7 @@ def get_field(field, form=None):
                 ),
                 TBODY(
                     TR(
-                        attrs={'ng-repeat': 'item in form.item.' + name},
+                        attrs={'ng-repeat': 'item in form.item.' + name, 'ng-click': 'showDetail(\'%s\', \'%s\', item)' % (model_name, name)},
                         *cols
                     )
                 ),
@@ -125,7 +128,7 @@ def get_field(field, form=None):
                 label_suffix=' '
             ),
             TAG('a', capfirst(_('add')),
-                attrs={'ng-show': 'form.write', 'class': 'btn', 'ng-click': 'showDetail(\'%s.%s\', \'%s\')' % (field.target_attr.model._meta.app_label, field.target_attr.model._meta.model_name, name)}
+                attrs={'ng-show': 'form.write', 'class': 'btn', 'ng-click': 'showDetail(\'%s\', \'%s\')' % (model_name, name)}
             )
         ]
         label = None
@@ -174,8 +177,9 @@ def get_field(field, form=None):
     if label:
         r = [TD(label, attrs={'class': 'label-cell'})]
     args.append(widget)
-    if span_tag:
-        args.append(TAG(span_tag, attrs={'ng-show': '!form.write || form.readonly.' + name}, *span_args, **span))
+    if state != 'write':
+        if span_tag:
+            args.append(TAG(span_tag, attrs={'ng-show': '!form.write || form.readonly.' + name}, *span_args, **span))
     r.append(TD(*args, **field_args))
     return r
 
@@ -210,7 +214,7 @@ def get_tables(items, cols=2):
 
     return TABLE(TR(*[TD(t, style='width: 50%') for t in tables]))
 
-def render_form(form, cols=2):
+def render_form(form, cols=2, exclude=[], state=None):
     items = []
     pages = []
     for page in form:
@@ -231,14 +235,21 @@ def render_form(form, cols=2):
             for container in fieldset:
                 container = [f for f in container]
                 if len(container) == 1:
-                    fields.append(''.join(get_field(container[0], form)))
+                    s = ''.join(get_field(container[0], form, exclude, state))
                 else:
-                    fields.append(get_container(container))
+                    s = get_container(container)
+                if s:
+                    fields.append(s)
 
     items = get_tables(items, cols)
     if pages:
         pages = TAG('tabset', *[TAG('tab', get_tables(page['items']), heading=page['title']) for page in pages])
     else:
         pages = ''
-    items = DIV(items, pages, attrs={'class': 'form-view'})
+    if state == 'write':
+        attrs = {'ng-init': 'form.write=true'}
+    else:
+        attrs = {}
+    attrs['class'] = 'form-view'
+    items = DIV(items, pages, **attrs)
     return items

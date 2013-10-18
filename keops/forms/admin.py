@@ -198,9 +198,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         for page, fieldsets in self.pages:
             yield TabPage(page, self, fieldsets)
 
-    def render_form(self, exclude=[]):
+    def render_form(self, exclude=[], state=None):
         self._prepare()
-        return views.render_form(self)
+        return views.render_form(self, exclude=exclude, state=state)
 
     @property
     def form(self):

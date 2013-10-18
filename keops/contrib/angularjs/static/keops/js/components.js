@@ -37,7 +37,7 @@ ui.directive('uiMoney', function($filter) {
     return {
         restrict: 'A',
         require : 'ngModel',
-        link : function (scope, element, attrs, ngModel) {
+        link : function (scope, element, attrs, ngModel, controller) {
 
             var precision = attrs.uiMoneyPrecision || 2;
             $(function() {
@@ -45,7 +45,8 @@ ui.directive('uiMoney', function($filter) {
                 var decimal = attrs.uiMoneyDecimal;
                 var symbol = attrs.uiMoneySymbol;
                 var negative = attrs.uiMoneyNegative;
-                element.maskMoney({symbol: symbol, thousands: thousands, decimal: decimal, precision: precision, allowNegative: negative, allowZero: true});
+                element.maskMoney({symbol: symbol, thousands: thousands, decimal: decimal, precision: precision, allowNegative: negative, allowZero: true}).
+                bind('keyup blur', function(event) { ngModel.$setViewValue(element.val().replace(RegExp('\\' + thousands, 'g'), '').replace(RegExp('\\' + decimal, 'g'), '.')); });
             });
 
             ngModel.$render = function () {
@@ -152,7 +153,6 @@ ui.filter('dateFromNow', function ($locale) {
 
 ui.filter('dateFrom', function ($locale) {
     return function (dateString) {
-        // TODO adjust to get current locale short date time format
         if (dateString) {
             var fmt = $locale.DATETIME_FORMATS.mediumDate.toUpperCase();
             var m = moment(dateString, fmt)

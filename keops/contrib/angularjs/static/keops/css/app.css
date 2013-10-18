@@ -280,12 +280,21 @@ legend {
     margin: 16px 5px 0 10px;
 }
 
-#keops-app .form-view table {
+.modal-body .form-view {
+    margin: 0 -8px 0 0;
+}
+
+.form-view table {
     width: 100%;
 }
 
-#keops-app .form-view table td {
+#keops-app .form-view table td, .form-view table td {
     vertical-align: top;
+}
+
+.modal-huge {
+    width: 960px;
+    margin: -300px 0 0 -500px;
 }
 
 .label-cell {
