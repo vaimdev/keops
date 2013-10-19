@@ -8,6 +8,7 @@ from keops.utils.html import *
 from keops.contrib.angularjs import views
 from keops.contrib.reports import Reports, ReportLink
 from keops.http import HttpJsonResponse
+from keops.utils import field_text
 from .forms import View
 
 class FieldLine(object):
@@ -282,7 +283,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             self.bound_fields[field] = bound_field
         return self.bound_fields[field]
 
-    def lookup(self, request):
+    def lookup(self, request, sel_fields=None):
         """
         Read lookup data list.
         """
@@ -296,7 +297,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if query:
             queryset = db.search_text(queryset, query)
         data = {
-            'data': [{'id': obj.pk, 'text': str(obj)} for obj in queryset[start:limit]],
+            'data': [ field_text(obj, sel_fields=sel_fields[field]) for obj in queryset[start:limit] ],
             'total': queryset.count()
         }
         return HttpJsonResponse(data)

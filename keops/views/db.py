@@ -38,6 +38,11 @@ def _choice_fields(model):
         model.Extra._cache_choice_fields = { f.name: 'get_%s_display' % f.name for f in model._meta.fields if f.choices }
     return model.Extra._cache_choice_fields
 
+def fk_select_fields(model):
+    if not hasattr(model.Extra, '_cache_fk_select_fields'):
+        model.Extra._cache_fk_select_fields = { f.name: f.custom_attrs['select_fields'] for f in model._meta.fields if 'select_fields' in f.custom_attrs }
+    return model.Extra._cache_fk_select_fields
+
 def grid(request):
     using = get_db(request)
     model = get_model(request.GET)
@@ -143,7 +148,8 @@ def read_items(request):
     return HttpJsonResponse(data)
 
 def lookup(request):
-    return get_model(request.GET)._admin.lookup(request)
+    model = get_model(request.GET)
+    return model._admin.lookup(request, sel_fields=fk_select_fields(model))
 
 def submit(request):
     """

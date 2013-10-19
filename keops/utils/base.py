@@ -3,11 +3,15 @@ import decimal
 from django.utils import formats
 from django.db import models
 
-def field_text(value, obj=None, field=None, disp_field=None):
+def field_text(value, obj=None, field=None, disp_field=None, sel_fields=None):
     if value is None:
         return ''
     elif isinstance(value, models.Model):
-        return {'id': value.pk, 'text': str(value)}
+        r = {'id': value.pk, 'text': str(value)}
+        if sel_fields:
+            for s in sel_fields:
+                r[s] = field_text(getattr(obj or value, s, None))
+        return r
     elif field != disp_field:
         return {'id': value, 'text': getattr(obj, disp_field)()}
     elif callable(value):

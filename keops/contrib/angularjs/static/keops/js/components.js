@@ -137,7 +137,6 @@ ui.directive('combobox', function() {
             };
             el.on('change', function () {
                 scope.$apply(function () {
-                    console.log(el.select2('data'));
                     controller.$setViewValue(el.select2('data'));
                 });
             });

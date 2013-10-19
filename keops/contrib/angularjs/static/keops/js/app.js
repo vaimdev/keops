@@ -251,6 +251,15 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         });
     };
 
+    $scope.sum = function (item, attr) {
+        var r = 0;
+        for (var i in item) {
+            r += item[i];
+        }
+        console.log(r);
+        return r;
+    }
+
     $scope.submit = function () {
         var form = this.dataForm;
         if (form.$dirty) {

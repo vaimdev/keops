@@ -136,14 +136,19 @@ def get_field(field, form=None, exclude=[], state=None):
         span_args = []
         span_tag = None
     elif isinstance(field, forms.ModelChoiceField):
+        a = {
+            'class': attrs.get('class'),
+            'lookup-url': '/db/lookup/?model=%s.%s&field=%s' % (
+                field.target_attr.model._meta.app_label,
+                field.target_attr.model._meta.model_name,
+                name,
+            )
+        }
+        a.update(field.target_attr.custom_attrs.get('widget_attrs', {}))
         widget_args.append(
             TAG('input combobox type="hidden" ng-model="%s" id="%s"' % (attrs.pop('ng-model'), bound_field.auto_id),
-                **{
-                    'class': attrs.get('class'),
-                    'lookup-url': '/db/lookup/?model=%s.%s&field=%s' %
-                                  (field.target_attr.model._meta.app_label,
-                                   field.target_attr.model._meta.model_name,
-                                   name)}))
+                **a
+            ))
         attrs = {'tag': 'div', 'ng-show': 'form.write'}
         span['ng-bind'] += '.text'
         # Change to remote combobox widget
@@ -170,6 +175,7 @@ def get_field(field, form=None, exclude=[], state=None):
     if 'tag' in attrs:
         widget = TAG(attrs.pop('tag'), name=attrs.pop('name', None) or name, *widget_args, **attrs)
     else:
+        attrs.update(field.target_attr.custom_attrs.get('widget_attrs', {}))
         widget = bound_field.as_widget(attrs=attrs)
 
     r = []
