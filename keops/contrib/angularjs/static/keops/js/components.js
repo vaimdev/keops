@@ -58,6 +58,32 @@ ui.directive('uiMoney', function($filter) {
     }
 });
 
+ui.directive('uiTable', function() {
+    return {
+        restrict: 'A',
+        require : 'ngModel',
+        link: function(scope, element, attrs, controller) {
+            if (attrs.ngChange)
+            scope.$on('rowChange', function (event) {
+                scope.$eval(attrs.ngChange);
+            })
+        }
+    }
+});
+
+ui.directive('uiTableRow', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs, controller) {
+            if (scope.$last) scope.last = true;
+            for (var i in scope.item)
+            scope.$watch('item.' + i, function() {
+                if (scope.last) scope.$emit('rowChange');
+            });
+        }
+    }
+});
+
 ui.directive('datePicker', function() {
     return {
         restrict: 'A',

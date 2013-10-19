@@ -95,30 +95,35 @@ def get_field(field, form=None, exclude=[], state=None):
     elif isinstance(field, keops.forms.GridField):
         field_args = {'colspan': 2, 'style': 'width: 100%;'}
 
-        attrs['tag'] = 'table remoteitem'
+        attrs['tag'] = 'div remoteitem style="max-height: 200px; overflow: auto;"'
         attrs['name'] = name
         attrs.pop('ng-show')
         span['ng-bind'] = 'item.__str__'
         model = field.target_attr.related.model
         related = field.target_attr.related
         list_fields = field.target_attr.list_fields
+        a = {'class': 'grid-field', 'style': 'table-layout: inherit;'}
+        a.update(field.target_attr.custom_attrs.get('widget_attrs', {}))
         model_name = field.target_attr.model._meta.app_label + '.' + field.target_attr.model._meta.model_name
         fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
         head = [ '<th%s>%s</th>' % (get_filter(f)[0], capfirst(f.verbose_name)) for f in fields ] + [TH('', style='width: 10px;')]
         cols = [ '<td%s>{{item.%s}}</td>' % (((isinstance(f, models.ForeignKey) or f.choices) and ('', f.name + '.text')) or get_filter(f)) for f in fields ] +\
             [TD('<i ng-show="form.write" style="cursor: pointer" title="%s" class="icon-remove"></i>''' % capfirst(_('remove item')), style='padding-right: 5px;')]
         widget_args = [
-            TABLE(
+            TAG('table ui-table ng-model=\'%s\'' % name,
                 THEAD(
                     TR(*head)
                 ),
                 TBODY(
                     TR(
-                        attrs={'ng-repeat': 'item in form.item.' + name, 'ng-click': 'showDetail(\'%s\', \'%s\', item)' % (model_name, name)},
+                        attrs={
+                            'ui-table-row': 'ui-table.row',
+                            'ng-repeat': 'item in form.item.' + name,
+                            'ng-click': 'showDetail(\'%s\', \'%s\', item)' % (model_name, name)},
                         *cols
                     )
                 ),
-                attrs={'class': 'grid-field', 'style': 'table-layout: inherit;'}
+                attrs=a
             )
         ]
 

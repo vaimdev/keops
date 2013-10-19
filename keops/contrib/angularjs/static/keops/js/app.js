@@ -224,6 +224,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
     };
 
     $scope.showDetail = function (model, detail, item) {
+        var field = $scope.form.item[detail];
         var options = {
             controller: 'DialogController',
             windowClass: 'modal-huge',
@@ -234,6 +235,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                         jQuery.extend(form.item, item);
                         form.ref = item;
                     }
+                    form.field = field;
                     return form;
                 }
             },
@@ -246,6 +248,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             if (form.ref) {
                 jQuery.extend(form.ref, form.item);
             }
+            else form.field.push(form.item);
         }, function () {
             console.log('cancel');
         });
@@ -254,9 +257,9 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
     $scope.sum = function (item, attr) {
         var r = 0;
         for (var i in item) {
-            r += item[i];
+            if (attr) r += parseFloat(item[i][attr]);
+            else r += item[i];
         }
-        console.log(r);
         return r;
     }
 
