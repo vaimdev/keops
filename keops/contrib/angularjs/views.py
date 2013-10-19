@@ -164,6 +164,7 @@ def get_field(field, form=None, exclude=[], state=None):
         span['style'] = 'cursor: pointer;'
     elif isinstance(field.widget, widgets.widgets.Textarea):
         attrs['style'] = 'height: 70px; margin: 0; resize: none;'
+        span['class'] = 'text-field-span'
     elif isinstance(field, forms.DecimalField):
         attrs['tag'] = 'input ui-money'
         attrs['ui-money-thousands'] = formats.get_format('THOUSAND_SEPARATOR')

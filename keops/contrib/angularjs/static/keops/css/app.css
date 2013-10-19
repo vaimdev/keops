@@ -205,6 +205,17 @@ legend {
 
 }
 
+.text-field-span {
+    font-style: italic;
+    margin-left: 0;
+    text-overflow: ellipsis;
+    color: #646464;
+    overflow: hidden;
+    word-wrap: break-word;
+    max-height: 50px;
+    font-size: 8pt;
+}
+
 #keops-app .grid-field th {
     border-bottom: 1px solid #bdbdbd;
 }
@@ -263,7 +274,7 @@ legend {
     transition: background-color linear 0.2s;
 }
 
-#keops-app .data-grid tbody tr:hover {
+#keops-app .data-grid, #keops-app .grid-field tbody tr:hover {
     background-color: #eaf2ff;
 }
 

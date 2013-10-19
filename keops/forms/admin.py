@@ -297,7 +297,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if query:
             queryset = db.search_text(queryset, query)
         data = {
-            'data': [ field_text(obj, sel_fields=sel_fields[field]) for obj in queryset[start:limit] ],
+            'data': [ field_text(obj, sel_fields=sel_fields.get(field)) for obj in queryset[start:limit] ],
             'total': queryset.count()
         }
         return HttpJsonResponse(data)
