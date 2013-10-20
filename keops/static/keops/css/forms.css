@@ -1,0 +1,33 @@
+.form-long-field {
+    width: 100%;
+}
+
+.form-date-field, .form-int-field, .form-decimal-field, form-small-field {
+    width: 132px;
+}
+
+.form-field {
+    width: 196px;
+}
+
+.form-20c-field {
+    width: 216px;
+}
+
+.form-field-cell {
+    width: 100%;
+}
+
+.form-container {
+    display: block !important;
+    table-layout: fixed;
+    margin: 0 -10px 0 -10px;
+}
+
+.form-container .form-field-cell {
+    width: 50% !important;
+}
+
+.form-field-label {
+    font-weight: bold;
+}

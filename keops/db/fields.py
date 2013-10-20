@@ -11,7 +11,7 @@ __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKe
 FIELD_BASIC_SEARCH = "basic"
 FIELD_ADVANCED_SEARCH = "advanced"
 
-_COMMON_ATTRS = ('mask', 'page', 'visible', 'fieldset', 'mask_re')
+#_COMMON_ATTRS = ('mask', 'page', 'visible', 'fieldset', 'mask_re')
 
 # Add custom_attrs to field instances
 # custom_attrs items:

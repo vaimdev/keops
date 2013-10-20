@@ -274,7 +274,7 @@ legend {
     transition: background-color linear 0.2s;
 }
 
-#keops-app .data-grid, #keops-app .grid-field tbody tr:hover {
+#keops-app .data-grid tbody tr:hover, #keops-app .grid-field tbody tr:hover {
     background-color: #eaf2ff;
 }
 
@@ -307,18 +307,18 @@ legend {
     margin: -300px 0 0 -500px;
 }
 
-.label-cell {
+.form-label-cell {
     width: auto;
     min-width: 100px;
     border-right: 1px solid #dddddd;
     padding-right: 8px;
 }
 
-.label-cell label {
+.form-label-cell label {
     white-space: nowrap;
 }
 
-.field-cell, .form-field-cell {
+.form-field-cell {
     margin: 0;
     width: 99%;
     padding: 0 20px 4px 10px;
@@ -332,20 +332,6 @@ legend {
     min-width: 120px;
 }
 
-.field-label {
-    font-weight: bold;
-}
-
-.long-field {
-    width: 100%;
-    margin-bottom: 0;
-}
-
-.small-field {
-    width: 132px;
-    margin-bottom: 0;
-}
-
 .field-cell .normal-field {
     width: 196px;
     margin-bottom: 0;
@@ -354,16 +340,6 @@ legend {
 .field-cell .normal-20c-field {
     width: 216px;
     margin-bottom: 0;
-}
-
-.form-view .field-container {
-    display: block !important;
-    table-layout: fixed;
-    margin: 0 -10px 0 -10px;
-}
-
-.form-view .field-container .field-cell {
-    width: 50% !important;
 }
 
 #keops-app .form-view > .tabbable {
@@ -437,6 +413,7 @@ legend {
 .ui-timepicker-rtl dl dd { margin: 0 45% 10px 10px; }
 
 input, textarea, select, .uneditable-input {
+    margin-bottom: 0;
     color: #313131;
 }
 

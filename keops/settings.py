@@ -21,7 +21,7 @@ FILE_FIELD_MODEL = 'base.file'
 
 INSTALLED_APPS = [
     'keops',
-    'keops.contrib.angularjs',
+    'keops.contrib.angular',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.contenttypes',
@@ -58,7 +58,11 @@ TEMPLATE_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-TEMPLATE_LOADERS = ['keops.template.loaders.app_directories.Loader',]
+TEMPLATE_LOADERS = (
+    ('django.template.loaders.cached.Loader', (
+        'keops.template.loaders.app_directories.Loader',
+    )),
+)
 
 ROOT_URLCONF = 'keops.urls'
 

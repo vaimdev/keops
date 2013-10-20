@@ -5,7 +5,7 @@ from django.utils import six
 from django import forms
 from django.utils.translation import ugettext as _
 from keops.utils.html import *
-from keops.contrib.angularjs import views
+from keops.contrib.angular import views
 from keops.contrib.reports import Reports, ReportLink
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
@@ -52,8 +52,26 @@ class ModelAdminBase(type):
         if attrs.get('admin_default', None):
             new_class()
         return new_class
-            
+
+def admin_formfield_callback(self, field, **kwargs):
+    f = field.formfield(**kwargs)
+    if f:
+        if f and f.help_text:
+            f.widget.attrs.setdefault('tooltip', f.help_text)
+        if isinstance(f, forms.ModelChoiceField):
+            f.widget.attrs.setdefault('class', 'form-long-field')
+        elif isinstance(f, (forms.DateField, forms.DateTimeField)):
+            f.widget.attrs.setdefault('class', 'form-date-field')
+        elif isinstance(f, forms.IntegerField):
+            f.widget.attrs.setdefault('class', 'form-int-field')
+        elif isinstance(f, forms.DecimalField):
+            f.widget.attrs.setdefault('class', 'form-decimal-field')
+        else:
+            f.widget.attrs.setdefault('class', 'form-long-field')
+        return f
+
 class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
+    formfield_callback = admin_formfield_callback
     admin_default = False
     template_name = 'keops/forms/model_form.html'
     list_template = 'keops/forms/list_form.html'
@@ -215,7 +233,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     @property
     def model_form(self):
         if not self._model_form:
-            self._model_form = forms.models.modelform_factory(self.model)
+            self._model_form = forms.models.modelform_factory(self.model, formfield_callback=self.formfield_callback)
         return self._model_form
 
     def get_printable_fields(self):

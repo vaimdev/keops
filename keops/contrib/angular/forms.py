@@ -10,8 +10,8 @@ class Select(widgets.Select):
     def render(self, name, value, attrs=None, choices=()):
         if not attrs:
             attrs = {}
-        if value and not 'ng-model' in attrs:
-            attrs['ng-init'] = "%s = '%s'" % (name, value)
+        if value and 'ng-model' in attrs:
+            attrs['ng-init'] = "%s = '%s'" % (attrs['ng-model'], value)
         return super(Select, self).render(name, value, attrs, choices)
 
     def build_attrs(self, extra_attrs=None, **kwargs):
@@ -36,13 +36,13 @@ class DateInput(widgets.DateInput):
         attrs['date-format'] = _('yy-mm-dd')
         attrs['ui-mask'] = _('9999-99-99')
         attrs['type'] = 'text'
-        attrs.setdefault('class', 'small-field')
+        attrs.setdefault('class', 'form-date-field')
         return attrs
 
 class DateTimeInput(DateInput):
     def build_attrs(self, extra_attrs=None, **kwargs):
         attrs = super(DateTimeInput, self).build_attrs(extra_attrs, **kwargs)
-        attrs.pop('date-picker')
+        del attrs['date-picker']
         attrs['date-time-picker'] = 'date-time-picker'
         attrs['time-format'] = _('HH:mm')
         attrs['ui-mask'] = _('9999-99-99 99:99 AA')

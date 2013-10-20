@@ -7,6 +7,7 @@ class Loader(app_directories.Loader):
 
     def load_template(self, template_name, template_dirs=None):
         if template_name.endswith('.mako'):
+            from keops.template.mako import Template
             source, origin = self.load_template_source(template_name, template_dirs)
             template = Template(source, lookup=self._get_lookup('mako'))
         else:
