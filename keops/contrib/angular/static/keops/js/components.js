@@ -78,7 +78,7 @@ ui.directive('uiTableRow', function() {
             if (scope.$last) scope.last = true;
             for (var i in scope.item)
             scope.$watch('item.' + i, function() {
-                if (scope.last) scope.$emit('rowChange');
+                scope.$emit('rowChange');
             });
         }
     }

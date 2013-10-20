@@ -4,12 +4,14 @@ import json
 from django.utils import six
 from django import forms
 from django.utils.translation import ugettext as _
+from django.conf import settings
 from keops.utils.html import *
-from keops.contrib.angular import views
 from keops.contrib.reports import Reports, ReportLink
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
 from .forms import View
+
+views = import_module(settings.FORM_RENDER_MODULE)
 
 class FieldLine(object):
     def __init__(self, form, fields):

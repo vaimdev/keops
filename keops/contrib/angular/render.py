@@ -83,7 +83,7 @@ def get_field(bound_field, form, exclude=[], state=None):
             label_suffix=' '
         )
         widget += TAG('a', capfirst(_('add')),
-            attrs={'ng-show': 'form.write', 'class': 'btn', 'ng-click': 'showDetail(\'%s\', \'%s\')' % (model_name, name)}
+            attrs={'ng-show': 'form.write', 'class': 'btn', 'ng-click': "showDetail('%s', '%s')" % (model_name, name)}
         )
         widget += TAG('table ui-table ng-model=\'%s\'' % name,
                 THEAD(
@@ -94,7 +94,7 @@ def get_field(bound_field, form, exclude=[], state=None):
                         attrs={
                             'ui-table-row': 'ui-table.row',
                             'ng-repeat': 'item in form.item.' + name,
-                            'ng-click': 'showDetail(\'%s\', \'%s\', item)' % (model_name, name)},
+                            'ng-click': "form.write && showDetail('%s', '%s', item)" % (model_name, name)},
                         *cols
                     )
                 ),
@@ -122,6 +122,7 @@ def get_field(bound_field, form, exclude=[], state=None):
             **widget_attrs
         )
         widget += '</div>'
+        cell_attrs['style'] = 'padding-right: 10px;'
     elif isinstance(field.widget, widgets.widgets.Textarea):
         widget_attrs['style'] = 'height: 70px; margin: 0; resize: none;'
         span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s" class="text-field-span"></span>' % (name, name)
@@ -146,7 +147,8 @@ def get_field(bound_field, form, exclude=[], state=None):
         r = [TD(label, attrs={'class': 'form-label-cell'})]
 
     if state != 'write':
-        r.append(TD(widget, span, **cell_attrs))
+        widget += span
+    r.append(TD(widget, **cell_attrs))
     return r
 
 def get_form_fields(form):
@@ -180,7 +182,7 @@ def get_tables(items, cols=2):
 
     return TABLE(TR(*[TD(t, style='width: 50%') for t in tables]))
 
-def render_form(form, cols=2, exclude=[], state=None):
+def render_form(form, cols=None, exclude=[], state=None):
     items = []
     pages = []
     for page in form:
@@ -207,6 +209,11 @@ def render_form(form, cols=2, exclude=[], state=None):
                 if s:
                     fields.append(s)
 
+    if cols is None:
+        if len(items) < 6:
+            cols = 1
+        else:
+            cols = 2
     items = get_tables(items, cols)
     if pages:
         pages = TAG('tabset', *[TAG('tab', get_tables(page['items']), heading=page['title']) for page in pages])
@@ -216,6 +223,9 @@ def render_form(form, cols=2, exclude=[], state=None):
         attrs = {'ng-init': 'form.write=true'}
     else:
         attrs = {}
-    attrs['class'] = 'form-view'
+    if cols == 1:
+        attrs['class'] = 'form-view1'
+    else:
+        attrs['class'] = 'form-view'
     items = DIV(items, pages, **attrs)
     return items

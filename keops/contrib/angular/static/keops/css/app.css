@@ -290,6 +290,10 @@ legend {
     margin: 16px 5px 0 10px;
 }
 
+#keops-app .form-view1 {
+    margin: 16px 5px 0 10px;
+}
+
 .modal-body .form-view {
     margin: 0 -8px 0 0;
 }
@@ -298,7 +302,11 @@ legend {
     width: 100%;
 }
 
-#keops-app .form-view table td, .form-view table td {
+.form-view1 table {
+    width: 700px;
+}
+
+.form-view table td {
     vertical-align: top;
 }
 
@@ -319,13 +327,16 @@ legend {
 }
 
 .form-field-cell {
-    margin: 0;
     width: 99%;
     padding: 0 20px 4px 10px;
 }
 
 .form-field-cell .select2-container {
     width: 100%;
+}
+
+.form-field-cell > .select2-container {
+    padding-right: 10px;
 }
 
 .label-cell label {

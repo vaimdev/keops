@@ -250,7 +250,6 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             }
             else form.field.push(form.item);
         }, function () {
-            console.log('cancel');
         });
     };
 
@@ -274,7 +273,6 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                 params: { pk: form.item.pk, model: form.model }
             })
         }, function () {
-            console.log('cancel');
         });
     };
 
