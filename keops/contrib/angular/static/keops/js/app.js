@@ -254,6 +254,30 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         });
     };
 
+    $scope.confirmDelete = function (message) {
+        var options = {
+            controller: 'DialogController',
+            resolve: {
+                form: function () {
+                    return $scope.form;
+                }
+            },
+            templateUrl: '/static/keops/confirm_delete.html'
+        };
+        var dialog = $modal.open(options);
+
+        dialog.result.then(function (form) {
+            console.log(form);
+            $http({
+                method: 'DELETE',
+                url: '/db/submit',
+                params: { pk: form.item.pk, model: form.model }
+            })
+        }, function () {
+            console.log('cancel');
+        });
+    };
+
     $scope.sum = function (item, attr) {
         var r = 0;
         for (var i in item) {
@@ -299,8 +323,6 @@ keopsApp.controller('MenuController', function($scope, $http, Form, $location, $
             templateUrl: '?' + template,
         };
         var dialog = $modal.open(options);
-
-        //dialog.open(template, 'DialogController');
     };
 
     $scope.itemClick = function (url, dialog) {
@@ -311,6 +333,7 @@ keopsApp.controller('MenuController', function($scope, $http, Form, $location, $
 
 keopsApp.controller('DialogController', function($scope, $http, Form, $location, $modalInstance, form) {
     $scope.form = form;
+    $scope.gettext = gettext;
 
     $scope.ok = function () {
         var v = true;
@@ -319,6 +342,6 @@ keopsApp.controller('DialogController', function($scope, $http, Form, $location,
     }
 
     $scope.cancel = function () {
-        $modalInstance.dismiss('cancel');
+        $modalInstance.dismiss(false);
     }
 });

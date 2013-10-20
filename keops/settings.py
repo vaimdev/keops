@@ -58,10 +58,14 @@ TEMPLATE_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
+#TEMPLATE_LOADERS = (
+#    ('django.template.loaders.cached.Loader', (
+#        'keops.template.loaders.app_directories.Loader',
+#    )),
+#)
+
 TEMPLATE_LOADERS = (
-    ('django.template.loaders.cached.Loader', (
-        'keops.template.loaders.app_directories.Loader',
-    )),
+    'keops.template.loaders.app_directories.Loader',
 )
 
 ROOT_URLCONF = 'keops.urls'

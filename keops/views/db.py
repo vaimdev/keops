@@ -155,8 +155,9 @@ def submit(request):
     """
     Default data submit view.
     """
-    print(request.POST)
-    if len(request.POST) == 1:
+    if request.method == 'DELETE':
+        data = request.GET
+    elif len(request.POST) == 1:
         for d in request.POST:
             data = json.loads(d)
             break

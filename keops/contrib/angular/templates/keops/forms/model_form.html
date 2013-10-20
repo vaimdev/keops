@@ -18,7 +18,19 @@
                                 <button type="button" ng-show="!form.write" class="btn" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
                                 <input type="submit" ng-show="form.write" class="btn btn-danger" ng-click="form.write = false" value="{{ _('save')|capfirst }}">
                                 <button type="button" ng-show="form.write" class="btn" ng-click="form.write = false">{{ _('cancel')|capfirst }}</button>
-                            </td><td ng-show="!form.write">
+
+
+                            </td>
+                            <td ng-show="!form.write">
+                                <div class="btn-group">
+                                <button class="btn dropdown-toggle" style="margin-left: 20px;" href="" target="_blank">{{ _('record')|capfirst }}<span style="margin-left: 5px;" class="caret"></span></button>
+                                <ul class="dropdown-menu" style="margin-left: 20px;">
+                                    <li><a style="cursor: pointer;" ng-click="confirmDelete()">{{ _('delete')|capfirst }}</a></li>
+                                    <li><a href="">{{ _('duplicate')|capfirst }}</a></li>
+                                </ul>
+                                </div>
+                            </td>
+                                <td ng-show="!form.write">
                                 {% if form.reports %}
                                 <div class="btn-group">
                                 {% with form.reports.0 as first_report %}

@@ -42,3 +42,12 @@ msgstr "ERRO INTERNO DO SERVIDOR"
 
 msgid "Create..."
 msgstr "Criar..."
+
+msgid "Yes"
+msgstr "Sim"
+
+msgid "No"
+msgstr "Não"
+
+msgid "Confirmation"
+msgstr "Confirmação"
