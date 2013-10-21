@@ -14,7 +14,7 @@
                         </div>
                         <table>
                             <tr><td>
-                                <button type="button" ng-show="!form.write" class="btn btn-info" ng-click="form.write = true">{{ _('create')|capfirst }}</button>
+                                <button type="button" ng-show="!form.write" class="btn btn-info" ng-click="form.newItem()">{{ _('create')|capfirst }}</button>
                                 <button type="button" ng-show="!form.write" class="btn" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
                                 <input type="submit" ng-show="form.write" class="btn btn-danger" ng-click="form.write = false" value="{{ _('save')|capfirst }}">
                                 <button type="button" ng-show="form.write" class="btn" ng-click="form.write = false">{{ _('cancel')|capfirst }}</button>
@@ -23,7 +23,7 @@
                             </td>
                             <td ng-show="!form.write">
                                 <div class="btn-group">
-                                <button class="btn dropdown-toggle" style="margin-left: 20px;" href="" target="_blank">{{ _('record')|capfirst }}<span style="margin-left: 5px;" class="caret"></span></button>
+                                <button class="btn dropdown-toggle" style="margin-left: 20px;" href="" target="_blank">{{ _('record')|capfirst }}<span style="margin-left: 8px;" class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">
                                     <li><a style="cursor: pointer;" ng-click="confirmDelete()">{{ _('delete')|capfirst }}</a></li>
                                     <li><a href="">{{ _('duplicate')|capfirst }}</a></li>
@@ -80,5 +80,8 @@
         </td>
     </tr>
 </table>
+<div>
+    <alert style="margin: 6px;" ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)"><span ng-bind-html="alert.msg"></span></alert>
+</div>
 {{ form_view|safe }}
 </form>

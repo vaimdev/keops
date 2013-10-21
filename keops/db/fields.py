@@ -147,9 +147,9 @@ class VirtualField(models.Field):
     Provides a generic virtual field.
     """
 
-    def __init__(self, verbose_name=None, help_text=None, blank=None, editable=True, readonly=True, **options):
+    def __init__(self, verbose_name=None, help_text=None, blank=None, editable=True, **options):
         self.rel = None
-        self.readonly = readonly
+        options.setdefault('readonly', True)
         super(VirtualField, self).__init__(
             verbose_name=verbose_name,
             help_text=help_text,
@@ -169,7 +169,7 @@ class VirtualField(models.Field):
 
 class PropertyField(VirtualField):
     """
-    Provides a virtual field based on property.
+    Provides a virtual field based on property/function/expression.
     """
 
     def __init__(self, verbose_name=None, fget=None, fset=None, **options):
@@ -178,8 +178,16 @@ class PropertyField(VirtualField):
         super(PropertyField, self).__init__(verbose_name=verbose_name, **options)
 
     def __get__(self, instance, instance_type=None):
+        if instance_type == type:
+            return self
         if self.fget:
-            return self.fget(instance)
+            if isinstance(self.fget, str):
+                v = eval(self.fget, globals(), {'self': instance})
+            elif callable(self.fget):
+                v = self.fget(instance)
+            else:
+                v = self.fget
+            return str(v)
 
     def __set__(self, instance, value):
         if self.fset:

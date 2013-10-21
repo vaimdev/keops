@@ -109,7 +109,6 @@ keopsApp.controller('ListController', function($scope, $location, List) {
 });
 
 
-
 // Form factory/controller
 keopsApp.factory('Form', function($http, SharedData, $location){
     var Form = function() {
@@ -128,6 +127,17 @@ keopsApp.factory('Form', function($http, SharedData, $location){
             this.start = SharedData.list.index - 1;
             this.total = SharedData.list.total;
         }
+    };
+
+    Form.prototype.newItem = function () {
+        $http({
+            method: 'GET',
+            url: '/db/new',
+            params: {model: this.model}
+        }).success(function(data) {
+                this.write = true;
+                this.item = data;
+            }.bind(this));
     };
 
     Form.prototype.nextPage = function() {
@@ -200,7 +210,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
     return Form;
 });
 
-keopsApp.controller('FormController', function($scope, $http, Form, $location, $element, $modal) {
+keopsApp.controller('FormController', function($scope, $http, Form, $location, $element, $modal, $timeout) {
     $scope.form = new Form();
     $scope.form.element = $element;
 
@@ -229,7 +239,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             controller: 'DialogController',
             windowClass: 'modal-huge',
             resolve: {
-                form: function () {
+                data: function () {
                     form = { item: {} }
                     if (item) {
                         jQuery.extend(form.item, item);
@@ -253,11 +263,24 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         });
     };
 
+    $scope.alerts = [];
+
+    $scope.addAlert = function(type, msg) {
+        $scope.alerts.push({type: type, msg: msg});
+        $timeout(function() {
+           $scope.alerts.splice(0, 1);
+        }, 10000);
+    };
+
+    $scope.closeAlert = function(index) {
+        $scope.alerts.splice(index, 1);
+    };
+
     $scope.confirmDelete = function (message) {
         var options = {
             controller: 'DialogController',
             resolve: {
-                form: function () {
+                data: function () {
                     return $scope.form;
                 }
             },
@@ -271,7 +294,10 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                 method: 'DELETE',
                 url: '/db/submit',
                 params: { pk: form.item.pk, model: form.model }
-            })
+            }).success(function (data) {
+                    $scope.addAlert(data.success ? 'success': 'error', data.msg);
+                    if (data.success) $scope.form.nextPage();
+                })
         }, function () {
         });
     };
@@ -283,7 +309,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             else r += item[i];
         }
         return r;
-    }
+    };
 
     $scope.submit = function () {
         var form = this.dataForm;
@@ -318,7 +344,12 @@ keopsApp.controller('MenuController', function($scope, $http, Form, $location, $
         template = template.replace('/', '=');
         var options = {
             controller: 'DialogController',
-            templateUrl: '?' + template,
+            resolve: {
+                data: function () {
+                    return null
+                }
+            },
+            templateUrl: '?' + template
         };
         var dialog = $modal.open(options);
     };
@@ -329,8 +360,8 @@ keopsApp.controller('MenuController', function($scope, $http, Form, $location, $
     }
 });
 
-keopsApp.controller('DialogController', function($scope, $http, Form, $location, $modalInstance, form) {
-    $scope.form = form;
+keopsApp.controller('DialogController', function($scope, $http, Form, $location, $modalInstance, data) {
+    $scope.form = data;
     $scope.gettext = gettext;
 
     $scope.ok = function () {

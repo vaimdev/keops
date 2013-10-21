@@ -5,7 +5,7 @@ from django.utils import six
 from django import forms
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from keops.utils.html import *
+from django.utils.text import capfirst
 from keops.contrib.reports import Reports, ReportLink
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
@@ -56,11 +56,14 @@ class ModelAdminBase(type):
         return new_class
 
 def admin_formfield_callback(self, field, **kwargs):
+    from keops.db import models
     f = field.formfield(**kwargs)
     if f:
         if f and f.help_text:
             f.widget.attrs.setdefault('tooltip', f.help_text)
         if isinstance(f, forms.ModelChoiceField):
+            f.widget.attrs.setdefault('class', 'form-long-field')
+        elif isinstance(field, models.TextField):
             f.widget.attrs.setdefault('class', 'form-long-field')
         elif isinstance(f, (forms.DateField, forms.DateTimeField)):
             f.widget.attrs.setdefault('class', 'form-date-field')
@@ -68,6 +71,10 @@ def admin_formfield_callback(self, field, **kwargs):
             f.widget.attrs.setdefault('class', 'form-int-field')
         elif isinstance(f, forms.DecimalField):
             f.widget.attrs.setdefault('class', 'form-decimal-field')
+        elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 15:
+            f.widget.attrs.setdefault('class', 'form-small-field')
+        elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 20:
+            f.widget.attrs.setdefault('class', 'form-20c-field')
         else:
             f.widget.attrs.setdefault('class', 'form-long-field')
         return f
@@ -219,9 +226,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         for page, fieldsets in self.pages:
             yield TabPage(page, self, fieldsets)
 
-    def render_form(self, exclude=[], state=None):
-        self._prepare()
-        return views.render_form(self, exclude=exclude, state=state)
+    def render_form(self, cols=None, exclude=[], state=None):
+        self._prepare_form()
+        return views.render_form(self, cols=cols, exclude=exclude, state=state)
 
     @property
     def form(self):
@@ -284,6 +291,21 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def queryset(self, request):
         return self.model.objects.all()
 
+    def new_item(self, request):
+        from keops.db import models
+        r = {'pk': None}
+        for field in self.model_fields:
+            if field.default != models.NOT_PROVIDED:
+                if callable(field.default):
+                    v = field.default()
+                else:
+                    v = field.default
+            else:
+                v = None
+            r[field.name] = field_text(v)
+        print(r)
+        return HttpJsonResponse(r)
+
     def get_formfield(self, field):
         if not field in self.bound_fields:
             try:
@@ -326,8 +348,26 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         """
         Default delete operation.
         """
+        from django.db.models.deletion import ProtectedError
+        import django.db.models
         obj = self.model.objects.using(using).get(pk=context['pk'])
-        obj.delete(using=using)
+        try:
+            obj.delete(using=using)
+        except ProtectedError as e:
+            return {
+                'success': False,
+                'action': 'DELETE',
+                'label': _('Error'),
+                'msg': _('Cannot delete the records because they are referenced through a protected foreign key!') + '<br>' + '<br>'.join([ capfirst(str(obj.__class__._meta.verbose_name)) + ': ' + str(obj) for obj in e.protected_objects ]),
+            }
+        except django.db.models.validators.ValidationError as e:
+            return {
+                'success': False,
+                'action': 'DELETE',
+                'label': _('Error'),
+                'msg': '<br>'.join(e.messages),
+            }
+
         return {
             'success': True,
             'action': 'DELETE',

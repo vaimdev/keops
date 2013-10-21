@@ -57,8 +57,6 @@ def get_field(bound_field, form, exclude=[], state=None):
         span = '<span ng-show="!form.write || form.readonly.%s">{{form.item.%s | dateFrom}}</span>' % (name, name)
     elif isinstance(field, forms.EmailField):
         span = '<a ng-href="mailto:{{form.item.%s}}" ng-show="!form.write || form.readonly.%s"></a>' % (name, name)
-    elif field.target_attr.choices:
-        span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s.text"></span>' % (name, name)
     elif isinstance(field, forms.ModelMultipleChoiceField):
         pass
         # TODO user select2
@@ -122,7 +120,10 @@ def get_field(bound_field, form, exclude=[], state=None):
             **widget_attrs
         )
         widget += '</div>'
-        cell_attrs['style'] = 'padding-right: 10px;'
+        cell_attrs['style'] = 'padding-right: 10px; max-width: 1px;' # adjust select2 size
+    elif isinstance(field, forms.ChoiceField):
+        span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s.text"></span>' % (name, name)
+        cell_attrs['style'] = 'padding-right: 0;'
     elif isinstance(field.widget, widgets.widgets.Textarea):
         widget_attrs['style'] = 'height: 70px; margin: 0; resize: none;'
         span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s" class="text-field-span"></span>' % (name, name)

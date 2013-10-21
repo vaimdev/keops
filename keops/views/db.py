@@ -1,9 +1,9 @@
 import decimal
 import datetime
 import json
-from django.db import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
+from keops.db import models
 from keops.db import get_db, set_db
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
@@ -90,7 +90,8 @@ def grid(request):
 
 def _read_fields(model):
     if not hasattr(model.Extra, '_cache_read_fields'):
-        model.Extra._cache_read_fields = [ f.name for f in model._meta.fields if not f.primary_key ]
+        model.Extra._cache_read_fields = [ f.name for f in model._meta.fields if not f.primary_key ] +\
+            [ f.name for f in model._meta.virtual_fields if isinstance(f, models.PropertyField) ]
     return model.Extra._cache_read_fields
 
 def prepare_read(context, using):
@@ -150,6 +151,9 @@ def read_items(request):
 def lookup(request):
     model = get_model(request.GET)
     return model._admin.lookup(request, sel_fields=fk_select_fields(model))
+
+def new_item(request):
+    return get_model(request.GET)._admin.new_item(request)
 
 def submit(request):
     """

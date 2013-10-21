@@ -13,7 +13,7 @@ def index(request):
         field = getattr(model, field)
         related = field.related
         rel_model = related.model
-        content = rel_model._admin.render_form(exclude=[related.field.name], state='write')
+        content = rel_model._admin.render_form(cols=2, exclude=[related.field.name], state='write')
         return render(request, 'keops/forms/detail_dialog.html', {
             'header': capfirst(field.verbose_name or field.name),
             'content': content

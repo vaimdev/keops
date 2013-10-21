@@ -90,3 +90,9 @@ msgstr "99/99/9999"
 
 msgid "yy-mm-dd"
 msgstr "dd/mm/yy"
+
+msgid "Cannot delete the records because they are referenced through a protected foreign key!"
+msgstr "Não é possível excluir os registros pois eles estão referenciados com uma chave estrangeira protegida!"
+
+msgid "Record successfully deleted!"
+msgstr "Registro deletado com sucesso!"

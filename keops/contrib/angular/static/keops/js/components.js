@@ -17,16 +17,16 @@ ui.directive('uiMask', function() {
     return {
         restrict: 'A',
         require : 'ngModel',
-        link : function (scope, element, attrs, controller) {
+        link : function (scope, element, attrs, ngModel) {
             var maskStore = attrs.uiMaskStore;
 
             $(function() {
                 element.mask(attrs['uiMask']);
                 return element.bind('keyup blur', function(event) {
                     if (maskStore)
-                        return controller.$setViewValue(element.val());
+                        return ngModel.$setViewValue(element.val());
                     else
-                        return controller.$setViewValue(element.mask());
+                        return ngModel.$setViewValue(element.mask());
                 });
             });
         }
@@ -50,9 +50,8 @@ ui.directive('uiMoney', function($filter) {
             });
 
             ngModel.$render = function () {
-                if (ngModel.$viewValue) {
-                element.val($filter('number')(ngModel.$viewValue, precision));
-                }
+                if (ngModel.$viewValue) element.val($filter('number')(ngModel.$viewValue, precision));
+                else element.val('');
             };
         }
     }

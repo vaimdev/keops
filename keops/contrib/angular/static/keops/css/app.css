@@ -19,7 +19,7 @@ legend {
 }
 
 #keops-app-head {
-    border-top: 2px solid #C71F27;
+    border-top: 2px solid #313131;
     height: 69px;
 	table-layout: fixed;
 	border-spacing: 0;
@@ -300,6 +300,7 @@ legend {
 
 .form-view table {
     width: 100%;
+    table-layout: auto;
 }
 
 .form-view1 table {
@@ -326,12 +327,16 @@ legend {
     white-space: nowrap;
 }
 
-.form-field-cell {
+.form-field-cell, .form-filter-cell {
     width: 99%;
     padding: 0 20px 4px 10px;
 }
 
-.form-field-cell .select2-container {
+.form-view > table {
+    table-layout: fixed;
+}
+
+.form-filter-cell .select2-container {
     width: 100%;
 }
 

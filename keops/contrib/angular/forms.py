@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.forms import widgets
 import django.forms
+from keops.utils.html import *
 
 class Select(widgets.Select):
     def render(self, name, value, attrs=None, choices=()):
@@ -24,10 +25,12 @@ class DateInput(widgets.DateInput):
     def render(self, name, value, attrs=None):
         if not attrs:
             attrs = {}
-        if value:
+        if value and 'ng-model' in attrs:
             attrs['ng-init'] = "%s = '%s'" % (name, value)
-        show = attrs.pop('ng-show', '')
-        return '<div class="input-append" style="display: inline;" ng-show="%s">%s</div>' % (show, super(DateInput, self).render(name, value, attrs))
+        d_attrs = {}
+        if 'ng-show' in attrs:
+            d_attrs['ng-show'] = attrs['ng-show']
+        return TAG('div class="input-append" style="display: inline;"', super(DateInput, self).render(name, value, attrs), attrs=d_attrs)
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         attrs = super(DateInput, self).build_attrs(extra_attrs, **kwargs)

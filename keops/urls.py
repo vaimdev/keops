@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls import patterns, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from keops import forms
@@ -15,6 +16,7 @@ urlpatterns = patterns('',
     (r'^db/lookup/$', 'keops.views.db.lookup'),
     (r'^db/submit/$', 'keops.views.db.submit'),
     (r'^db/test/$', 'keops.views.test.index'),
+    (r'^db/new/$', 'keops.views.db.new_item'),
     # additional
     (r'^accounts/', include('django.contrib.auth.urls')),
     (r'^admin/', include('keops.modules.base.urls')),

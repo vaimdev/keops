@@ -94,6 +94,7 @@ def form(request):
     report._report_file = find_report_file(report.name)
     params = report._report_file.split('.')[0] + '.json'
     form = get_form(report, params)
+    print(str(form))
     return render(request, 'keops/forms/filter_form.html', {
         'header': os.path.basename(params).split('.')[0],
         'form': form,
