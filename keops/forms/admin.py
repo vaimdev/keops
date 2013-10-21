@@ -3,6 +3,7 @@ from collections import OrderedDict
 from importlib import import_module
 import json
 from django.utils import six
+from django.core.exceptions import ValidationError
 from django import forms
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -416,10 +417,16 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 try:
                     field = self.model._meta.get_field(k)
                     if isinstance(field, models.DateField):
-                        v = datetime.datetime.strptime(v, settings.DATE_INPUT_FORMATS[0])
+                        for format in settings.DATE_INPUT_FORMATS:
+                            try:
+                                v = datetime.datetime.strptime(v, format)
+                                break
+                            except:
+                                pass
                 except:
                     pass
                 setattr(obj, k, v)
+            obj.full_clean()
             obj.save(using=using)
 
             # submit related data
@@ -453,7 +460,6 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         Receive submit data.
         """
         from keops.views import db
-        from keops.db import models
         using = db.get_db(request)
         if request.method == 'DELETE':
             result = self.delete(request.GET, using)
@@ -465,7 +471,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                     'msg': _('Record successfully saved!'),
                     'data': db.prepare_read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]
                 }
-            except models.validators.ValidationError as e:
+            except ValidationError as e:
                 result = {
                     'success': False,
                     'msg': '<br>'.join(e.messages)
