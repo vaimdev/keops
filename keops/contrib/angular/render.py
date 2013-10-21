@@ -70,7 +70,7 @@ def get_field(bound_field, form, exclude=[], state=None):
         list_fields = field.target_attr.list_fields
         attrs = {'class': 'grid-field', 'style': 'table-layout: inherit;'}
         attrs.update(field.target_attr.custom_attrs.get('widget_attrs', {}))
-        model_name = field.target_attr.model._meta.app_label + '.' + field.target_attr.model._meta.model_name
+        model_name = str(field.target_attr.model._meta)
         fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
         head = [ '<th%s>%s</th>' % (get_filter(f)[0], capfirst(f.verbose_name)) for f in fields ] + [TH('', style='width: 10px;')]
         cols = [ '<td%s>{{item.%s}}</td>' % (((isinstance(f, models.ForeignKey) or f.choices) and ('', f.name + '.text')) or get_filter(f)) for f in fields ] +\
@@ -109,10 +109,7 @@ def get_field(bound_field, form, exclude=[], state=None):
             span = '<a ng-show="!form.write" ng-bind="form.item.%s.text"></a>' % name
 
         widget_attrs.update({
-            'lookup-url': '/db/lookup/?model=%s.%s&field=%s' % (
-                field.target_attr.model._meta.app_label,
-                field.target_attr.model._meta.model_name,
-                name,
+            'lookup-url': '/db/lookup/?model=%s&field=%s' % (str(field.target_attr.model._meta), name,
             )
         })
         widget = '<div ng-show="%s" class="form-long-field">' % (widget_attrs.pop('ng-show'))

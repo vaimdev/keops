@@ -182,8 +182,8 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         // notify form remote items
         var formItem = this.item;
         formItem.items = {};
-        items = this.element.find('[remoteitem]');
-        remoteitems = [];
+        var items = this.element.find('[remoteitem]');
+        var remoteitems = [];
         for (var i = 0; i < items.length; i++) remoteitems.push(angular.element(items[i]).attr('name'));
         // make params
         data = { model: this.model, pk: this.item.pk, items: angular.toJson(remoteitems) };
@@ -231,6 +231,18 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
 
     $scope.openResource = function (url, search) {
         $location.path(url).search(search).replace();
+    };
+
+    $scope.fieldChangeCallback = function (field) {
+        var v = $scope.form.item[field];
+        $http({
+            method: 'GET',
+            url: '/db/field/change',
+            params: { model: $scope.form.model, field: field, value: v }
+        }).
+            success(function (data) {
+                jQuery.extend($scope.form.item, data.values);
+            });
     };
 
     $scope.showDetail = function (model, detail, item) {
@@ -321,7 +333,6 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                     if (el.$dirty) data[el.$name] = typeof el.$modelValue === 'object' ? el.$modelValue['value'] : el.$modelValue;
                 }
             }
-            console.log('pk', this.form.item.pk);
             $http({
                 method: 'POST',
                 url: '/db/submit/',
@@ -329,7 +340,11 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                 data: { model: this.form.model, pk: this.form.item.pk, data: data }
             }).
             success(function (data, status, headers, config) {
-                console.log(data);
+                if (data.success) {
+                    $scope.form.write = false;
+                    jQuery.extend($scope.form.item, data.data);
+                };
+                $scope.addAlert(data.success ? 'success' : 'error', data.msg);
             });
         }
     }

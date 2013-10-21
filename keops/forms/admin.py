@@ -1,3 +1,4 @@
+import datetime
 from collections import OrderedDict
 from importlib import import_module
 import json
@@ -144,16 +145,16 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if self.model._meta.abstract:
             return
         from django.db import models
-        model_fields = self.model._meta.concrete_fields + self.model._meta.many_to_many + self.model._meta.virtual_fields
+        model_fields = self.model._meta.all_fields + self.model._meta.many_to_many
         self.model_fields = model_fields
         if not self.fields:
             self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f, (
                 models.AutoField, generic.GenericForeignKey)) and\
-                getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
+                f.custom_attrs.get('visible', not f.primary_key)]
         if not self.list_display:
-            self.list_display = [f.name for f in self.model._meta.concrete_fields if not f.name in self.exclude and not\
+            self.list_display = [f.name for f in self.model._meta.all_fields if not f.name in self.exclude and not\
                 isinstance(f, (models.AutoField, models.ManyToManyField)) and\
-                getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
+                f.custom_attrs.get('visible', not f.primary_key)]
         if not self.printable_fields:
             self.printable_fields = self.list_display
 
@@ -167,9 +168,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             if not field.name in self.fields:
                 continue
             if not self.pages:
-                attrs = getattr(field, 'custom_attrs', {})
-                page = pages.setdefault(str(attrs.get('page', None) or ''), OrderedDict())
-                fieldset = page.setdefault(str(attrs.get('fieldset', None) or ''), {'fields': []})
+                attrs = field.custom_attrs
+                page = pages.setdefault(str(attrs.page or ''), OrderedDict())
+                fieldset = page.setdefault(str(attrs.fieldset or ''), {'fields': []})
                 fieldset['fields'].append(field.name)
             if not self.readonly_fields and field.readonly:
                 readonly_fields.append(field.name)
@@ -252,7 +253,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def _prepare_context(self, request, context):
         context.update({
             'model': self.model,
-            'model_name': '%s.%s' % (self.model._meta.app_label, self.model._meta.model_name),
+            'model_name': '%s' % str(self.model._meta),
         })
         
     def view(self, request, view_type, **kwargs):
@@ -375,6 +376,14 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             'msg': _('Record successfully deleted!'),
         }
 
+    def field_change(self, request):
+        field = request.GET['field']
+        f = self.model._meta.get_field(field)
+        obj = self.model()
+        v = json.loads(request.GET['value'])
+        if f.custom_attrs['on_change']:
+            return HttpJsonResponse(f.custom_attrs['on_change'](obj, request, field, v))
+
     def read(self, request):
         """
         Return JSON serialized data.
@@ -388,6 +397,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         Save context data on using specified database.
         """
         from keops.views import db
+        from keops.db import models
+        from django.utils import formats
         pk = context.get('pk')
         if 'model' in context:
             model = db.get_model(context)
@@ -402,6 +413,12 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 data = json.loads(data)
             obj = obj or model()
             for k, v in data.items():
+                try:
+                    field = self.model._meta.get_field(k)
+                    if isinstance(field, models.DateField):
+                        v = datetime.datetime.strptime(v, settings.DATE_INPUT_FORMATS[0])
+                except:
+                    pass
                 setattr(obj, k, v)
             obj.save(using=using)
 
@@ -436,10 +453,21 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         Receive submit data.
         """
         from keops.views import db
+        from keops.db import models
         using = db.get_db(request)
         if request.method == 'DELETE':
             result = self.delete(request.GET, using)
         else:
-            success, obj = self.save(request.POST, using)
-            result = {'success': success, 'data': db.prepare_read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]}
+            try:
+                success, obj = self.save(request.POST, using)
+                result = {
+                    'success': True,
+                    'msg': _('Record successfully saved!'),
+                    'data': db.prepare_read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]
+                }
+            except models.validators.ValidationError as e:
+                result = {
+                    'success': False,
+                    'msg': '<br>'.join(e.messages)
+                }
         return HttpJsonResponse(result)

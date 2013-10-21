@@ -370,7 +370,7 @@ legend {
     border-collapse: separate;
 }
 
-#keops-app .form-title {
+#keops-app .form-title span {
 	text-shadow: 0 1px 1px #fff;
 }
 

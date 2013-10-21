@@ -155,6 +155,9 @@ def lookup(request):
 def new_item(request):
     return get_model(request.GET)._admin.new_item(request)
 
+def field_change(request):
+    return get_model(request.GET)._admin.field_change(request)
+
 def submit(request):
     """
     Default data submit view.

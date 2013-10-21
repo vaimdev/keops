@@ -1,39 +1,38 @@
 # Active Data Dictionary for Django base field class
+from bisect import bisect
 from django.conf import settings
 from django.db import models
-from django.db.models import signals
-from keops.forms.widgets import GridWidget
 
 __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey',
            'FileRelField', 'ImageRelField', 'VirtualField', 'PropertyField',
            'OneToManyField', 'get_model_url']
 
-FIELD_BASIC_SEARCH = "basic"
-FIELD_ADVANCED_SEARCH = "advanced"
+_custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter')
 
-#_COMMON_ATTRS = ('mask', 'page', 'visible', 'fieldset', 'mask_re')
+class FieldCustomAttrs(dict):
+    def __getattr__(self, item):
+        return self.get(item)
+
+    def __setattr__(self, key, value):
+        self[key] = value
 
 # Add custom_attrs to field instances
 # custom_attrs items:
-#   widget -> field widget type (extjs compatible widgets)
+#   widget -> field widget type (html5/angular/jquery compatible widgets)
 #   page -> field will be placed on specified page
 #   fieldset -> field will be placed on specified fieldset
 #   mask -> field widget input mask
-#   on_change -> on field change event
-#   dependencies -> field dependencies
-#   client_formula -> field client side formula
-#   server_formula -> field server side formula
-#   client_attrs -> client side widget attributes as javascript expression, dict or list object: {'visible': 'this.fieldValue("field") == true'}
-#   server_attrs -> server side widget attributes as python expression, callable, dict or list object: {'visible': 'self.field is None'}
-#   states -> on server side, this attribute configure target field state: {'object state': 'field_attr = value'}
+#   on_change -> on field change server side event
 #   change_default -> if user can change field default value
 #   insert_default -> default value for new objects
 #   update_default -> default value for updated objects
 #   translate -> field content translation (True/False)
-#   select -> field search type: None = no search, "basic" = basic search, "advanced" = advanced filter
+#   filter -> field filter type: None = no filter, BasicFieldFilter and AdvancedFieldFilter
 #   widget_attrs -> client side widget attributes (all html5, angular, jquery compatible attributes are supported)
+
 class Field(object):
     _init = models.Field.__init__
+    _contribute_to_class = models.Field.contribute_to_class
 
     def __init__(self, *args, **kwargs):
         # Change default field db null to false
@@ -43,21 +42,29 @@ class Field(object):
             kwargs.pop('null', None)
             kwargs.pop('blank', None)
         # Add custom_attrs to field
-        self.custom_attrs = kwargs.pop('custom_attrs', {})
-        if 'mask' in kwargs:
-            self.custom_attrs['mask'] = kwargs.pop('mask')
-        if 'page' in kwargs:
-            self.custom_attrs['page'] = kwargs.pop('page')
-        if 'visible' in kwargs:
-            self.custom_attrs['visible'] = kwargs.pop('visible')
-        if 'fieldset' in kwargs:
-            self.custom_attrs['fieldset'] = kwargs.pop('fieldset')
-        if 'mask_re' in kwargs:
-            self.custom_attrs['mask_re'] = kwargs.pop('mask_re')
+        self.custom_attrs = FieldCustomAttrs(kwargs.pop('custom_attrs', {}))
+        for attr in _custom_attrs:
+            if attr in kwargs:
+                self.custom_attrs[attr] = kwargs.pop(attr)
         self.readonly = kwargs.pop('readonly', False)
         Field._init(self, *args, **kwargs)
 
+    def contribute_to_class(self, cls, name, virtual_only=False):
+        if not hasattr(cls._meta, 'all_fields'):
+            cls._meta.all_fields = []
+        cls._meta.all_fields.insert(bisect(cls._meta.all_fields, self), self)
+        if 'on_change' in self.custom_attrs:
+            self.custom_attrs.setdefault('widget_attrs', {})['ng_change'] = 'fieldChangeCallback(\'%s\')' % name
+        Field._contribute_to_class(self, cls, name, virtual_only=virtual_only)
+
     models.Field.__init__ = __init__
+    models.Field.contribute_to_class = contribute_to_class
+
+class BasicFieldFilter(object):
+    pass
+
+class AdvancedFieldFilter(object):
+    pass
 
 class NullCharField(models.CharField):
     """
@@ -159,11 +166,7 @@ class VirtualField(models.Field):
 
 
     def contribute_to_class(self, cls, name):
-        self.name = name
-        self.model = cls
-        self.cache_attr = "_%s_cache" % name
-        cls._meta.add_virtual_field(self)
-        #signals.pre_init.connect(self.instance_pre_init, sender=cls, weak=False)
+        super(VirtualField, self).contribute_to_class(cls, name, True)
         setattr(cls, name, self)
 
 
@@ -181,12 +184,15 @@ class PropertyField(VirtualField):
         if instance_type == type:
             return self
         if self.fget:
-            if isinstance(self.fget, str):
-                v = eval(self.fget, globals(), {'self': instance})
-            elif callable(self.fget):
-                v = self.fget(instance)
-            else:
-                v = self.fget
+            try:
+                if isinstance(self.fget, str):
+                    v = eval(self.fget, globals(), {'self': instance})
+                elif callable(self.fget):
+                    v = self.fget(instance)
+                else:
+                    v = self.fget
+            except:
+                return ''
             return str(v)
 
     def __set__(self, instance, value):

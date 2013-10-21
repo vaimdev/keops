@@ -16,8 +16,10 @@
                             <tr><td>
                                 <button type="button" ng-show="!form.write" class="btn btn-info" ng-click="form.newItem()">{{ _('create')|capfirst }}</button>
                                 <button type="button" ng-show="!form.write" class="btn" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
-                                <input type="submit" ng-show="form.write" class="btn btn-danger" ng-click="form.write = false" value="{{ _('save')|capfirst }}">
-                                <button type="button" ng-show="form.write" class="btn" ng-click="form.write = false">{{ _('cancel')|capfirst }}</button>
+
+                                <input type="submit" ng-show="form.write" class="btn btn-danger" value="{{ _('save')|capfirst }}" tooltip="{{ _('Save record changes') }}">
+                                <button type="submit" ng-show="form.write" class="btn btn-danger" tooltip="{{ _('Save changes and create a new record') }}">{{ _('Save + New') }}</button>
+                                <button type="button" ng-show="form.write" class="btn" ng-click="form.write = false" tooltip="{{ _('Cancel changes') }}">{{ _('cancel')|capfirst }}</button>
 
 
                             </td>

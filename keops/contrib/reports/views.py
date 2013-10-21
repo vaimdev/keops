@@ -12,14 +12,14 @@ from keops.utils import field_text
 
 __all__ = ['ReportForm', 'form', 'find_report_file', 'get_form']
 
-# Cache prepared form report class
+# Cache prepared report form class
 FORM_CACHE = {}
 
 class ReportForm(forms.Form):
     """
     Represent a generic report params dialog.
     """
-    # Form private attrs
+    # Report private attrs
     _report_file = ''
     _params_file = ''
     _report_id = None
@@ -94,7 +94,6 @@ def form(request):
     report._report_file = find_report_file(report.name)
     params = report._report_file.split('.')[0] + '.json'
     form = get_form(report, params)
-    print(str(form))
     return render(request, 'keops/forms/filter_form.html', {
         'header': os.path.basename(params).split('.')[0],
         'form': form,

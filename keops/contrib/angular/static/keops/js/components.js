@@ -13,6 +13,47 @@ ui.directive('ngEnter', function() {
     };
 });
 
+ui.directive('datePicker', function() {
+    return {
+        restrict: 'A',
+        require : 'ngModel',
+        link: function(scope, element, attrs, controller) {
+            attrs.uiMaskStore = 1;
+            var el = element.datepicker({
+                dateFormat: attrs.dateFormat,
+                showOn: 'button',
+                onSelect: function(dateText, datepicker) {
+                    controller.$setViewValue(dateText);
+                }
+            });
+            el.next('.ui-datepicker-trigger').addClass('btn').html('<i class="icon-calendar"></i>');
+        }
+    }
+});
+
+ui.directive('dateTimePicker', function() {
+    return {
+        restrict: 'A',
+        //require : 'ngModel',
+        link: function(scope, element, attrs, controller) {
+            attrs.uiMaskStore = 1;
+            var el = element.datetimepicker({
+                dateFormat: attrs.dateFormat,
+                timeFormat: attrs.timeFormat,
+                alwaysSetTime: false,
+                showOn: 'button',
+                onSelect: function(dateText, datepicker) {
+                    scope.date = dateText;
+                    scope.$apply();
+                }
+            });
+            el = el.next('.ui-datepicker-trigger');
+            el.addClass('btn').html('<i class="icon-calendar"></i>');
+        }
+    }
+});
+
+
 ui.directive('uiMask', function() {
     return {
         restrict: 'A',
@@ -83,45 +124,6 @@ ui.directive('uiTableRow', function() {
     }
 });
 
-ui.directive('datePicker', function() {
-    return {
-        restrict: 'A',
-        require : 'ngModel',
-        link: function(scope, element, attrs, controller) {
-            var el = element.datepicker({
-                dateFormat: attrs.dateFormat,
-                showOn: 'button',
-                onSelect: function(dateText, datepicker) {
-                    controller.$setViewValue(dateText);
-                }
-            });
-            el = el.next('.ui-datepicker-trigger');
-            el.addClass('btn').html('<i class="icon-calendar"></i>');
-        }
-    }
-});
-
-ui.directive('dateTimePicker', function() {
-    return {
-        restrict: 'A',
-        //require : 'ngModel',
-        link: function(scope, element, attrs, controller) {
-            var el = element.datetimepicker({
-                dateFormat: attrs.dateFormat,
-                timeFormat: attrs.timeFormat,
-                alwaysSetTime: false,
-                showOn: 'button',
-                onSelect: function(dateText, datepicker) {
-                    scope.date = dateText;
-                    scope.$apply();
-                }
-            });
-            el = el.next('.ui-datepicker-trigger');
-            el.addClass('btn').html('<i class="icon-calendar"></i>');
-        }
-    }
-});
-
 //var s = $.fn.select2.defaults.formatNoMatches();
 //$.fn.select2.defaults.formatNoMatches = function () { return s + ' <a style="position: absolute; right: 10px; cursor: pointer;">' + gettext('Create...') + '</a>'; },
 
@@ -185,7 +187,7 @@ ui.filter('dateFrom', function ($locale) {
     return function (dateString) {
         if (dateString) {
             var fmt = $locale.DATETIME_FORMATS.mediumDate.toUpperCase();
-            var m = moment(dateString, fmt)
+            var m = moment(dateString, fmt);
             return m.format('LL') + ' (' + m.fromNow() + ')';
         }
         else return '';
