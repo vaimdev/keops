@@ -8,13 +8,6 @@ import django.forms
 from keops.utils.html import *
 
 class Select(widgets.Select):
-    def render(self, name, value, attrs=None, choices=()):
-        if not attrs:
-            attrs = {}
-        if value and 'ng-model' in attrs:
-            attrs['ng-init'] = "%s = '%s'" % (attrs['ng-model'], value)
-        return super(Select, self).render(name, value, attrs, choices)
-
     def build_attrs(self, extra_attrs=None, **kwargs):
         attrs = super(Select, self).build_attrs(extra_attrs, **kwargs)
         attrs.setdefault('ng-model', kwargs.get('name'))
@@ -25,8 +18,6 @@ class DateInput(widgets.DateInput):
     def render(self, name, value, attrs=None):
         if not attrs:
             attrs = {}
-        if value and 'ng-model' in attrs:
-            attrs['ng-init'] = "%s = '%s'" % (name, value)
         d_attrs = {}
         if 'ng-show' in attrs:
             d_attrs['ng-show'] = attrs['ng-show']

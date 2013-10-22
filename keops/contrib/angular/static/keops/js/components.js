@@ -87,7 +87,10 @@ ui.directive('uiMoney', function($filter) {
                 var symbol = attrs.uiMoneySymbol;
                 var negative = attrs.uiMoneyNegative;
                 element.maskMoney({symbol: symbol, thousands: thousands, decimal: decimal, precision: precision, allowNegative: negative, allowZero: true}).
-                bind('keyup blur', function(event) { ngModel.$setViewValue(element.val().replace(RegExp('\\' + thousands, 'g'), '').replace(RegExp('\\' + decimal, 'g'), '.')); });
+                bind('keyup blur', function(event) {
+                        ngModel.$setViewValue(element.val().replace(RegExp('\\' + thousands, 'g'), '').replace(RegExp('\\' + decimal, 'g'), '.'));
+                    }
+                );
             });
 
             ngModel.$render = function () {

@@ -106,8 +106,14 @@ msgstr "Salvar alterações do registro"
 msgid "Save changes and create a new record"
 msgstr "Salvar alterações e criar um novo registro"
 
+msgid "Save changes and edit the created record"
+msgstr "Salvar alterações e editar o registro criado"
+
 msgid "Cancel changes"
 msgstr "Cancelar alterações"
 
 msgid "Save + New"
 msgstr "Salvar + Novo"
+
+msgid "Save + Edit"
+msgstr "Salvar + Editar"

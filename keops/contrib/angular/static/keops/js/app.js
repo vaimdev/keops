@@ -202,6 +202,23 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         });
     };
 
+    Form.prototype.cancel = function () {
+        this.write = false;
+        //this.refresh();
+    };
+
+    Form.prototype.refresh = function () {
+        var pk = $location.search()['pk'];
+        if (pk)
+        $http({
+            method: 'GET',
+            url: '/db/read',
+            params: { limit: 1, model: this.model, pk: $location.search()['pk'] }
+        }).success(function (data) {
+                jQuery.extend(this.item, data.items[0]);
+            }.bind(this));
+    };
+
     Form.prototype.initForm = function (model) {
         this.model = model;
         this.nextPage();
@@ -330,9 +347,12 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             for (var i in form) {
                 if (i[0] !== '$') {
                     var el = form[i];
-                    if (el.$dirty) data[el.$name] = typeof el.$modelValue === 'object' ? el.$modelValue['value'] : el.$modelValue;
+                    var v = $scope.form.item[i];
+                    if (el.$dirty) data[el.$name] = typeof v === 'object' ? v['id'] : v;
                 }
-            }
+            };
+            console.log(data);
+            form.$setPristine();
             $http({
                 method: 'POST',
                 url: '/db/submit/',
@@ -345,8 +365,9 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                     jQuery.extend($scope.form.item, data.data);
                 };
                 $scope.addAlert(data.success ? 'success' : 'error', data.msg);
-            });
+                }.bind(this));
         }
+        else $scope.addAlert('error', gettext('No pending data to submit!'))
     }
 });
 

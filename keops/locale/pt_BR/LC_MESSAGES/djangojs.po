@@ -51,3 +51,6 @@ msgstr "Não"
 
 msgid "Confirmation"
 msgstr "Confirmação"
+
+msgid "No pending data to submit!"
+msgstr "Não há dados pendentes para envio!"

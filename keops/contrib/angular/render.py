@@ -35,7 +35,7 @@ def get_field(bound_field, form, exclude=[], state=None):
 
     widget_attrs = field.widget.attrs.copy()
     widget_attrs.update(field.target_attr.custom_attrs.get('widget_attrs', {}))
-    widget_attrs.update({'ng-model': 'form.item.' + name, 'ng-show': 'form.write'})
+    widget_attrs.update({'ng-model': 'form.item.' + name, 'ng-show': 'form.write', 'name': name})
     if readonly:
         span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s"></span>' % (name, name)
         widget_attrs['ng-show'] += ' && !form.readonly.%s' % name
@@ -117,6 +117,7 @@ def get_field(bound_field, form, exclude=[], state=None):
             **widget_attrs
         )
         widget += '</div>'
+        print(widget)
         cell_attrs['style'] = 'padding-right: 10px; max-width: 1px;' # adjust select2 size
     elif isinstance(field, forms.ChoiceField):
         span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s.text"></span>' % (name, name)

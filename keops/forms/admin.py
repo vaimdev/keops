@@ -398,7 +398,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         Save context data on using specified database.
         """
         from keops.views import db
-        from keops.db import models
+        from django.db import models
         from django.utils import formats
         pk = context.get('pk')
         if 'model' in context:
@@ -423,6 +423,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                                 break
                             except:
                                 pass
+                    elif isinstance(field, models.ForeignKey):
+                        k = field.attname
                 except:
                     pass
                 setattr(obj, k, v)
