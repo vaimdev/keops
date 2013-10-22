@@ -204,7 +204,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
 
     Form.prototype.cancel = function () {
         this.write = false;
-        //this.refresh();
+        this.refresh();
     };
 
     Form.prototype.refresh = function () {
@@ -216,7 +216,20 @@ keopsApp.factory('Form', function($http, SharedData, $location){
             params: { limit: 1, model: this.model, pk: $location.search()['pk'] }
         }).success(function (data) {
                 jQuery.extend(this.item, data.items[0]);
+                this.masterChange();
             }.bind(this));
+    };
+
+    Form.prototype.getNestedItems = function () {
+        var items = this.element.find('[remoteitem]');
+        var r = {};
+        // check item changes
+        for (var i = 0; i < items.length; i++) {
+            var item = angular.element(items[i]);
+            var name = item.attr('name');
+            r[name] = this.item[name];
+        };
+        return r;
     };
 
     Form.prototype.initForm = function (model) {
@@ -275,6 +288,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                         form.ref = item;
                     }
                     form.field = field;
+                    form.instance = $scope.form;
                     return form;
                 }
             },
@@ -283,11 +297,15 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         var dialog = $modal.open(options);
 
         dialog.result.then(function (form) {
-            console.log(form);
+            form.instance.nestedDirty = true;
             if (form.ref) {
+                if (!form.item.__state__) form.item.__state__ = 'modified';
                 jQuery.extend(form.ref, form.item);
             }
-            else form.field.push(form.item);
+            else {
+                form.item.__state__ = 'created';
+                form.field.push(form.item);
+            }
         }, function () {
         });
     };
@@ -340,9 +358,13 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         return r;
     };
 
+    $scope.tableRowFilter = function (obj) {
+        return obj.__state__ !== 'deleted';
+    };
+
     $scope.submit = function () {
         var form = this.dataForm;
-        if (form.$dirty) {
+        if (form.$dirty || $scope.form.nestedDirty) {
             var data = {};
             for (var i in form) {
                 if (i[0] !== '$') {
@@ -351,20 +373,46 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                     if (el.$dirty) data[el.$name] = typeof v === 'object' ? v['id'] : v;
                 }
             };
-            console.log(data);
-            form.$setPristine();
-            $http({
-                method: 'POST',
-                url: '/db/submit/',
-                headers: { 'Content-Type': "application/x-www-form-urlencoded" },
-                data: { model: this.form.model, pk: this.form.item.pk, data: data }
-            }).
+            // detect nested grid fields
+            var nested = $scope.form.getNestedItems();
+            for (var n in nested) {
+                var nestedData = [];
+                for (i = 0; i < nested[n].length; i++) {
+                    var obj = {};
+                    var item = nested[n][i];
+                    if (item.__state__ === 'deleted') obj.action = 'DELETE';
+                    else if (item.__state__ === 'modified') obj.action = 'UPDATE';
+                    else if (item.__state__ === 'created') obj.action = 'CREATE';
+                    delete item.__state__;
+                    if (obj.action) {
+                        obj.data = {};
+                        jQuery.extend(obj.data, item);
+                        for (var x in obj.data) {
+                            var v = obj.data[x];
+                            if (typeof v === 'object')
+                                obj.data[x] = v.id;
+
+                        };
+                        nestedData.push(obj);
+                    };
+                };
+                data[n] = nestedData;
+            };
+            console.debug(data);
+            return $http.post(
+                '/db/submit/', { model: this.form.model, pk: this.form.item.pk, data: data }
+            ).
             success(function (data, status, headers, config) {
+                $scope.addAlert(data.success ? 'success' : 'error', data.msg);
                 if (data.success) {
+                    $scope.form.nestedDirty = false;
+                    form.$setPristine();
                     $scope.form.write = false;
                     jQuery.extend($scope.form.item, data.data);
-                };
-                $scope.addAlert(data.success ? 'success' : 'error', data.msg);
+                }
+                else {
+                    throw data.msg;
+                }
                 }.bind(this));
         }
         else $scope.addAlert('error', gettext('No pending data to submit!'))

@@ -382,8 +382,13 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         f = self.model._meta.get_field(field)
         obj = self.model()
         v = json.loads(request.GET['value'])
-        if f.custom_attrs['on_change']:
-            return HttpJsonResponse(f.custom_attrs['on_change'](obj, request, field, v))
+        if f.custom_attrs.on_change:
+            return HttpJsonResponse(f.custom_attrs.on_change(obj, request, field, v))
+
+    def find_field(self, name):
+        for f in self.model_fields:
+            if f.name == name:
+                return f
 
     def read(self, request):
         """
@@ -398,15 +403,18 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         Save context data on using specified database.
         """
         from keops.views import db
-        from django.db import models
-        from django.utils import formats
+        from keops.db import models
+        from django.db.models import ForeignKey
         pk = context.get('pk')
         if 'model' in context:
-            model = db.get_model(context)
+            model = context['model']
+            if isinstance(model, str):
+                model = db.get_model(context)
         else:
             model = self.model
         data = context.get('data')
         obj = None
+        related = OrderedDict()
         if pk:
             obj = model.objects.using(using).get(pk=pk)
         if data:
@@ -415,7 +423,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             obj = obj or model()
             for k, v in data.items():
                 try:
-                    field = self.model._meta.get_field(k)
+                    field = model._admin.find_field(k)
                     if isinstance(field, models.DateField):
                         for format in settings.DATE_INPUT_FORMATS:
                             try:
@@ -423,39 +431,41 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                                 break
                             except:
                                 pass
-                    elif isinstance(field, models.ForeignKey):
+                    elif isinstance(field, ForeignKey):
                         k = field.attname
+                    elif isinstance(field, models.OneToManyField):
+                        related[field] = v
+                        continue
                 except:
-                    pass
+                    raise
                 setattr(obj, k, v)
+
             obj.full_clean()
             obj.save(using=using)
 
-            # submit related data
-        related = context.get('related')
-        if related:
-            self.save_item(json.loads(related), obj, using)
+        # submit related data
+        for field, v in related.items():
+            self.save_related(field, v, obj, using)
         return True, obj
 
-    def save_item(self, data, parent, using):
+    def save_related(self, field, data, parent, using):
         """
-        Save item data rows (ManyToMany/OneToMany).
+        Save related data rows (ManyToManyField/OneToManyField).
         """
+        model = field.related.model
         for obj in data:
-            model = self.model
-            link_field = obj['linkField']
-            rows = obj['data']
-            for row in rows:
-                action = row.get('action')
-                record = row.get('data')
-                pk = row.get('pk')
-                if action == 'DELETE':
-                    model.objects.using(using).get(pk=pk).delete()
-                    continue
-                elif action == 'CREATE':
-                    record[link_field] = parent.pk
-                context = {'pk': pk, 'model': model, 'data': record}
-                self.save(context, using)
+            action = obj['action']
+            record = obj['data']
+            pk = record.pop('pk', None)
+            if action == 'DELETE':
+                model.objects.using(using).get(pk=pk).delete()
+                continue
+            elif action == 'CREATE':
+                record[field.related.field.name] = parent.pk
+            try:
+                self.save({'pk': pk, 'model': model, 'data': record}, using)
+            except ValidationError as e:
+                raise ValidationError([str(model._meta)] + e.messages)
 
     def submit(self, request, **kwargs):
         """

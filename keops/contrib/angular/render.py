@@ -35,7 +35,7 @@ def get_field(bound_field, form, exclude=[], state=None):
 
     widget_attrs = field.widget.attrs.copy()
     widget_attrs.update(field.target_attr.custom_attrs.get('widget_attrs', {}))
-    widget_attrs.update({'ng-model': 'form.item.' + name, 'ng-show': 'form.write', 'name': name})
+    widget_attrs.update({'ng-model': 'form.item.' + name, 'ng-show': 'form.write', 'name': name, 'id': bound_field.auto_id})
     if readonly:
         span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s"></span>' % (name, name)
         widget_attrs['ng-show'] += ' && !form.readonly.%s' % name
@@ -74,7 +74,7 @@ def get_field(bound_field, form, exclude=[], state=None):
         fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
         head = [ '<th%s>%s</th>' % (get_filter(f)[0], capfirst(f.verbose_name)) for f in fields ] + [TH('', style='width: 10px;')]
         cols = [ '<td%s>{{item.%s}}</td>' % (((isinstance(f, models.ForeignKey) or f.choices) and ('', f.name + '.text')) or get_filter(f)) for f in fields ] +\
-            [TD('<i ng-show="form.write" style="cursor: pointer" title="%s" class="icon-remove"></i>''' % capfirst(_('remove item')), style='padding-right: 5px;')]
+            [TD('<button class="btn" ng-show="form.write" tooltip="%s" ng-click="item.__state__ = \'deleted\'"><i class="icon-remove"></i></button>' % capfirst(_('remove item')), style='padding-right: 5px;')]
 
         widget += bound_field.label_tag(
             attrs={'class': 'field-label', 'style': 'display: inline-block; padding-right: 10px;'},
@@ -91,7 +91,7 @@ def get_field(bound_field, form, exclude=[], state=None):
                     TR(
                         attrs={
                             'ui-table-row': 'ui-table.row',
-                            'ng-repeat': 'item in form.item.' + name,
+                            'ng-repeat': 'item in form.item.' + name + ' | filter:tableRowFilter',
                             'ng-click': "form.write && showDetail('%s', '%s', item)" % (model_name, name)},
                         *cols
                     )
@@ -113,7 +113,7 @@ def get_field(bound_field, form, exclude=[], state=None):
             )
         })
         widget = '<div ng-show="%s" class="form-long-field">' % (widget_attrs.pop('ng-show'))
-        widget += TAG('input combobox type="hidden" id="%s"' % bound_field.auto_id,
+        widget += TAG('input combobox type="hidden"',
             **widget_attrs
         )
         widget += '</div>'
@@ -129,7 +129,6 @@ def get_field(bound_field, form, exclude=[], state=None):
         widget_attrs['ui-money-thousands'] = formats.get_format('THOUSAND_SEPARATOR')
         widget_attrs['ui-money-decimal'] = formats.get_format('DECIMAL_SEPARATOR')
         widget_attrs['ui-money-negative'] = True
-        widget_attrs['id'] = bound_field.auto_id
 
         widget = TAG('input ui-money', attrs=widget_attrs)
 
@@ -139,7 +138,7 @@ def get_field(bound_field, form, exclude=[], state=None):
         cell_attrs['ng-init'] = 'form.readonly.%s = true' % name
 
     if not widget:
-        widget = bound_field.as_widget(attrs=widget_attrs)
+        widget = field.widget.render(name, None, attrs=widget_attrs)
 
     r = []
     if label:

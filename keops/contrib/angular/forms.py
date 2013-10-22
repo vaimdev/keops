@@ -16,11 +16,15 @@ class Select(widgets.Select):
 
 class DateInput(widgets.DateInput):
     def render(self, name, value, attrs=None):
-        if not attrs:
+        if attrs:
+            attrs = attrs.copy()
+        else:
             attrs = {}
         d_attrs = {}
         if 'ng-show' in attrs:
             d_attrs['ng-show'] = attrs['ng-show']
+        if value and not 'ng-init' in attrs:
+            attrs['ng-init'] = attrs.get('ng-model', name) + " = '%s'" % str(value)
         return TAG('div class="input-append" style="display: inline;"', super(DateInput, self).render(name, value, attrs), attrs=d_attrs)
 
     def build_attrs(self, extra_attrs=None, **kwargs):

@@ -3,6 +3,7 @@ import datetime
 import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from keops.db import models
 from keops.db import get_db, set_db
 from keops.http import HttpJsonResponse
@@ -164,10 +165,8 @@ def submit(request):
     """
     if request.method == 'DELETE':
         data = request.GET
-    elif len(request.POST) == 1:
-        for d in request.POST:
-            data = json.loads(d)
-            break
+    else:
+        data = json.loads(request.body.decode(settings.DEFAULT_CHARSET))
         request.POST = data
     model = get_model(data)
     return model._admin.submit(request)
