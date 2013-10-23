@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from keops.forms.admin import ModelAdmin
 
 # Add data dict object to Django model (class Extra)
-dd_items = {
+extra_attrs = {
     # Extra attributes
     'default_fields': None,
     'status_field': None, # main model status field representation
@@ -71,7 +71,7 @@ class ModelBase(object):
             extra = type('Extra', (base,), {})
             new_class.add_to_class('Extra', extra)
 
-        for d, v in dd_items.items():
+        for d, v in extra_attrs.items():
             if not hasattr(extra, d):
                 setattr(extra, d, copy.copy(v))
 
@@ -289,6 +289,10 @@ class Model(object):
             setattr(self.__class__, '__str__', Model._str)
         return self.__class__.__str__(self)
 
+    def __copy__(self):
+        self.id = self.pk = None
+        return self
+
     # Monkey patch
     models.Model.__init__ = __init__
     models.Model.delete = delete
@@ -296,3 +300,4 @@ class Model(object):
     #models.Model._save_table = _save_table
     #models.Model.__setattr__ = __setattr__
     models.Model.__str__ = __str__
+    models.Model.__copy__ = __copy__

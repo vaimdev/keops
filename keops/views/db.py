@@ -4,6 +4,7 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+from django.db.models import ForeignKey
 from keops.db import models
 from keops.db import get_db, set_db
 from keops.http import HttpJsonResponse
@@ -44,6 +45,21 @@ def fk_select_fields(model):
         model.Extra._cache_fk_select_fields = { f.name: f.custom_attrs['select_fields'] for f in model._meta.fields if 'select_fields' in f.custom_attrs }
     return model.Extra._cache_fk_select_fields
 
+def _display_fn(model):
+    if not hasattr(model.Extra, '_cache_display_fn'):
+        r = {}
+        for field in model._meta.all_fields:
+            if field.custom_attrs.display_fn:
+                display = field.custom_attrs.display_fn
+            elif isinstance(field, ForeignKey) and field.custom_attrs.default_fields:
+                fields = field.custom_attrs.default_fields
+                display = lambda x : ' - '.join([ str(getattr(x, f, '') or '') for f in fields ])
+            else:
+                display = str
+            r[field.name] = display
+        model.Extra._cache_display_fn = r
+    return model.Extra._cache_display_fn
+
 def grid(request):
     using = get_db(request)
     model = get_model(request.GET)
@@ -83,9 +99,10 @@ def grid(request):
 
     # TODO Check content type permissions permissions
 
-    get_val = lambda x: '' if x is None else (callable(x) and str(x())) or str(x)
+    get_val = lambda x: '' if x is None else (callable(x) and x()) or x
     fields = ['pk'] + fields
-    rows = [ { f: str(get_val(getattr(row, disp_fields.get(f, f)))) for f in fields } for row in queryset ]
+    display_fn = _display_fn(model)
+    rows = [ { f: display_fn.get(f, str)(get_val(getattr(row, disp_fields.get(f, f)))) for f in fields } for row in queryset ]
     data = {'items': rows, 'total': count}
     return HttpJsonResponse(data)
 
@@ -119,7 +136,8 @@ def prepare_read(context, using):
         count = None
     fields = ['pk', '__str__'] + context.get('fields', _read_fields(model))
     disp_fields = _choice_fields(model)
-    rows = [ { f: field_text(getattr(row, f), row, f, disp_fields.get(f, f)) for f in fields } for row in queryset ]
+    display_fn = _display_fn(model)
+    rows = [ { f: field_text(getattr(row, f), row, f, disp_fields.get(f, f), display_fn=display_fn.get(f, str)) for f in fields } for row in queryset ]
     return {'items': rows, 'total': count}
     
 def read(request):
@@ -151,10 +169,13 @@ def read_items(request):
 
 def lookup(request):
     model = get_model(request.GET)
-    return model._admin.lookup(request, sel_fields=fk_select_fields(model))
+    return model._admin.lookup(request, sel_fields=fk_select_fields(model), display_fn=_display_fn(model)[request.GET['field']])
 
 def new_item(request):
     return get_model(request.GET)._admin.new_item(request)
+
+def copy_item(request):
+    return get_model(request.GET)._admin.copy(request)
 
 def field_change(request):
     return get_model(request.GET)._admin.field_change(request)

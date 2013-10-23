@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import models as auth
 from django.contrib.auth.models import Group
+import django.contrib.auth.signals
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
@@ -74,9 +75,25 @@ class UserLog(models.Model):
 
 class UserData(models.Model):
     user = models.ForeignKey(User, null=False)
-    key = models.CharField(max_length=64)
+    key = models.CharField(max_length=64, db_index=True)
     value = models.TextField()
 
     class Meta:
         unique_together = (('user', 'key'),)
         db_table = 'auth_user_data'
+
+def user_logged_in(sender, request, user, *args, **kwargs):
+    # Load basic user information
+    # Select last login user company
+    db = user._state.db
+    company = UserData.objects.using(db).filter(user=user, key='auth.profile.last_company')
+    from .models import Company
+    if company:
+        company = Company.objects.using(db).get(pk=company[0].value)
+    else:
+        # TODO check permission
+        company = Company.objects.using(db).all()[0]
+        UserData.objects.create(user=user, key='auth.profile.last_company', value=company.pk)
+    request.session['company'] = company
+
+django.contrib.auth.user_logged_in.connect(user_logged_in)

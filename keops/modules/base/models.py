@@ -184,8 +184,3 @@ class AttributeValue(models.Model):
 # TODO: Build a content translation structure
 # TODO: Build a module/app installer
 # TODO: Implement cron jobs
-
-def user_logged_in(sender, *args, **kwargs):
-    print('user logged in')
-
-django.contrib.auth.user_logged_in.connect(user_logged_in)

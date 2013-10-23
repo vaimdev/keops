@@ -42,16 +42,6 @@ class Account(models.Model):
     class Meta:
         db_table = 'account'
 
-class Plain(models.Model):
-    """
-    Store all account relations.
-    """
-    parent_account = models.ForeignKey(Account)
-    account = models.ForeignKey(Account)
-
-    class Meta:
-        db_table = 'account_plain'
-
 class BankType(models.Model):
     name = models.CharField(_('name'), max_length=32, db_index=True)
 
@@ -83,8 +73,8 @@ class Move(models.Model):
 class MoveLine(models.Model):
     account_move = models.ForeignKey(Move, null=False)
     document = models.CharField(max_length=32, db_index=True)
-    #debit_account = models.ForeignKey(Account, 'debit account')
-    #credit_account = models.ForeignKey(Account, 'credit account')
+    debit_account = models.ForeignKey(Account, verbose_name='debit account', related_name='+')
+    credit_account = models.ForeignKey(Account, verbose_name='credit account', related_name='+')
     value = models.MoneyField(blank=False)
     debit = models.MoneyField(default=0)
     credit = models.MoneyField(default=0)

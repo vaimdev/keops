@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     (r'^db/lookup/$', 'keops.views.db.lookup'),
     (r'^db/submit/$', 'keops.views.db.submit'),
     (r'^db/new/$', 'keops.views.db.new_item'),
+    (r'^db/new/copy/$', 'keops.views.db.copy_item'),
     (r'^db/field/change$', 'keops.views.db.field_change'),
     (r'^db/test/$', 'keops.views.test.index'),
     # additional

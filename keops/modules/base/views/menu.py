@@ -12,7 +12,7 @@ def index(request, menu_id):
     return render(request, 'keops/app.html', {
         'app_menu': base.Menu.objects.filter(parent=None),
         'menu': base.Menu.objects.get(pk=menu_id),
-        'site_name': 'COMPANY NAME' # TODO get current company name
+        'company': request.session.get('company', '') # TODO get current company name
     })
 
 

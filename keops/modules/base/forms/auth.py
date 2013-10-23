@@ -4,7 +4,7 @@ from keops.modules.base import auth
 
 class UserAdmin(ModelAdmin):
     model = auth.User
-    admin_default = True
+    default_admin = True
     pages = (
         (None, (
             (None, {
@@ -20,7 +20,7 @@ class UserAdmin(ModelAdmin):
 
 class GroupAdmin(ModelAdmin):
     model = auth.Group
-    admin_default = True
+    default_admin = True
     pages = (
         (None, (
             (None, {'fields': ('name',)}),

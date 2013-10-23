@@ -1,6 +1,7 @@
 import datetime
 from collections import OrderedDict
 from importlib import import_module
+import copy
 import json
 from django.utils import six
 from django.core.exceptions import ValidationError
@@ -53,7 +54,7 @@ class TabPage(object):
 class ModelAdminBase(type):
     def __new__(cls, name, bases, attrs):
         new_class = type.__new__(cls, name, bases, attrs)
-        if attrs.get('admin_default', None):
+        if attrs.get('default_admin', None):
             new_class()
         return new_class
 
@@ -83,7 +84,7 @@ def admin_formfield_callback(self, field, **kwargs):
 
 class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     formfield_callback = admin_formfield_callback
-    admin_default = False
+    default_admin = False
     template_name = 'keops/forms/model_form.html'
     list_template = 'keops/forms/list_form.html'
     fields = ()
@@ -115,7 +116,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         self._form = None
         self._model_form = None
         if self.model:
-            if self.admin_default:
+            if self.default_admin:
                 self.contribute_to_class(self.model, '_admin')
 
     def contribute_to_class(self, cls, name):
@@ -305,7 +306,17 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             else:
                 v = None
             r[field.name] = field_text(v)
-        print(r)
+        return HttpJsonResponse(r)
+
+    def copy(self, request):
+        from keops.db import models
+        self._prepare_form()
+        pk = request.GET['pk']
+        obj = copy.copy(self.model.objects.get(pk=pk))
+        r = {'pk': None}
+        for field in self.model_fields:
+            if not field.primary_key and not isinstance(field, (models.ManyToManyField, models.OneToManyField)):
+                r[field.name] = field_text(getattr(obj, field.name))
         return HttpJsonResponse(r)
 
     def get_formfield(self, field):
@@ -327,21 +338,23 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             self.bound_fields[field] = bound_field
         return self.bound_fields[field]
 
-    def lookup(self, request, sel_fields=None):
+    def lookup(self, request, sel_fields=None, display_fn=str):
         """
         Read lookup data list.
         """
         from keops.views import db
         context = request.GET
         field = context.get('field')
-        queryset = self.get_formfield(field).field.queryset
+        form_field = self.get_formfield(field).field
+        queryset = form_field.queryset
         start = int(context.get('start', '0'))
         limit = int(context.get('limit', '25')) + start # settings
         query = context.get('query', '')
+        fields = form_field.target_attr.custom_attrs.fields
         if query:
             queryset = db.search_text(queryset, query)
         data = {
-            'data': [ field_text(obj, sel_fields=sel_fields.get(field)) for obj in queryset[start:limit] ],
+            'data': [ field_text(obj, sel_fields=sel_fields.get(field), display_fn=display_fn) for obj in queryset[start:limit] ],
             'total': queryset.count()
         }
         return HttpJsonResponse(data)

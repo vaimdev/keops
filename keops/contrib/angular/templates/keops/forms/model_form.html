@@ -29,7 +29,7 @@
                                 <button class="btn dropdown-toggle" style="margin-left: 20px;" href="" target="_blank">{{ _('record')|capfirst }}<span style="margin-left: 8px;" class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">
                                     <li><a style="cursor: pointer;" ng-click="confirmDelete()">{{ _('delete')|capfirst }}</a></li>
-                                    <li><a href="">{{ _('duplicate')|capfirst }}</a></li>
+                                    <li ng-show="form.item.pk"><a ng-click="form.newItem(form.item.pk)">{{ _('duplicate')|capfirst }}</a></li>
                                 </ul>
                                 </div>
                             </td>

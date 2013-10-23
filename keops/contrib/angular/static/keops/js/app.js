@@ -129,11 +129,17 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         }
     };
 
-    Form.prototype.newItem = function () {
+    Form.prototype.newItem = function (pk) {
+        var params = {model: this.model};
+        var url = '/db/new';
+        if (pk) {
+            params['pk'] = pk;
+            url = '/db/new/copy'
+        };
         $http({
             method: 'GET',
-            url: '/db/new',
-            params: {model: this.model}
+            url: url,
+            params: params
         }).success(function(data) {
                 this.write = true;
                 this.item = data;

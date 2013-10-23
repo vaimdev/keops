@@ -7,7 +7,7 @@ __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKe
            'FileRelField', 'ImageRelField', 'VirtualField', 'PropertyField',
            'OneToManyField', 'get_model_url']
 
-_custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter')
+_custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter', 'default_fields', 'display_fn')
 
 class FieldCustomAttrs(dict):
     def __getattr__(self, item):
