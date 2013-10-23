@@ -4,7 +4,6 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
-from django.db.models import ForeignKey
 from keops.db import models
 from keops.db import get_db, set_db
 from keops.http import HttpJsonResponse
@@ -15,7 +14,6 @@ def index(request):
     """
     Set default db alias session value.
     """
-    # set default _db_alias to 'alias'
     assert request.method == 'GET'
     alias = request.GET.get('alias')
     if alias:
@@ -51,7 +49,7 @@ def _display_fn(model):
         for field in model._meta.all_fields:
             if field.custom_attrs.display_fn:
                 display = field.custom_attrs.display_fn
-            elif isinstance(field, ForeignKey) and field.custom_attrs.default_fields:
+            elif isinstance(field, models.ForeignKey) and field.custom_attrs.default_fields:
                 fields = field.custom_attrs.default_fields
                 display = lambda x : ' - '.join([ str(getattr(x, f, '') or '') for f in fields ])
             else:

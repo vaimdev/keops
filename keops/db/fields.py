@@ -124,13 +124,11 @@ def get_resource_url(field, *args, **kwargs):
 models.ForeignKey.get_resource_url = get_resource_url
 
 # Change ForeignKey fields for business model
-def ForeignKey(to, to_field=None, rel_class=models.ManyToOneRel, **options):
-    #list_display = options.pop('list_display', [])
-    # Protect foreign key delete cascade
-    options.setdefault('on_delete', models.PROTECT)
-    f = models.ForeignKey(to=to, to_field=to_field, rel_class=rel_class, **options)
-    #f.list_display = list_display
-    return f
+class ForeignKey(models.ForeignKey):
+    def __init__(self, to, to_field=None, rel_class=models.ManyToOneRel, db_constraint=True, **kwargs):
+        # Protect foreign key delete cascade
+        kwargs.setdefault('on_delete', models.PROTECT)
+        super(ForeignKey, self).__init__(to=to, to_field=to_field, rel_class=rel_class, **kwargs)
 
 class FileRelField(models.ForeignKey):
     """
@@ -140,8 +138,7 @@ class FileRelField(models.ForeignKey):
     """
     def __init__(self, to=None, to_field=None, rel_class=models.ManyToOneRel,
                  db_constraint=True, **options):
-        if to is None and hasattr(settings, 'FILE_FIELD_MODEL'):
-            to = settings.FILE_FIELD_MODEL
+        to = to or getattr(settings, 'FILE_FIELD_MODEL')
         options.setdefault('related_name', '+')
         super(FileRelField, self).__init__(to=to, to_field=to_field, rel_class=rel_class,
                                            db_constraint=db_constraint, **options)

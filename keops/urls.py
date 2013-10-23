@@ -9,7 +9,6 @@ js_info_dict = {
 
 urlpatterns = patterns('',
     # db
-    (r'^db/$', 'keops.views.db.index'),
     (r'^db/grid/$', 'keops.views.db.grid'),
     (r'^db/read/$', 'keops.views.db.read'),
     (r'^db/read/items/$', 'keops.views.db.read_items'),
