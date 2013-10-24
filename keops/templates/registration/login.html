@@ -1,30 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<div style="top: 100px; width: 400px; height: 130px; margin: auto; padding: 40px 10px 10px 10px; position: relative; border: solid 1px #c4c4c4; border-radius: 8px; box-shadow: #111111;">
-{% block message %}{% endblock %}
-{% if form.errors %}
-<p>{{ _('Invalid user name/password! Please try again.') }}</p>
-{% endif %}
-<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-{% csrf_token %}
-<table style="table-layout: fixed; margin-left: 30px;">
-<tr>
-    <td class="form-label-cell">{{ form.username.label_tag }}</td>
-    <td class="form-field-cell">{{ form.username }}</td>
-</tr>
-<tr>
-    <td class="form-label-cell">{{ form.password.label_tag }}</td>
-    <td class="form-field-cell">{{ form.password }}</td>
-</tr>
-    <tr>
-        <td colspan="2"><input style="float: right; margin-right: 40px;" class="btn" type="submit" value="Login" /></td>
-    </tr>
-</table>
-
-
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
+<div class="container" style="max-width: 400px;">
+    <div class="panel panel-primary" style="margin-top: 100px;">
+        <div class="panel-heading">Login</div>
+        {% block message %}{% endblock %}
+        {% if form.errors %}
+        <p>{{ _('Invalid user name/password! Please try again.') }}</p>
+        {% endif %}
+        <div class="panel-body">
+            <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+            {% csrf_token %}
+                <table style="width: 100%;">
+                <tr>
+                    <td><input id="id_username" name="username" class="form-control input-sm" placeholder="{{ form.username.label }}"></td>
+                </tr>
+                <tr>
+                    <td><input id="id_password" name="password" class="form-control input-sm" type="password" placeholder="{{ form.password.label }}"></td>
+                </tr>
+                    <tr>
+                        <td style="padding-top: 10px;"><input style="float: right;" class="btn btn-sm btn-default" type="submit" value="Login" /></td>
+                    </tr>
+                </table>
+                <input style="float: right;" type="hidden" name="next" value="{{ next }}" />
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

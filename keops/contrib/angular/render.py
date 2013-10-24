@@ -24,10 +24,9 @@ def get_filter(field, model=None):
         pass
     return '', field
 
-def get_field(bound_field, form, exclude=[], state=None):
+def get_field(bound_field, form, state=None):
 
-    if bound_field.name in exclude:
-        return []
+    return loader.render_to_string('keops/forms/fields/formfield.html.mako', {'field': bound_field, 'forms': keops.forms})
 
     field = bound_field.field
     name = bound_field.name
@@ -201,7 +200,7 @@ def render_form(form, cols=None, exclude=[], state=None):
             for container in fieldset:
                 container = [f for f in container]
                 if len(container) == 1:
-                    s = ''.join(get_field(container[0], form, exclude, state))
+                    s = get_field(container[0], form, state)
                 else:
                     s = get_container(container)
                 if s:

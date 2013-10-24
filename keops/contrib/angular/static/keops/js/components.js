@@ -26,7 +26,7 @@ ui.directive('datePicker', function() {
                     controller.$setViewValue(dateText);
                 }
             });
-            el.next('.ui-datepicker-trigger').addClass('btn').html('<i class="icon-calendar"></i>');
+            el.next('.ui-datepicker-trigger').addClass('btn btn-default btn-sm').html('<span class="glyphicon glyphicon-calendar"></span>');
         }
     }
 });

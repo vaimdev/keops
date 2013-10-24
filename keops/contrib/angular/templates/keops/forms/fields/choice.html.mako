@@ -1,0 +1,1 @@
+${field.as_widget(attrs={'combobox': 1, 'ng-model': 'form.item.' + field.name, 'ng-show': 'form.write', 'style': 'padding: 0;'})}

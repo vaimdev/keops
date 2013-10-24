@@ -242,8 +242,8 @@ class OneToManyField(VirtualField):
         return self._related
 
     def formfield(self, **kwargs):
-        from keops.forms import fields
-        defaults = {'form_class': fields.GridField, 'queryset': None}
+        from keops.forms import GridField
+        defaults = {'form_class': GridField, 'queryset': None}
         defaults.update(kwargs)
         return super(OneToManyField, self).formfield(**defaults)
 

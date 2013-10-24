@@ -6,10 +6,47 @@ body {
     height: 100%;
     overflow-y: scroll;
     padding: 0;
+    font-size: 12px;
 }
 
 legend {
     font-size: 15px;
+}
+
+.navbar {
+    margin-bottom: 0;
+}
+
+.navbar-keops {
+    padding-left: 200px;
+    border-bottom: solid 1px rgb(216, 210, 210);
+
+    background-color: #eaeaea;
+    background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+	background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+	background-image: linear-gradient(#fefefe, #e9e9e9);
+	background-repeat: repeat-x;
+
+
+    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-help-text {
+    font-size: 8pt;
+    min-height: 20px;
+    color: #4a4a4a;
+    vertical-align: text-bottom;
+    margin-top: 5px;
+}
+
+.tab-pane {
+    margin-top: 20px;
+}
+
+.form-control {
+    font-size: 12px;
 }
 
 #keops-app {
@@ -40,10 +77,11 @@ legend {
 
 #keops-app-logo {
     position: absolute;
+    left: 2px;
 }
 
 #keops-app-menu {
-	padding: 0px 0px 0px 80px;
+	padding: 0 0 0 80px;
     border-top: solid 1px rgb(202, 202, 202);
     border-bottom: solid 1px rgb(202, 202, 202);
     color: #555;
@@ -91,6 +129,10 @@ legend {
 
 .keops-site-name {
     font-size: 11px;
+    position: absolute;
+    right: 20px;
+    top: 2px;
+    z-index: 99;
 }
 
 #keops-app-table {
@@ -128,6 +170,7 @@ legend {
 
 #keops-app-left-menu ul {
     margin: 0;
+    padding: 0;
 }
 
 #keops-app-left-menu il {
@@ -340,7 +383,7 @@ legend {
     width: 100%;
 }
 
-.form-field-cell > .select2-container {
+.form-field-cell .select2-container {
     padding-right: 10px;
 }
 

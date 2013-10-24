@@ -120,3 +120,6 @@ msgstr "Salvar + Editar"
 
 msgid "Invalid user name/password! Please try again."
 msgstr "Usuário/senha inválidos! Por favor tente novamente."
+
+msgid "My account"
+msgstr "Minha conta"

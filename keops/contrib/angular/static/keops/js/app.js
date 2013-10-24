@@ -29,6 +29,12 @@ var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ui.bootstra
                     return '?menulist=' + params.id;
                 }
             }).
+            when('/accounts/password/change/',
+            {
+                templateUrl: function (params) {
+                    return '/admin/accounts/password/change/';
+                }
+            }).
             when('/report/:option',
             {
                 templateUrl: function (params) {
@@ -63,7 +69,7 @@ keopsApp.factory('List', function($http, SharedData) {
     List.prototype.nextPage = function(model, query) {
         if (this.loading || this.loaded) return;
         this.loading = true;
-
+        console.log('query', query);
         var params = {
             model: model,
             start: this.start,
@@ -89,6 +95,7 @@ keopsApp.factory('List', function($http, SharedData) {
     };
 
     List.prototype.query = function(model, query) {
+        this.q = query;
         this.total = null;
         this.start = 0;
         this.loaded = false;
@@ -319,13 +326,14 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
     $scope.alerts = [];
 
     $scope.addAlert = function(type, msg) {
-        $scope.alerts.push({type: type, msg: msg});
-        $timeout(function() {
-           $scope.alerts.splice(0, 1);
-        }, 10000);
+        $scope.alerts.push({type: type, msg: msg, timer: $timeout(function() {
+            $scope.alerts.splice(0, 1); }, 10000)
+        });
     };
 
     $scope.closeAlert = function(index) {
+        var alert = $scope.alerts[index];
+        $timeout.cancel(alert.timer);
         $scope.alerts.splice(index, 1);
     };
 

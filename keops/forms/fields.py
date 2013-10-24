@@ -1,9 +1,7 @@
-from django import forms
+from django.forms import *
 from .widgets import *
 
-__all__ = ['GridField', 'DateIntervalField']
-
-class GridField(forms.Field):
+class GridField(Field):
     widget = GridWidget
     input_direct = False
 
@@ -11,5 +9,5 @@ class GridField(forms.Field):
         self.queryset = queryset
         super(GridField, self).__init__(required=required, label=label, help_text=help_text, *args, **kwargs)
 
-class DateIntervalField(forms.CharField):
+class DateIntervalField(CharField):
     widget = DateIntervalWidget

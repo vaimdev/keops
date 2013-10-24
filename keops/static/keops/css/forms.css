@@ -6,6 +6,10 @@
     width: 132px;
 }
 
+.form-date-field {
+    display: inline-block;
+}
+
 .form-field {
     width: 196px;
 }

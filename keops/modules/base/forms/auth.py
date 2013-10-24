@@ -1,4 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
+from django import forms
+from keops.db import models
 from keops.forms.admin import ModelAdmin
 from keops.modules.base import auth
 
@@ -29,3 +31,8 @@ class GroupAdmin(ModelAdmin):
             (None, {'fields': ('permissions',)}),
         ),)
     )
+
+class ChangePasswordForm(forms.Form):
+    old_password = models.CharField()
+    new_password = models.CharField()
+    _password = models.CharField()

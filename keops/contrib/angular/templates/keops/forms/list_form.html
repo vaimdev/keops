@@ -4,25 +4,25 @@
         <td class="form-head">
             <table style="width: 100%; height: 76px">
                 <tr>
-                    <td class="form-title" style="width: 100%;">
+                    <td class="form-title">
                         <span>
                             <span style="display: inline-block; padding-right: 10px;"><b>{{ form.title|capfirst }}</b></span>
-                            <label style="display: inline-block;" class="form-data-info">{% verbatim %}{{list.start}} / {{list.total}}{% endverbatim %}</label>
+                            <span class="badge" style="text-shadow: none; font-size: 11px; font-weight: normal;">{% verbatim %}{{list.start}} / {{list.total}}{% endverbatim %}</span>
                         </span>
-                        <div style="font-size: 8pt; min-height: 10px; color: GrayText;">
-                            {{ form.help_text }}
+                        <div class="form-help-text">
+                            <span>{{ form.help_text }}</span>
                         </div>
                         <div>
                             <table><tr>
                             <td>
-                                <a class="btn btn-info" href="#{{ action.get_absolute_url }}form/?state=new">{{ _('create')|capfirst }}</a>
-                                <a class="btn">{{ _('record')|capfirst }}</a>
+                                <a class="btn btn-sm btn-primary" href="#{{ action.get_absolute_url }}form/?state=new">{{ _('create')|capfirst }}</a>
+                                <a class="btn btn-sm btn-default">{{ _('record')|capfirst }}</a>
                             </td>
                             <td>
                                 {% if form.reports %}
                                 <div class="btn-group">
-                                <a class="btn button-label" style="margin-left: 20px;"  href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
-                                <button class="btn dropdown-toggle"><span class="caret"></span></button>
+                                <a class="btn btn-sm btn-default button-label" style="margin-left: 20px;"  href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <button class="btn btn-sm btn-default dropdown-toggle"><span class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">
                                 {% for report in form.reports %}
                                     <li>{{ report|safe }}</li>
@@ -30,7 +30,7 @@
                                 </ul>
                                 </div>
                                 {% else %}
-                                <a style="margin-left: 20px;" class="btn" href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <a style="margin-left: 20px;" class="btn btn-sm btn-default" href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
                                 {% endif %}
                             </td>
                             </tr></table>
@@ -40,15 +40,17 @@
                         <table style="height: 100%; float: right;">
                             <tr>
                                 <td style="height: 100%;">
-                                    <span style="cursor: pointer;" class="input-add-on" ng-click="list.query('{{ model_name }}', searchField)"><i class="icon-search"></i></span>
-                                    <input style="width: 350px;" class="input-prepend" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" value="{{ query }}" ng-enter="list.query('{{ model_name }}', searchField)">
+                                    <div class="input-group input-group-sm">
+                                        <input style="width: 350px;" class="form-control" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" value="{{ query }}" ng-enter="list.query('{{ model_name }}', searchField)">
+                                        <span style="cursor: pointer;" class="btn btn-sm btn-primary" ng-click="list.query('{{ model_name }}', searchField)"><span class="glyphicon glyphicon-search"></span></span>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
                                     <div class="btn-group" style="float: right;">
-                                        <a class="btn active" title="{{ _("list")|capfirst }}"><i class="icon-reorder"></i></a>
-                                        <a class="btn" href="#{{ action.get_absolute_url }}form/" title="{{ _("form")|capfirst }}"><i class="icon-edit"></i></a>
+                                        <a class="btn btn-default active" title="{{ _("list")|capfirst }}"><i class="icon-reorder"></i></a>
+                                        <a class="btn btn-default" href="#{{ action.get_absolute_url }}form/" title="{{ _("form")|capfirst }}"><i class="icon-edit"></i></a>
                                     </div>
                                 </td>
                             </tr>

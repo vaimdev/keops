@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html ng-app="keopsApp" lang="{{ LANGUAGE_CODE }}')">
 <head>
-    <title>Keops</title>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.css">
+    <title>{{ company.name }}</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/app.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/forms.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/animations.css">
@@ -36,27 +36,34 @@
 </head>
 <body>
     <div id="keops-app">
-        <table id="keops-app-table">
-            <tr>
-                <td colspan="2" id="keops-app-head">
-                    <img src="{{ STATIC_URL }}keops/images/logo.png" id="keops-app-logo">
-                    <div id="keops-app-site-name">
-                        <span class="keops-site-name">{{ company.name }}</span>
-                        <span style="position: absolute; right: 20px;">My account | <a href="/accounts/logout">Logout</a></span>
-                    </div>
-                    <div id="keops-app-menu">
-                        <ul>
+
+        <nav class="navbar navbar-default navbar-keops" role="navigation"  style="padding-left: 200px;">
+<a href="/admin/"><img src="{{ STATIC_URL }}keops/images/logo.png" id="keops-app-logo" title="{{ company.name }}">
+                        <span style="font-size: 11px;"></span>
+</a>
+
+
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="/accounts/logout/" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> {{ user.username }}<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="#accounts/password/change/?user={{ user.pk }}">{{ _('Change password')|capfirst }}</a></li>
+              <li><a href="/accounts/logout/">{{ _('Logout')|capfirst }}</a></li>
+            </ul>
+          </li>
+        </ul>
+
+                        <ul class="nav navbar-nav">
                             {% for m in app_menu %}
-                            <il><a href='../{{ m.pk }}'>{{ m.name }}</a></il>
+                            <li {% if m.pk == menu.pk %}class="active"{% endif %}><a href='../{{ m.pk }}'>{{ m.name }}</a></li>
                             {% endfor %}
                         </ul>
-                    </div>
-                </td>
-            </tr>
+</nav>
+
+        <table id="keops-app-table">
             <tr>
                 <td id="keops-app-left-menu" ng-controller="MenuController">
-                    <h4><span>{{ menu.name|upper }}</span></h4>
-                    <ul>
+                    <ul class="nav nav-pills nav-stacked">
                         {% for m in menu.menu_set.all %}
                         {% if m.closed %}
                         <a class="menu-level-1" ng-click="closedMenuClick('{{ m.get_absolute_url }}')" style="cursor: pointer;">{{ m.name }}</a>

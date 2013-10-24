@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 from keops.modules.base import models as base
 from keops import forms
 
+@login_required
 def index(request, menu_id):
     if 'action' in request.GET:
         return response_action(request)
@@ -12,6 +14,7 @@ def index(request, menu_id):
     return render(request, 'keops/app.html', {
         'app_menu': base.Menu.objects.filter(parent=None),
         'menu': base.Menu.objects.get(pk=menu_id),
+        'user': request.user,
         'company': request.session.get('company', '') # TODO get current company name
     })
 
