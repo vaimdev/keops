@@ -10,19 +10,6 @@ from keops.http import HttpJsonResponse
 from keops.utils import field_text
 from keops.utils.filter import search_text
 
-def index(request):
-    """
-    Set default db alias session value.
-    """
-    assert request.method == 'GET'
-    alias = request.GET.get('alias')
-    if alias:
-        set_db(alias)
-        next = request.GET.get('next')
-        if next:
-            return HttpResponseRedirect(next)
-    return HttpResponse(get_db())
-
 def get_model(context):
     # TODO Check model permission
     # TODO CACHE PERMISSION

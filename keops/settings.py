@@ -40,7 +40,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 # IMPORTANT! MULTI-DB SUPPORT WORKS WITH 'django.contrib.sessions.backends.cache' ONLY
-# ANOTHER SESSION STORE NEEDS DJANGO DEFAULT DATABASE ROUTER
+# ANOTHER SESSION BACKEND STORE NEEDS DJANGO DEFAULT DATABASE ROUTER
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 SERIALIZATION_MODULES = {
@@ -58,14 +58,10 @@ TEMPLATE_PROCESSORS = (
     "django.core.context_processors.request",
 )
 
-#TEMPLATE_LOADERS = (
-#    ('django.template.loaders.cached.Loader', (
-#        'keops.template.loaders.app_directories.Loader',
-#    )),
-#)
-
 TEMPLATE_LOADERS = (
-    'keops.template.loaders.app_directories.Loader',
+    ('django.template.loaders.cached.Loader', (
+        'keops.template.loaders.app_directories.Loader',
+    )),
 )
 
 ROOT_URLCONF = 'keops.urls'
