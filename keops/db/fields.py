@@ -174,6 +174,8 @@ class PropertyField(VirtualField):
     def __init__(self, verbose_name=None, fget=None, fset=None, **options):
         self.fget = fget
         self.fset = fset
+        options.setdefault('null', True)
+        options.setdefault('blank', True)
         super(PropertyField, self).__init__(verbose_name=verbose_name, **options)
 
     def __get__(self, instance, instance_type=None):

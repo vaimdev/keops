@@ -4,8 +4,16 @@
 % if isinstance(field.field, forms.GridField):
 	<td colspan="2"><%include file="/keops/forms/fields/grid.html.mako"/></td>
 % else:
-	<td class="form-label-cell">${field.label_tag()}</td>
-	<td class="form-field-cell"${ro}>
+	<td class="form-label-cell"
+	% if field.field.required:
+		ng-class="form.item.${field.name} == '' ? 'has-error' : ''"
+    % endif
+			>${field.label_tag(attrs={'class': 'control-label'})}</td>
+	<td class="form-field-cell"${ro}
+	% if field.field.required:
+		ng-class="form.item.${field.name} == '' ? 'has-error' : ''"
+    % endif
+			>
 		<%include file="/keops/forms/fields/widget.html.mako"/>
 		<%include file="/keops/forms/fields/span.html.mako"/>
 	</td>

@@ -63,6 +63,8 @@ class ModelAdminBase(type):
 def admin_formfield_callback(self, field, **kwargs):
     f = field.formfield(**kwargs)
     if f:
+        if field.custom_attrs.widget_attrs:
+            f.widget.attrs.update(field.custom_attrs.widget_attrs)
         if f.help_text:
             f.widget.attrs.setdefault('tooltip', f.help_text)
         if field.readonly:
@@ -438,7 +440,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             obj = obj or model()
             for k, v in data.items():
                 try:
-                    field = model._admin.find_field(k)
+                    field = model._admin.get_modelfield(k)
                     if isinstance(field, models.DateField):
                         for format in settings.DATE_INPUT_FORMATS:
                             try:
