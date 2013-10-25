@@ -1,7 +1,5 @@
 from django.utils import six
 from django.forms import forms
-from django.views.generic import TemplateView
-from django.views.generic.edit import CreateView
 
 class View(object):
     template_name = 'keops/forms/view.html'

@@ -59,29 +59,18 @@ class ModelAdminBase(type):
         return new_class
 
 def admin_formfield_callback(self, field, **kwargs):
-    from keops.db import models
     f = field.formfield(**kwargs)
     if f:
-        if f and f.help_text:
+        if f.help_text:
             f.widget.attrs.setdefault('tooltip', f.help_text)
-        if isinstance(f, forms.ModelChoiceField):
-            f.widget.attrs.setdefault('class', 'form-long-field')
-        if isinstance(f, forms.ChoiceField):
-            f.widget.attrs.setdefault('class', 'form-long-field')
-        elif isinstance(field, models.TextField):
-            f.widget.attrs.setdefault('class', 'form-control input-sm form-long-field')
-        elif isinstance(f, (forms.DateField, forms.DateTimeField)):
-            f.widget.attrs.setdefault('class', 'form-control input-sm form-date-field')
-        elif isinstance(f, forms.IntegerField):
-            f.widget.attrs.setdefault('class', 'form-control input-sm form-int-field')
-        elif isinstance(f, forms.DecimalField):
-            f.widget.attrs.setdefault('class', 'form-control input-sm form-decimal-field')
+        if field.readonly:
+            f.widget.attrs.setdefault('readonly', True)
         elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 15:
-            f.widget.attrs.setdefault('class', 'form-control input-sm form-small-field')
+            f.widget.attrs.setdefault('class', 'input-sm form-small-field')
         elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 20:
-            f.widget.attrs.setdefault('class', 'form-control input-sm form-20c-field')
+            f.widget.attrs.setdefault('class', 'input-sm form-20c-field')
         else:
-            f.widget.attrs.setdefault('class', 'form-control input-sm form-long-field')
+            f.widget.attrs.setdefault('class', 'input-sm form-long-field')
         return f
 
 class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
@@ -257,7 +246,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def _prepare_context(self, request, context):
         context.update({
             'model': self.model,
-            'model_name': '%s' % str(self.model._meta),
+            'model_name': str(self.model._meta),
         })
         
     def view(self, request, view_type, **kwargs):

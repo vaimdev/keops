@@ -8,7 +8,7 @@ import django.forms.widgets
 import keops.forms
 from keops.utils.html import *
 from keops.forms import widgets
-from django.template import loader, Context
+from django.template import loader, RequestContext
 
 def get_filter(field, model=None):
     try:
@@ -25,7 +25,7 @@ def get_filter(field, model=None):
     return '', field
 
 def get_field(bound_field, form, state=None):
-
+    from keops.middleware.threadlocal import get_current_request
     return loader.render_to_string('keops/forms/fields/formfield.html.mako', {'field': bound_field, 'forms': keops.forms})
 
     field = bound_field.field

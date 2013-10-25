@@ -1,3 +1,7 @@
+<%!
+	from django.utils.translation import ugettext as _
+	from django.utils.text import capfirst
+%>
 <div remoteitem style="max-height: 200px; overflow: auto;" name="${field.name}">
 	<%
         related = field.field.target_attr.related
@@ -5,6 +9,8 @@
         list_fields = field.field.target_attr.list_fields
         fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
 	%>
+	<label class="field-label" style="display: inline-block; padding-right: 10px;">${field.label}</label>
+	<a ng-show="form.write" class="btn btn-sm btn-default" ng-click="showDetail('%s', '%s')">${_('add') | capfirst}</a>
 	<table class="grid-field">
 		<thead>
 		<tr>

@@ -1,4 +1,3 @@
-
 from django.template.loaders import app_directories
 
 class Loader(app_directories.Loader):
