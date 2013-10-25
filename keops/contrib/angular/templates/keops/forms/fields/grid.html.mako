@@ -10,12 +10,12 @@
 %>
 <div remoteitem style="max-height: 200px; overflow: auto;" name="${field.name}">
 	<label class="field-label" style="display: inline-block; padding-right: 10px;">${field.label}</label>
-	<a ng-show="form.write" class="btn btn-sm btn-default" ng-click="showDetail('%s', '%s')">${_('add') | capfirst}</a>
+	<a ng-show="form.write" class="btn btn-sm btn-default" ng-click="showDetail('${field.field.target_attr.model._meta}', '${field.name}')">${_('add') | capfirst}</a>
 	<table class="grid-field">
 		<thead>
 		<tr>
 		% for f in fields:
-			<th>${f.verbose_name}</th>
+			<th>${f.verbose_name|capfirst}</th>
 		% endfor
 			<th style="width: 10px;"></th>
 		</tr>
@@ -26,7 +26,7 @@
 			<td>{{item.${f.name}}}</td>
         % endfor
 			<td>
-				<button class="btn btn-default" ng-show="form.write" tooltip="%s" ng-click="item.__state__ = 'deleted'"><i class="icon-remove"></i></button>
+				<button class="btn btn-default" ng-show="form.write" tooltip="${_('remove item')|capfirst}" ng-click="item.__state__ = 'deleted'"><i class="icon-remove"></i></button>
 			</td>
 		</tr>
 		</tbody>

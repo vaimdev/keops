@@ -18,8 +18,8 @@
                                 <button type="button" ng-show="!form.write" class="btn btn-sm btn-default" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
 
                                 <input type="submit" ng-show="form.write" class="btn btn-sm btn-primary" value="{{ _('save')|capfirst }}" tooltip="{{ _('Save record changes') }}">
-                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-primary" tooltip="{{ _('Save changes and create a new record') }}">{{ _('Save + New') }}</button>
-                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-primary" tooltip="{{ _('Save changes and edit the created record') }}">{{ _('Save + Edit') }}</button>
+                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-default" tooltip="{{ _('Save changes and create a new record') }}">{{ _('Save + New') }}</button>
+                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-default" tooltip="{{ _('Save changes and edit the created record') }}">{{ _('Save + Edit') }}</button>
                                 <button type="button" ng-show="form.write" class="btn btn-sm btn-danger" ng-click="form.cancel()" tooltip="{{ _('Cancel changes') }}">{{ _('cancel')|capfirst }}</button>
                             </td>
                             <td ng-show="!form.write">
@@ -27,7 +27,7 @@
                                 <button class="btn btn-sm btn-default dropdown-toggle" style="margin-left: 20px;" href="" target="_blank">{{ _('record')|capfirst }}<span style="margin-left: 8px;" class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">
                                     <li><a style="cursor: pointer;" ng-click="confirmDelete()">{{ _('delete')|capfirst }}</a></li>
-                                    <li ng-show="form.item.pk"><a ng-click="form.newItem(form.item.pk)">{{ _('duplicate')|capfirst }}</a></li>
+                                    <li ng-show="form.item.pk"><a style="cursor: pointer;" ng-click="form.newItem(form.item.pk)">{{ _('duplicate')|capfirst }}</a></li>
                                 </ul>
                                 </div>
                             </td>

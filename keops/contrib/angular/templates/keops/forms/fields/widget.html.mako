@@ -10,7 +10,8 @@
 	<%include file="/keops/forms/fields/datetime.html.mako"/>
 % elif isinstance(field.field, forms.DecimalField):
 	<%include file="/keops/forms/fields/decimal.html.mako"/>
+% elif isinstance(field.field, forms.DateIntervalField):
+	<%include file="/keops/forms/fields/dateinterval.html.mako"/>
 % else:
 	<%include file="/keops/forms/fields/input.html.mako"/>
 % endif
-<%include file="/keops/forms/fields/span.html.mako"/>

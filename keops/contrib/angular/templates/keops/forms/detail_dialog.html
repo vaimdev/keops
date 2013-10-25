@@ -1,5 +1,6 @@
-{% extends "keops/forms/data_content.html" %}
-{% block class %}modal-huge{% endblock %}
+{% extends "keops/dialog.html" %}
 {% block content %}
-{% include "keops/dialog.html" %}
+<form name="filterForm" ng-init="form.write = true;{{ initial_values }}">
+{{ content|safe }}
+</form>
 {% endblock %}

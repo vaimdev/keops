@@ -1,14 +1,14 @@
 import os
 import json
-from collections import OrderedDict
 from django.shortcuts import render
-from django import forms
 from django.conf import settings
+from django.template import loader
 from keops.db import models
 from keops.db import get_connection
 from keops.modules.base.models import Report
-import keops.forms
+from keops import forms
 from keops.utils import field_text
+from keops.utils.html import *
 
 __all__ = ['ReportForm', 'form', 'find_report_file', 'get_form']
 
@@ -42,7 +42,7 @@ def _get_initial_data(form):
         elif 'value' in param:
             v = param['value']
         if isinstance(v, (list, tuple)):
-            v = [field_text(x) for x in v]
+            v = [ field_text(x) for x in v ]
         if not v is None:
             initial[param['name']] = v
     return initial
@@ -67,7 +67,7 @@ def get_field(param):
             c = conn.cursor()
             c.execute(param[p])
             attrs['choices'] = [[r[0], (len(r) == 1 and r[0]) or r[1]] for r in c.fetchall()]
-    return getattr(forms, field_type, getattr(keops.forms, field_type, None))(**attrs)
+    return getattr(forms, field_type, getattr(forms, field_type, None))(**attrs)
 
 
 def get_form(report, params):
@@ -97,4 +97,6 @@ def form(request):
     return render(request, 'keops/forms/filter_form.html', {
         'header': os.path.basename(params).split('.')[0],
         'form': form,
+        'initial_values': ''.join([ (isinstance(v, list) and ''.join([ 'form.item.%s_%s="%s";' % (k, i, n) for i, n in enumerate(v) ]) ) or ('form.item.%s="%s";' % (k, v)) for k, v in form.initial.items() if v ]),
+        'fields': ''.join([ TR(loader.render_to_string('keops/forms/fields/formfield.html.mako', {'field': f, 'forms': forms})) for f in form ])
     })

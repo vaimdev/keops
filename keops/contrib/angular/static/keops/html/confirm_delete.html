@@ -1,0 +1,14 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4>{{ gettext('Confirmation') }}</h4>
+        </div>
+        <div class="modal-body">
+            {{ gettext('Confirm delete record?') }}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" ng-click="ok()">{{ gettext('Yes') }}</button>
+            <button class="btn btn-primary" ng-click="cancel()">{{ gettext('No') }}</button>
+        </div>
+    </div>
+</div>

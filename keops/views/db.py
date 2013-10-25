@@ -1,11 +1,8 @@
-import decimal
-import datetime
 import json
-from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from keops.db import models
-from keops.db import get_db, set_db
+from keops.db import get_db
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
 from keops.utils.filter import search_text

@@ -292,7 +292,6 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         var field = $scope.form.item[detail];
         var options = {
             controller: 'DialogController',
-            windowClass: 'modal-huge',
             resolve: {
                 data: function () {
                     form = { item: {} }
@@ -345,7 +344,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                     return $scope.form;
                 }
             },
-            templateUrl: '/static/keops/confirm_delete.html'
+            templateUrl: '/static/keops/html/confirm_delete.html'
         };
         var dialog = $modal.open(options);
 

@@ -1,12 +1,8 @@
 {% extends "keops/dialog.html" %}
 {% block content %}
-<form name="filterForm">
+<form name="filterForm" ng-init="form.write = true;{{ initial_values }}">
     <table style="width: 100%;">
-    {% for field in form %}
-    <tr>
-        <td class="form-label-cell">{{ field.label_tag }}</td><td class="form-filter-cell">{{ field }}</td>
-    </tr>
-    {% endfor %}
+        {{ fields|safe }}
     </table>
 </form>
 {% endblock %}

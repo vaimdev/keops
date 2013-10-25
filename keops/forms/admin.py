@@ -79,6 +79,8 @@ def admin_formfield_callback(self, field, **kwargs):
             f.widget.attrs.setdefault('class', 'form-control input-sm form-decimal-field')
         elif isinstance(f, forms.IntegerField):
             f.widget.attrs.setdefault('class', 'form-control input-sm form-int-field')
+        elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 5:
+            f.widget.attrs.setdefault('class', 'form-control input-sm form-5c-field')
         elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 15:
             f.widget.attrs.setdefault('class', 'form-control input-sm form-small-field')
         elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 20:

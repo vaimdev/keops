@@ -36,30 +36,23 @@
 </head>
 <body>
     <div id="keops-app">
-
         <nav class="navbar navbar-default navbar-keops" role="navigation"  style="padding-left: 200px;">
-<a href="/admin/"><img src="{{ STATIC_URL }}keops/images/logo.png" id="keops-app-logo" title="{{ company.name }}">
-                        <span style="font-size: 11px;"></span>
-</a>
-
-
-        <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown">
-            <a href="/accounts/logout/" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> {{ user.username }}<b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="#accounts/password/change/?user={{ user.pk }}">{{ _('Change password')|capfirst }}</a></li>
-              <li><a href="/accounts/logout/">{{ _('Logout')|capfirst }}</a></li>
+            <a href="/admin/"><img src="{{ STATIC_URL }}keops/images/logo.png" id="keops-app-logo" title="{{ company.name }}"></a>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown">
+                <a href="/accounts/logout/" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> {{ user.username }}<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#accounts/password/change/?user={{ user.pk }}">{{ _('Change password')|capfirst }}</a></li>
+                  <li><a href="/accounts/logout/">{{ _('Logout')|capfirst }}</a></li>
+                </ul>
+              </li>
             </ul>
-          </li>
-        </ul>
-
-                        <ul class="nav navbar-nav">
-                            {% for m in app_menu %}
-                            <li {% if m.pk == menu.pk %}class="active"{% endif %}><a href='../{{ m.pk }}'>{{ m.name }}</a></li>
-                            {% endfor %}
-                        </ul>
-</nav>
-
+            <ul class="nav navbar-nav">
+                {% for m in app_menu %}
+                <li {% if m.pk == menu.pk %}class="active"{% endif %}><a href='../{{ m.pk }}'>{{ m.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </nav>
         <table id="keops-app-table">
             <tr>
                 <td id="keops-app-left-menu" ng-controller="MenuController">
