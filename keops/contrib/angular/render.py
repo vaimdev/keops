@@ -24,8 +24,7 @@ def get_filter(field, model=None):
         pass
     return '', field
 
-def get_field(bound_field, form, state=None):
-    from keops.middleware.threadlocal import get_current_request
+def get_field(bound_field, form):
     return loader.render_to_string('keops/forms/fields/formfield.html.mako', {'field': bound_field, 'forms': keops.forms})
 
     field = bound_field.field
@@ -200,7 +199,11 @@ def render_form(form, cols=None, exclude=[], state=None):
             for container in fieldset:
                 container = [f for f in container]
                 if len(container) == 1:
-                    s = get_field(container[0], form, state)
+                    f = container[0]
+                    if f.name in exclude:
+                        s = ''
+                    else:
+                        s = get_field(container[0], form)
                 else:
                     s = get_container(container)
                 if s:

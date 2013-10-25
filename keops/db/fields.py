@@ -9,7 +9,7 @@ __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKe
 
 _custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter', 'default_fields', 'display_fn')
 
-class FieldCustomAttrs(dict):
+class CustomAttrs(dict):
     def __getattr__(self, item):
         return self.get(item)
 
@@ -42,7 +42,7 @@ class Field(object):
             kwargs.pop('null', None)
             kwargs.pop('blank', None)
         # Add custom_attrs to field
-        self.custom_attrs = FieldCustomAttrs(kwargs.pop('custom_attrs', {}))
+        self.custom_attrs = CustomAttrs(kwargs.pop('custom_attrs', {}))
         for attr in _custom_attrs:
             if attr in kwargs:
                 self.custom_attrs[attr] = kwargs.pop(attr)
@@ -80,6 +80,11 @@ class NullCharField(models.CharField):
         """
         return None if value == "" else value
 
+class DecimalField(models.DecimalField):
+    def __init__(self, verbose_name=None, max_digits=18, decimal_places=4, **kwargs):
+        super(DecimalField, self).__init__(verbose_name=verbose_name, max_digits=max_digits,
+                                           decimal_places=decimal_places, **kwargs)
+
 class MoneyField(models.DecimalField):
     def __init__(self, verbose_name=None, name=None, max_digits=18, decimal_places=4, **kwargs):
         super(MoneyField, self).__init__(verbose_name=verbose_name, name=name, max_digits=max_digits,
@@ -94,12 +99,6 @@ def CharField(verbose_name=None, max_length=100, empty_null=True, *args, **optio
         return NullCharField(verbose_name=verbose_name, max_length=max_length, *args, **options)
     else:
         return models.CharField(verbose_name=verbose_name, max_length=max_length, **options)
-
-# Decimal(18, 4) shortcut
-def DecimalField(*args, **options):
-    options.setdefault('max_digits', 18)
-    options.setdefault('decimal_places', 4)
-    return models.DecimalField(*args, **options)
 
 def get_model_url(cls):
     """

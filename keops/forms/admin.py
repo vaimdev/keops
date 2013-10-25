@@ -4,6 +4,7 @@ from importlib import import_module
 import copy
 import json
 from django.utils import six
+from django.utils import formats
 from django.core.exceptions import ValidationError
 from django import forms
 from django.utils.translation import ugettext as _
@@ -14,6 +15,7 @@ from keops.http import HttpJsonResponse
 from keops.utils import field_text
 from .forms import View
 
+# replaced using mako template
 views = import_module(settings.FORM_RENDER_MODULE)
 
 class FieldLine(object):
@@ -65,12 +67,27 @@ def admin_formfield_callback(self, field, **kwargs):
             f.widget.attrs.setdefault('tooltip', f.help_text)
         if field.readonly:
             f.widget.attrs.setdefault('readonly', True)
+        elif isinstance(f, forms.DateField):
+            f.widget.attrs.setdefault('class', 'form-control input-sm form-date-field')
+            f.widget.attrs.setdefault('ui-mask', _('9999-99-99'))
+        elif isinstance(f, forms.DecimalField):
+            f.widget.attrs['type'] = 'text'
+            f.widget.attrs['ui-money'] = 'ui-money'
+            f.widget.attrs['ui-money-thousands'] = formats.get_format('THOUSAND_SEPARATOR')
+            f.widget.attrs['ui-money-decimal'] = formats.get_format('DECIMAL_SEPARATOR')
+            f.widget.attrs['ui-money-negative'] = True
+            f.widget.attrs.setdefault('class', 'form-control input-sm form-decimal-field')
+        elif isinstance(f, forms.IntegerField):
+            f.widget.attrs.setdefault('class', 'form-control input-sm form-int-field')
         elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 15:
-            f.widget.attrs.setdefault('class', 'input-sm form-small-field')
+            f.widget.attrs.setdefault('class', 'form-control input-sm form-small-field')
         elif isinstance(f, forms.CharField) and f.max_length and f.max_length <= 20:
-            f.widget.attrs.setdefault('class', 'input-sm form-20c-field')
-        else:
-            f.widget.attrs.setdefault('class', 'input-sm form-long-field')
+            f.widget.attrs.setdefault('class', 'form-control input-sm form-20c-field')
+        elif isinstance(f.widget, forms.Textarea):
+            f.widget.attrs.setdefault('style', 'resize: none; height: 70px;')
+            f.widget.attrs.setdefault('class', 'form-control input-sm form-long-field')
+        elif isinstance(f, forms.CharField):
+            f.widget.attrs.setdefault('class', 'form-control input-sm form-long-field')
         return f
 
 class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
@@ -89,7 +106,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     reports = ()
     formfield_overrides = None
 
-    toolbar_actions = ['create', 'read', 'update', 'delete', 'print', 'delete', 'search']
+    toolbar_actions = ['create', 'read', 'update', 'delete', 'print', 'delete', 'duplicate', 'search']
 
     actions = []
     model = None
@@ -125,6 +142,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if self._prepared:
             return
         from django.contrib.contenttypes import generic
+        from django.db import models
         extra = getattr(self.model, 'Extra', None)
         if extra:
             if not self.fields and extra.field_groups and extra.field_groups.get('display_fields', None):
@@ -137,7 +155,6 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 self.reports = Reports([ReportLink(report, import_module(self.model.__module__)) for report in extra.reports])
         if self.model._meta.abstract:
             return
-        from django.db import models
         model_fields = self.model._meta.all_fields + self.model._meta.many_to_many
         self.model_fields = model_fields
         if not self.fields:
@@ -177,14 +194,15 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             self.readonly_fields = readonly_fields
 
         if self.search_fields:
-            # set search field to __icontains
+            # set default search field to __icontains
             for i, f in enumerate(self.search_fields):
                 if not '__' in f:
                     self.search_fields[i] = '%s__icontains' % f
         elif not self.search_fields or not self.display_expression:
-            search_fields = ''
+            search_fields = []
             for f in self.model_fields:
                 try:
+                    # FIND ONLY DB CHAR FIELDS
                     field = self.model._meta.get_field(f.name)
                     if isinstance(field, models.CharField):
                         search_fields = ['%s__icontains']
@@ -200,20 +218,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     def _prepare_form(self):
         self._prepare()
         for name in self.fields:
-            field = None
-            for f in self.model_fields:
-                if f.name == name:
-                    field = f
-                    break
-
+            field = self.get_modelfield(name)
             if field and not name in self.bound_fields:
-                if name in self.form.fields:
-                    f = self.form.fields[name]
-                else:
-                    f = field.formfield()
-                    self.form.fields[name] = f
-                self.bound_fields[name] = self.form[name]
-                f.target_attr = field
+                self.get_formfield(name)
+
         self._prepared = True
 
     def __iter__(self):
@@ -299,6 +307,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         return HttpJsonResponse(r)
 
     def copy(self, request):
+        """
+        Return model object copy.
+        """
         from keops.db import models
         self._prepare_form()
         pk = request.GET['pk']
@@ -309,15 +320,19 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 r[field.name] = field_text(getattr(obj, field.name))
         return HttpJsonResponse(r)
 
+    def get_modelfield(self, field):
+        for f in self.model_fields:
+            if f.name == field:
+                return f
+
     def get_formfield(self, field):
         if not field in self.bound_fields:
             try:
-                f = self.model._meta.get_field(field)
+                f = self.get_modelfield(field)
             except:
                 f = None
             if f:
-                form_field = f.formfield()
-                form_field.form_field = f
+                form_field = self.formfield_callback(f)
             else:
                 lbl = field
                 form_field = forms.CharField(label=lbl)
@@ -387,11 +402,6 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         v = json.loads(request.GET['value'])
         if f.custom_attrs.on_change:
             return HttpJsonResponse(f.custom_attrs.on_change(obj, request, field, v))
-
-    def find_field(self, name):
-        for f in self.model_fields:
-            if f.name == name:
-                return f
 
     def read(self, request):
         """

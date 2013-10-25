@@ -123,3 +123,9 @@ msgstr "Usuário/senha inválidos! Por favor tente novamente."
 
 msgid "My account"
 msgstr "Minha conta"
+
+msgid "logout"
+msgstr "finalizar sessão"
+
+msgid "change password"
+msgstr "mudar senha"

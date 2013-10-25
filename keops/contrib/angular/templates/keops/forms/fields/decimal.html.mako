@@ -1,0 +1,1 @@
+<input type="text" ui-money ng-model="form.item.${field.name}" ng-show="form.write && !form.readonly.${field.name}" ${' '.join('%s="%s"' % (k, v) for k, v in field.field.widget.attrs.items())}>
