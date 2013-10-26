@@ -231,3 +231,6 @@ msgstr "sigla"
 
 msgid "language"
 msgstr "idioma"
+
+msgid "reporting"
+msgstr "relatórios"

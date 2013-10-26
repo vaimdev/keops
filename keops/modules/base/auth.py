@@ -281,11 +281,18 @@ class User(Contact, AbstractUser):
 
     class Extra:
         field_groups = {
-            'list_fields': ('username', 'email', 'first_name', 'last_name'),
-            'search_fields': ('username', 'email', 'first_name', 'last_name'),
+            'list_fields': ('username', 'name', 'email'),
+            'search_fields': ('username', 'name', 'email'),
         }
 
+
+    def __str__(self):
+        return self.username + self.get_full_name()
+
     def get(self, key, default=None):
+        """
+        Return user data value.
+        """
         data = UserData.objects.using(self._state.db).filter(user=self, key=key)
         if data:
             return data[0].value
@@ -293,6 +300,9 @@ class User(Contact, AbstractUser):
             return default
 
     def set(self, key, value):
+        """
+        Set user data value.
+        """
         db = self._state.db
         data = UserData.objects.using(db).filter(user=self, key=key)
         if data:
@@ -303,15 +313,15 @@ class User(Contact, AbstractUser):
         data.save(using=db)
 
     def setdefault(self, key, default):
+        """
+        Set user data default value.
+        """
         db = self._state.db
         data = UserData.objects.using(db).filter(user=self, key=key)
         if data:
             return data[0].value
         UserData.objects.using(db).create(user=self, key=key, value=default)
         return default
-
-    def __str__(self):
-        return self.username + (self.first_name and (' (' + self.first_name + (self.last_name and (' ' + self.last_name) or '') + ')') or '')
 
 
 class UserContent(models.Model):
