@@ -47,7 +47,6 @@ def adjust_dependencies(apps):
                 apps.append(app)
             else:
                 apps.insert(i + 1, app)
-    print(apps)
 
 # Auto register modules on settings.INSTALLED_APPS
 register_modules('keops.modules', os.path.dirname(__file__))

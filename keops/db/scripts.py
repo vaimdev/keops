@@ -115,7 +115,6 @@ def install(app_name, db):
         # keep multidatabase app cache updated
         if not app_label in app_cache:
             app_cache.append(app_label)
-        print('install app', app_label, db, app_cache)
         app_list.append(app_name)
         app = import_module(app_name)
         path = os.path.dirname(app.__file__)

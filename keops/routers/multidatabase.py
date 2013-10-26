@@ -34,5 +34,4 @@ class MultiDatabaseRouter(object):
         return True
     
     def allow_syncdb(self, db, model):
-        apps = self._get_connection_apps(db)
-        return model._meta.app_label in apps
+        return model._meta.app_label in self._get_connection_apps(db)
