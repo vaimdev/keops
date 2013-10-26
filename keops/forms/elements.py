@@ -1,7 +1,10 @@
 
 class Element(object):
+    template_name = ''
+
     def __init__(self):
-        self.tag = ''
+        self.node = None
+        self.tag_name = ''
         self.attrs = {}
         self.children = []
 
@@ -28,12 +31,24 @@ class Field(Element):
     pass
 
 class Fieldset(Element):
+    """
+    Render a fieldset element.
+    """
+    pass
+
+class Form(Element):
     pass
 
 class Grid(Field):
+    """
+    Render grid element.
+    """
     pass
 
-class Group(Element):
+class Container(Element):
+    """
+    Render a field container element.
+    """
     pass
 
 class Tabset(Element):

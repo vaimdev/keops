@@ -2,7 +2,7 @@ import os
 from importlib import import_module
 from django.conf import settings
 
-__all__ = ['register_modules']
+__all__ = ['register_modules', 'adjust_dependencies']
 
 def register_modules(prefix, path):
     lst = os.listdir(path)
@@ -15,14 +15,26 @@ def register_modules(prefix, path):
             except:
                 pass
 
+    adjust_dependencies(settings.INSTALLED_APPS)
+
+def get_dependencies(app):
+    r = []
+    mod = import_module(app)
+    info = getattr(mod, 'app_info', None)
+    if info and 'dependencies' in info:
+        deps = [ d.replace('-', '_') for d in list(info.get('dependencies')) ]
+        for dep in deps:
+            r += get_dependencies(dep)
+        return r + deps
+    return []
+
+def adjust_dependencies(apps):
     # adjust module dependency priority
-    apps = settings.INSTALLED_APPS
+
     for app in apps:
-        mod = import_module(app)
-        info = getattr(mod, 'app_info', None)
-        if info and 'dependencies' in info:
+        deps = get_dependencies(app)
+        if deps:
             apps.remove(app)
-            deps = info.get('dependencies')
             i = 0
             for dep in deps:
                 dep = dep.replace('-', '_')
@@ -35,6 +47,7 @@ def register_modules(prefix, path):
                 apps.append(app)
             else:
                 apps.insert(i + 1, app)
+    print(apps)
 
 # Auto register modules on settings.INSTALLED_APPS
 register_modules('keops.modules', os.path.dirname(__file__))

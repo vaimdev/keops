@@ -1,23 +1,27 @@
-# Enable django to work with multi database using DATABASE_ROUTER settings
-
-import copy
-from django.db import DEFAULT_DB_ALIAS
+# Enable keops to work with multi database using DATABASE_ROUTER settings
+# each db have your own installed apps (registered on base.module)
+# by default keops installs all apps defined on BASE_APPS settings
 from keops.middleware.threadlocal import get_db
 
 class MultiDatabaseRouter(object):
-    APPS_CACHE = {}
+    _app_cache = {}
 
     def _get_connection_apps(self, db):
-        apps = self.APPS_CACHE.get(db, [])
+        apps = self._app_cache.get(db, [])
         if not apps:
             from keops import settings
-            apps = [s.split('.')[-1] for s in settings.INSTALLED_APPS]
+            from keops.modules import adjust_dependencies
+
+            # Adjust BASE_APPS dependencies
+            adjust_dependencies(settings.BASE_APPS)
+            apps = [s.split('.')[-1] for s in settings.BASE_APPS]
             try:
                 # cache all installed modules
                 from keops.modules.base import models
-                apps.extend([r.app_label for r in models.Module.objects.using(db).all()])
+                apps.extend([ r.app_label for r in models.Module.objects.using(db).all() ])
             except:
                 pass
+            self._app_cache[db] = apps
         return apps
 
     def db_for_read(self, model, **hints):

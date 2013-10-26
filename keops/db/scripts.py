@@ -102,7 +102,9 @@ def runfile(filename, db):
 
 def install(app_name, db):
     from keops.modules.base import models as base
+    from keops.routers.multidatabase import MultiDatabaseRouter
     app_list = []
+    app_cache = MultiDatabaseRouter._app_cache[db]
 
     def install_app(app_name):
         app_name = app_name.replace('-', '_')
@@ -110,6 +112,10 @@ def install(app_name, db):
         if app_name in app_list or base.Module.objects.using(db).filter(app_label=app_label):
             #print('Application "%s" already installed on database "%s".' % (app_label, db))
             return
+        # keep multidatabase app cache updated
+        if not app_label in app_cache:
+            app_cache.append(app_label)
+        print('install app', app_label, db, app_cache)
         app_list.append(app_name)
         app = import_module(app_name)
         path = os.path.dirname(app.__file__)
