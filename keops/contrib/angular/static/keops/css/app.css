@@ -147,11 +147,13 @@ legend {
 }
 
 #keops-app-left-menu {
+    padding-top: 20px;
     width: 220px;
     background-color: rgb(252, 252, 252);
 	box-shadow: 0 3px 0 rgba(255, 255, 255, 0.4), 0 0 5px rgba(0, 0, 0, 0.1);
     border-right: solid 1px rgb(221, 221, 221);
-	text-shadow: 0 1px 1px #fff;
+	text-shadow: 0 1px 0 #fff;
+    border-radius: 5px;
 }
 
 #keops-app-left-menu h4 {
@@ -185,6 +187,7 @@ legend {
     padding: 2px 0 2px 25px;
     text-decoration: none;
     cursor: pointer;
+    color: #716b7a;
 }
 
 #keops-app-left-menu .menu-level-1 {
@@ -193,8 +196,6 @@ legend {
 
 #keops-app-left-menu a:hover {
     background-color: #e7e7e7;
-    margin: -1px;
-    border: 1px solid #cacaca;
 }
 
 #keops-app-left-menu .menu-level-3 {
@@ -318,7 +319,7 @@ legend {
 }
 
 #keops-app .data-grid tbody tr:hover, #keops-app .grid-field tbody tr:hover {
-    background-color: #eaf2ff;
+    background-color: #f0f0f0;
 }
 
 #keops-app .data-grid-row-even {
@@ -400,7 +401,7 @@ legend {
     margin-bottom: 0;
 }
 
-#keops-app .form-view > .tabbable {
+#keops-app .form-view > .tabbable, #keops-app .form-view1 > .tabbable {
     margin-top: 15px;
 }
 
@@ -415,6 +416,17 @@ legend {
 #keops-app .form-title span {
 	text-shadow: 0 1px 1px #fff;
 }
+
+#keops-app .form-title .badge {
+	text-shadow: 1px 1px 0 #7d7d7d;
+    font-size: 11px;
+    font-weight: normal;
+}
+
+#keops-app .form-grid-cell {
+    padding-right: 10px;
+}
+
 
 #keops-app .form-data-info {
 	text-shadow: 0 1px 1px #fff;

@@ -1,30 +1,41 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container" style="max-width: 400px;">
-    <div class="panel panel-primary" style="margin-top: 100px;">
-        <div class="panel-heading">Login</div>
-        {% block message %}{% endblock %}
-        {% if form.errors %}
-        <p>{{ _('Invalid user name/password! Please try again.') }}</p>
-        {% endif %}
-        <div class="panel-body">
-            <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-            {% csrf_token %}
-                <table style="width: 100%;">
-                <tr>
-                    <td><input id="id_username" name="username" class="form-control input-sm" placeholder="{{ form.username.label }}"></td>
-                </tr>
-                <tr>
-                    <td><input id="id_password" name="password" class="form-control input-sm" type="password" placeholder="{{ form.password.label }}"></td>
-                </tr>
+<div class="container">
+    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+      <div class="modal-dialog" style="width: 400px;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Login</h4>
+          </div>
+          <div class="modal-body">
+            {% block message %}{% endblock %}
+            {% if form.errors %}
+            <p>{{ _('Invalid user name/password! Please try again.') }}</p>
+            {% endif %}
+
+                {% csrf_token %}
+                    <table style="width: 100%;">
                     <tr>
-                        <td style="padding-top: 10px;"><input style="float: right;" class="btn btn-sm btn-default" type="submit" value="Login" /></td>
+                        <td><input id="id_username" name="username" class="form-control" placeholder="{{ form.username.label }}"></td>
                     </tr>
-                </table>
-                <input style="float: right;" type="hidden" name="next" value="{{ next }}" />
-            </form>
+                    <tr>
+                        <td><input id="id_password" name="password" class="form-control" type="password" placeholder="{{ form.password.label }}"></td>
+                    </tr>
+                    </table>
+
+          </div>
+          <input class="btn" type="hidden" name="next" value="{{ next }}" />
+          <div class="modal-footer">
+              <input class="btn btn-primary" type="submit" value="{{ _('enter')|capfirst }}" />
+          </div>
         </div>
-    </div>
+      </div>
+    </form>
 </div>
+{% block project %}
+<span style="position: fixed; bottom: 5px; right: 5px;">
+    <a href="http://www.djangoproject.com/"><img src="https://www.djangoproject.com/m/img/badges/djangoproject120x25.gif" border="0" alt="A Django project." title="A Django project." /></a>
+</span>
+{% endblock %}
 {% endblock %}

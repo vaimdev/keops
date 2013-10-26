@@ -1,0 +1,13 @@
+{% block form_block %}
+<form name="dataForm" submit="submit()">
+{% endblock %}
+    <div class="panel panel-default" style="margin: 10px;{% block form_style %}width: 430px;{% endblock %}">
+        <div class="panel-heading">
+            <h3 class="panel-title">{% block header %}{{ header }}{% endblock %}</h3>
+        </div>
+        <div class="panel-body">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</form>

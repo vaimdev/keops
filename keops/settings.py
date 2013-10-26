@@ -17,8 +17,6 @@ DATABASES = {'default': {}}
 
 AUTH_USER_MODEL = 'base.user'
 
-FILE_FIELD_MODEL = 'base.file'
-
 INSTALLED_APPS = [
     'keops',
     'keops.contrib.angular',
@@ -31,6 +29,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',

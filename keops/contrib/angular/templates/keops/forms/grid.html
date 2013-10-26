@@ -1,4 +1,4 @@
-<table class="data-grid" ng-init="list.q = '{{ query }}'" infinite-scroll="list.nextPage('{{ model_name }}', list.q)" infinite-scroll-distance="1">
+<table class="data-grid table-condensed table-striped table-hover" ng-init="list.q = '{{ query }}'" infinite-scroll="list.nextPage('{{ model_name }}', list.q)" infinite-scroll-distance="1">
     <thead>
         <tr>
             {% for field in fields %}
@@ -7,7 +7,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="item in list.items" ng-class-odd="'data-grid-row-odd'" ng-class-even="'data-grid-row-even'" ng-click="itemClick('action/{{ action.pk }}/form/', 'pk={% verbatim %}{{item.pk}}{% endverbatim %}', $index)">
+        <tr ng-repeat="item in list.items" ng-click="itemClick('action/{{ action.pk }}/form/', 'pk={% verbatim %}{{item.pk}}{% endverbatim %}', $index)">
             {% for field in list_display %}
             {{ field|safe }}
             {% endfor %}

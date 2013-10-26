@@ -7,14 +7,14 @@
                     <td class="form-title">
                         <span>
                             <span style="display: inline-block; padding-right: 10px;"><b><a href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a></b> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</span>
-                            <span class="badge" style="text-shadow: none; font-size: 11px; font-weight: normal;">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</span>
+                            <span class="badge">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</span>
                         </span>
                         <div class="form-help-text">
                             <span>{{ form.help_text }}</span>
                         </div>
                         <table>
                             <tr><td>
-                                <button type="button" ng-show="!form.write" class="btn btn-sm btn-primary" ng-click="form.newItem()">{{ _('create')|capfirst }}</button>
+                                <button type="button" ng-show="!form.write" class="btn btn-sm btn-primary" ng-click="form.newItem()" tooltip="{{ _('Create new record') }}">{{ _('create')|capfirst }}</button>
                                 <button type="button" ng-show="!form.write" class="btn btn-sm btn-default" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
 
                                 <input type="submit" ng-show="form.write" class="btn btn-sm btn-primary" value="{{ _('save')|capfirst }}" tooltip="{{ _('Save record changes') }}">

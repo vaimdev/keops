@@ -5,5 +5,5 @@ app_info = {
     'description': _('Base module required for all keops based business apps.'),
     'category': _('Basic'),
     'version': '0.4',
-    'fixtures': ['data.json.django', 'auth.json.django', 'menu.json.django', 'company.json'],
+    'fixtures': ['company.json', 'data.json.django', 'auth.json.django', 'menu.json.django'],
 }

@@ -129,3 +129,6 @@ msgstr "finalizar sessão"
 
 msgid "change password"
 msgstr "mudar senha"
+
+msgid "enter"
+msgstr "entrar"

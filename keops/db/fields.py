@@ -3,9 +3,8 @@ from bisect import bisect
 from django.conf import settings
 from django.db import models
 
-__all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey',
-           'FileRelField', 'ImageRelField', 'VirtualField', 'PropertyField',
-           'OneToManyField', 'get_model_url']
+__all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey', 'ImageField',
+           'VirtualField', 'PropertyField', 'OneToManyField', 'get_model_url']
 
 _custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter', 'default_fields', 'display_fn')
 
@@ -129,22 +128,6 @@ class ForeignKey(models.ForeignKey):
         kwargs.setdefault('on_delete', models.PROTECT)
         super(ForeignKey, self).__init__(to=to, to_field=to_field, rel_class=rel_class, **kwargs)
 
-class FileRelField(models.ForeignKey):
-    """
-    ForeignKey to store file field on a database binary column, the default model
-    is specified on settings.FILE_FIELD_MODEL. This strategy will optimize performance,
-    once binary data will be loaded when fk is invoked manually.
-    """
-    def __init__(self, to=None, to_field=None, rel_class=models.ManyToOneRel,
-                 db_constraint=True, **options):
-        to = to or getattr(settings, 'FILE_FIELD_MODEL')
-        options.setdefault('related_name', '+')
-        super(FileRelField, self).__init__(to=to, to_field=to_field, rel_class=rel_class,
-                                           db_constraint=db_constraint, **options)
-
-class ImageRelField(FileRelField):
-    pass
-
 class VirtualField(models.Field):
     """
     Provides a generic virtual field.
@@ -254,7 +237,8 @@ class OneToManyField(VirtualField):
         else:
             return self
 
-
+class ImageField(models.BinaryField):
+    pass
 
 # TODO: add ImageRelField (a foreign key to file model), to performance optimization binary content load
 # TODO: optimize foreignkey queryset

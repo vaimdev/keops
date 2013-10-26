@@ -123,7 +123,7 @@ class Mail(models.Model):
     is_notification = models.BooleanField(_('is notification'))
 
 class Notification(models.Model):
-    partner = models.ForeignKey('contacts.Contact', null=False)
+    contact = models.ForeignKey('base.contact', null=False)
     message = models.ForeignKey(Message, null=False)
     read = models.BooleanField(_('read'), default=False)
     starred = models.BooleanField(_('starred'), default=False)

@@ -10,6 +10,8 @@
         "model": "base.user",
         "data-id": "auth-user-admin",
     	"fields" : {
+    		"company": ["main-company"],
+    		"name": "{{ _('administrator')|capfirst }}",
             "username": "{{ _('admin') }}",
             "first_name": "{{ _('administrator')|capfirst }}",
             "raw_password": "admin",

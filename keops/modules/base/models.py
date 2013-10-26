@@ -22,36 +22,6 @@ class File(models.Model):
     file_format = models.CharField(max_length=10, null=False) # document file format
     body = models.BinaryField(null=False)
 
-# Company/data context
-class Company(Element):
-    """
-    Company configuration model.
-    """
-    name = models.CharField(_('name'), max_length=128, help_text=_('Company name'), null=False)
-    parent = models.ForeignKey('self')
-    currency = models.ForeignKey('base.Currency', verbose_name=_('currency'))
-    zip_code = models.CharField(_('zip'), max_length=24)
-    country = models.ForeignKey('base.Country')
-    logo = models.ImageRelField(verbose_name=_('Logo'))
-    email = models.EmailField('e-mail')
-    phone = models.CharField(_('phone'), max_length=64)
-    fax = models.CharField(_('fax'), max_length=64)
-    website = models.URLField('website')
-    comment = models.TextField(_('comments'), help_text=_('Company comments'))
-    report_style = models.CharField(_('report style'), max_length=64, page=_('Report Configurations'))
-    report_header = models.TextField(_('report header'), page=_('Report Configurations'))
-    report_footer = models.TextField(_('report footer'), page=_('Report Configurations'))
-
-    class Meta:
-        verbose_name_plural = _('companies')
-
-    class Extra:
-        display_expression = ('name',)
-        field_groups = {
-            'list_fields': ('name', 'country', 'website'),
-            'search_fields': ('name', 'country', 'website'),
-        }
-
 class CompanyModel(models.Model):
     company = models.ForeignKey(Company, visible=False)
 
@@ -169,7 +139,7 @@ class AttributeValue(models.Model):
     text_value = models.CharField(max_length=1024)
     texta_value = models.TextField()
     logical_value = models.BooleanField()
-    file_value = models.FileRelField()
+    file_value = models.BinaryField()
     ref_value = models.PositiveIntegerField()
     int_value = models.BigIntegerField()
     decimal_value = models.MoneyField()

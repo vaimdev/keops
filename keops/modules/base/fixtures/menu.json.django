@@ -178,5 +178,14 @@
 			"model": "base.basemodel",
 			"sequence": 110
         }
+    },
+    {
+        "model": "base.menu",
+        "data-id": "menu-reporting",
+    	"fields" : {
+			"name": "{{ _('reporting')|capfirst }}",
+			"model": "base.basemodel",
+			"sequence": 8000
+        }
     }
 ]

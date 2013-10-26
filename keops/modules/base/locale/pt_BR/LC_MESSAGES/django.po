@@ -82,6 +82,9 @@ msgstr "ações de formulários"
 msgid "report actions"
 msgstr "ações de relatórios"
 
+msgid "administrator"
+msgstr "administrador"
+
 msgid "administrators"
 msgstr "administradores"
 

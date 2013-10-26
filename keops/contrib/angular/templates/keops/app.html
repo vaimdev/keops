@@ -56,7 +56,7 @@
         <table id="keops-app-table">
             <tr>
                 <td id="keops-app-left-menu" ng-controller="MenuController">
-                    <ul class="nav nav-pills nav-stacked">
+                    <ul>
                         {% for m in menu.menu_set.all %}
                         {% if m.closed %}
                         <a class="menu-level-1" ng-click="closedMenuClick('{{ m.get_absolute_url }}')" style="cursor: pointer;">{{ m.name }}</a>

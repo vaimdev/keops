@@ -89,6 +89,7 @@ ui.directive('uiMoney', function($filter) {
                 element.maskMoney({symbol: symbol, thousands: thousands, decimal: decimal, precision: precision, allowNegative: negative, allowZero: true}).
                 bind('keyup blur', function(event) {
                         ngModel.$setViewValue(element.val().replace(RegExp('\\' + thousands, 'g'), '').replace(RegExp('\\' + decimal, 'g'), '.'));
+                        scope.$apply();
                     }
                 );
             });
@@ -152,6 +153,7 @@ ui.directive('combobox', function() {
                         },
                         results: function (data, page) {
                             var more = (page * 10) < data.total;
+                            data.data.splice(0, 0, {id: null, text: gettext('---------')});
                             return { results: data.data, more: more };
                         }
                     }
@@ -167,7 +169,9 @@ ui.directive('combobox', function() {
             };
             el.on('change', function () {
                 scope.$apply(function () {
-                    controller.$setViewValue(el.select2('data'));
+                    var data = el.select2('data');
+                    if (data.id === null) controller.$setViewValue('');
+                    else controller.$setViewValue(data);
                 });
             });
         }

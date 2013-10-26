@@ -1,4 +1,3 @@
-
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
@@ -20,7 +19,7 @@ class ElementManager(models.Manager):
         """
         Filter id on ModelData table, and get the related content object.
         """
-        return ModelData.objects.get(name=id).content_object
+        return ModelData.objects.using(self.db).get(name=id).content_object
 
     def filter_by_user(self, user, **kwargs):
         return self.filter(**kwargs).filter(Q(groups__id__in=user.groups.all().values('id')) | Q(users=user))
