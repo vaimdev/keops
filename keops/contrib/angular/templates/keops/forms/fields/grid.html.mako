@@ -6,7 +6,6 @@
 	related = field.field.target_attr.related
 	model = related.model
 	list_fields = field.field.target_attr.list_fields
-	from django.db import models
 	fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
 	disp = {f.name: {'name': (isinstance(f, models.ForeignKey) or f.choices) and (f.name + '.text') or f.name, 'style': isinstance(f, (models.IntegerField, models.DecimalField)) and 'text-align: right;' or '', 'filter': isinstance(f, (models.IntegerField, models.DecimalField)) and '|number:2' or ''} for f in fields }
 %>

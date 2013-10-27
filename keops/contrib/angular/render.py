@@ -25,7 +25,7 @@ def get_filter(field, model=None):
     return '', field
 
 def get_field(bound_field, form):
-    return loader.render_to_string('keops/forms/fields/formfield.html.mako', {'field': bound_field, 'forms': keops.forms})
+    return loader.render_to_string('keops/forms/fields/formfield.html.mako', {'field': bound_field, 'forms': keops.forms, 'models': models})
 
     field = bound_field.field
     name = bound_field.name
