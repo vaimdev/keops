@@ -150,6 +150,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         }).success(function(data) {
                 this.write = true;
                 this.item = data;
+                this.item.__str__ = gettext('<New>')
             }.bind(this));
     };
 

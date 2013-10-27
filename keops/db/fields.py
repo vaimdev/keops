@@ -51,6 +51,9 @@ class Field(object):
     def contribute_to_class(self, cls, name, virtual_only=False):
         if not hasattr(cls._meta, 'all_fields'):
             cls._meta.all_fields = []
+            for b in cls.__bases__:
+                if hasattr(b, '_meta') and hasattr(b._meta, 'all_fields'):
+                    cls._meta.all_fields += b._meta.all_fields
         cls._meta.all_fields.insert(bisect(cls._meta.all_fields, self), self)
         if 'on_change' in self.custom_attrs:
             self.custom_attrs.setdefault('widget_attrs', {})['ng_change'] = 'fieldChangeCallback(\'%s\')' % name

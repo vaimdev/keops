@@ -1,14 +1,13 @@
 from django.utils.translation import ugettext as _
 from django.utils import formats
 from django.utils.text import capfirst
-from django.core.urlresolvers import reverse
 from django import forms
 from django.db import models
-import django.forms.widgets
 import keops.forms
 from keops.utils.html import *
 from keops.forms import widgets
 from django.template import loader, RequestContext
+
 
 def get_filter(field, model=None):
     try:
@@ -24,8 +23,13 @@ def get_filter(field, model=None):
         pass
     return '', field
 
+
 def get_field(bound_field, form):
-    return loader.render_to_string('keops/forms/fields/formfield.html.mako', {'field': bound_field, 'forms': keops.forms, 'models': models})
+    return loader.render_to_string('keops/forms/fields/formfield.html.mako', {
+        'field': bound_field, 'forms': keops.forms, 'models': models, 'model': form.model
+    })
+
+    # REPLACED BY MAKO TEMPLATES (keops/forms/fields/*.html.mako)
 
     field = bound_field.field
     name = bound_field.name
@@ -45,7 +49,6 @@ def get_field(bound_field, form):
 
     attrs = {}
 
-
     if isinstance(field, forms.BooleanField):
         widget = '<label style="cursor: pointer" ng-show="!form.write">%s</label>' % forms.widgets.CheckboxInput(attrs=widget_attrs).render(name, None)
         span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s ? \'%s\': \'%s\'"></span>' % (name, name, capfirst(_('yes')), capfirst(_('no')))
@@ -55,9 +58,6 @@ def get_field(bound_field, form):
         span = '<span ng-show="!form.write || form.readonly.%s">{{form.item.%s | dateFrom}}</span>' % (name, name)
     elif isinstance(field, forms.EmailField):
         span = '<a ng-href="mailto:{{form.item.%s}}" ng-show="!form.write || form.readonly.%s"></a>' % (name, name)
-    elif isinstance(field, forms.ModelMultipleChoiceField):
-        pass
-        # TODO user select2
     elif isinstance(field, keops.forms.GridField):
         cell_attrs = {'colspan': 2, 'style': 'width: 100%;'}
         span = ''
@@ -69,7 +69,7 @@ def get_field(bound_field, form):
         attrs = {'class': 'grid-field', 'style': 'table-layout: inherit;'}
         attrs.update(field.target_attr.custom_attrs.get('widget_attrs', {}))
         model_name = str(field.target_attr.model._meta)
-        fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
+        fields = [model._meta.get_field(f) for f in list_fields if related.field.name != f]
         head = [ '<th%s>%s</th>' % (get_filter(f)[0], capfirst(f.verbose_name)) for f in fields ] + [TH('', style='width: 10px;')]
         cols = [ '<td%s>{{item.%s}}</td>' % (((isinstance(f, models.ForeignKey) or f.choices) and ('', f.name + '.text')) or get_filter(f)) for f in fields ] +\
             [TD('<button class="btn" ng-show="form.write" tooltip="%s" ng-click="item.__state__ = \'deleted\'"><i class="icon-remove"></i></button>' % capfirst(_('remove item')), style='padding-right: 5px;')]
@@ -116,7 +116,7 @@ def get_field(bound_field, form):
         )
         widget += '</div>'
         print(widget)
-        cell_attrs['style'] = 'padding-right: 10px; max-width: 1px;' # adjust select2 size
+        cell_attrs['style'] = 'padding-right: 10px; max-width: 1px;'  # adjust select2 size
     elif isinstance(field, forms.ChoiceField):
         span = '<span ng-show="!form.write || form.readonly.%s" ng-bind="form.item.%s.text"></span>' % (name, name)
         cell_attrs['style'] = 'padding-right: 0;'
@@ -158,6 +158,7 @@ def get_container(container):
                                 attrs={'class': 'field-container'})),
                       attrs={'class': 'field-cell'})
 
+
 def get_tables(items, cols=2):
     l = len(items)
     c = l // cols
@@ -177,6 +178,7 @@ def get_tables(items, cols=2):
         tables.append(TABLE(*table))
 
     return TABLE(TR(*[TD(t, style='width: 50%') for t in tables]))
+
 
 def render_form(form, cols=None, exclude=[], state=None):
     items = []

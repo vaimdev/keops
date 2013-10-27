@@ -13,9 +13,9 @@ from django.utils.text import capfirst
 from keops.contrib.reports import Reports, ReportLink
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
-from .forms import View
+from keops.forms.forms import View
+from .sites import site
 
-# replaced using mako template
 views = import_module(settings.FORM_RENDER_MODULE)
 
 class FieldLine(object):
@@ -94,6 +94,14 @@ def admin_formfield_callback(self, field, **kwargs):
             f.widget.attrs.setdefault('class', 'form-control input-sm form-long-field')
         return f
 
+
+def _base_action(modeladmin, request, queryset):
+    """
+    Dispatch base.formaction.
+    """
+    pass
+
+
 class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     formfield_callback = admin_formfield_callback
     default_admin = False
@@ -113,6 +121,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
     toolbar_actions = ['create', 'read', 'update', 'delete', 'print', 'delete', 'duplicate', 'search']
 
     actions = []
+    use_global_actions = True  # If site.actions objects are allowed
+    use_form_actions = True  # If base.formaction objects are allowed
     model = None
     title = None
     label = None
@@ -159,7 +169,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 self.reports = Reports([ReportLink(report, import_module(self.model.__module__)) for report in extra.reports])
         if self.model._meta.abstract:
             return
-        model_fields = self.model._meta.all_fields + self.model._meta.many_to_many
+        model_fields = self.model._meta.all_fields
         self.model_fields = model_fields
         if not self.fields:
             self.fields = [f.name for f in model_fields if not f.name in self.exclude and not isinstance(f, (
@@ -251,6 +261,55 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             self._model_form = forms.models.modelform_factory(self.model, formfield_callback=self.formfield_callback)
         return self._model_form
 
+    def get_form_actions(self, request):
+        """
+        Return all base.formaction actions.
+        """
+        from django.contrib.contenttypes.models import ContentType
+        from keops.modules.base.models import FormAction
+        ct = ContentType.objects.get_by_natural_key(self.model._meta.app_label, self.model._meta.model_name)
+        actions = FormAction.objects.filter(content_type=ct, is_admin=True)
+        r = OrderedDict()
+        for action in actions:
+            r[action.pk] = action
+        return r
+
+    def get_actions(self, request):
+        """
+        Return all admin actions.
+        """
+        actions = OrderedDict()
+        # Add current actions
+        for action in self.actions:
+            actions[action] = getattr(self, action, _base_action)
+
+        # Add form_actions
+        if self.use_form_actions:
+            actions.update(self.get_form_actions(request))
+        return actions
+
+    def get_global_actions(self, request):
+        """
+        Return all admin actions.
+        """
+        if self.use_global_actions:
+            return site._global_actions.copy()
+        return {}
+
+    def get_actions(self, request):
+        """
+        Return all admin actions.
+        """
+        actions = OrderedDict()
+        # Add current actions
+        for action in self.actions:
+            actions[action] = getattr(self, action, _base_action)
+
+        # Add form_actions
+        if self.use_form_actions:
+            actions.update(self.get_form_actions(request))
+        return actions
+
     def get_printable_fields(self):
         self._prepare()
         return self.printable_fields
@@ -268,6 +327,9 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         else:
             self._prepare_change_view(request, kwargs)
             v = super(ModelAdmin, self).view
+        get_actions = lambda x: [(k, getattr(v, 'short_description', v), getattr(v, 'html', None) and getattr(v, 'html')(v)) for k, v in x]
+        kwargs['actions'] = get_actions(self.get_actions(request).items())
+        kwargs['global_actions'] = get_actions(self.get_global_actions(request).items())
         return v(request, **kwargs)
     
     def _prepare_change_view(self, request, context):
@@ -279,8 +341,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
     def list_view(self, request, **kwargs):
         kwargs['query'] = request.GET.get('query', '')
-        kwargs['fields'] = [ (views.get_filter(f, self.model)[0], self.get_formfield(f).label) for f in self.list_display ]
-        kwargs['list_display'] = [ '<td%s>{{item.%s}}</td>' % views.get_filter(f, self.model) for f in self.list_display ]
+        kwargs['fields'] = [(views.get_filter(f, self.model)[0], self.get_formfield(f).label) for f in self.list_display]
+        kwargs['list_display'] = ['<td%s>{{item.%s}}</td>' % views.get_filter(f, self.model) for f in self.list_display]
         self._prepare_context(request, kwargs)
         kwargs.setdefault('pagesize', 50)
         return self.render(request, self.list_template, kwargs)
@@ -294,7 +356,25 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         self.view(request, **kwargs)
         
     def queryset(self, request):
+        extra = getattr(self.model, 'Extra')
+        if extra:
+            if extra.queryset:
+                return extra.queryset(request)
         return self.model.objects.all()
+
+    def list_queryset(self, request):
+        extra = getattr(self.model, 'Extra')
+        if extra:
+            if extra.list_queryset:
+                return extra.list_queryset(request)
+        return self.queryset(request)
+
+    def lookup_queryset(self, request):
+        extra = getattr(self.model, 'Extra')
+        if extra:
+            if extra.lookup_queryset:
+                return extra.lookup_queryset(request)
+        return self.queryset(request)
 
     def new_item(self, request):
         from keops.db import models
@@ -310,14 +390,13 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             r[field.name] = field_text(v)
         return HttpJsonResponse(r)
 
-    def copy(self, request):
+    def duplicate(self, request, obj):
         """
         Return model object copy.
         """
         from keops.db import models
         self._prepare_form()
-        pk = request.GET['pk']
-        obj = copy.copy(self.model.objects.get(pk=pk))
+        obj = copy.copy(obj)
         r = {'pk': None}
         for field in self.model_fields:
             if not field.primary_key and not isinstance(field, (models.ManyToManyField, models.OneToManyField)):
@@ -340,6 +419,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
             else:
                 lbl = field
                 form_field = forms.CharField(label=lbl)
+                f = self.model._meta.get_field(field)
                 f = getattr(self.model, field)
             self.form.fields[field] = form_field
             bound_field = self.form[field]
@@ -363,41 +443,17 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         if query:
             queryset = db.search_text(queryset, query)
         data = {
-            'data': [ field_text(obj, sel_fields=sel_fields.get(field), display_fn=display_fn) for obj in queryset[start:limit] ],
+            'data': [field_text(obj, sel_fields=sel_fields.get(field), display_fn=display_fn)
+                     for obj in queryset[start:limit]],
             'total': queryset.count()
         }
         return HttpJsonResponse(data)
 
-    def delete(self, context, using):
+    def delete(self, request, obj, using=None):
         """
         Default delete operation.
         """
-        from django.db.models.deletion import ProtectedError
-        import django.db.models
-        obj = self.model.objects.using(using).get(pk=context['pk'])
-        try:
-            obj.delete(using=using)
-        except ProtectedError as e:
-            return {
-                'success': False,
-                'action': 'DELETE',
-                'label': _('Error'),
-                'msg': _('Cannot delete the records because they are referenced through a protected foreign key!') + '<br>' + '<br>'.join([ capfirst(str(obj.__class__._meta.verbose_name)) + ': ' + str(obj) for obj in e.protected_objects ]),
-            }
-        except django.db.models.validators.ValidationError as e:
-            return {
-                'success': False,
-                'action': 'DELETE',
-                'label': _('Error'),
-                'msg': '<br>'.join(e.messages),
-            }
-
-        return {
-            'success': True,
-            'action': 'DELETE',
-            'label': _('Success'),
-            'msg': _('Record successfully deleted!'),
-        }
+        obj.delete(using=using)
 
     def field_change(self, request):
         field = request.GET['field']
@@ -442,7 +498,7 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
                 try:
                     field = model._admin.get_modelfield(k)
                     if isinstance(field, models.DateField):
-                        for format in settings.DATE_INPUT_FORMATS:
+                        for format in settings.DATE_INPUT_FORMATS:  # TODO adjust on input widget
                             try:
                                 v = datetime.datetime.strptime(v, format)
                                 break
@@ -462,10 +518,10 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
 
         # submit related data
         for field, v in related.items():
-            self.save_related(field, v, obj, using)
+            self._save_related(field, v, obj, using)
         return True, obj
 
-    def save_related(self, field, data, parent, using):
+    def _save_related(self, field, data, parent, using):
         """
         Save related data rows (ManyToManyField/OneToManyField).
         """
@@ -490,19 +546,16 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         """
         from keops.views import db
         using = db.get_db(request)
-        if request.method == 'DELETE':
-            result = self.delete(request.GET, using)
-        else:
-            try:
-                success, obj = self.save(request.POST, using)
-                result = {
-                    'success': True,
-                    'msg': _('Record successfully saved!'),
-                    'data': db.prepare_read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]
-                }
-            except ValidationError as e:
-                result = {
-                    'success': False,
-                    'msg': '<br>'.join(e.messages)
-                }
+        try:
+            success, obj = self.save(request.POST, using)
+            result = {
+                'success': True,
+                'msg': _('Record successfully saved!'),
+                'data': db.prepare_read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0]
+            }
+        except ValidationError as e:
+            result = {
+                'success': False,
+                'msg': '<br>'.join(e.messages)
+            }
         return HttpJsonResponse(result)

@@ -137,9 +137,9 @@ ui.directive('combobox', function() {
         require : 'ngModel',
         link: function(scope, element, attrs, controller) {
             var url = attrs.lookupUrl;
-
+            var multiple = attrs['multiple'];
             if (url) {
-                var el = element.select2({
+                var cfg = {
                     ajax: {
                         url: url,
                         dataType: 'json',
@@ -153,11 +153,13 @@ ui.directive('combobox', function() {
                         },
                         results: function (data, page) {
                             var more = (page * 10) < data.total;
-                            data.data.splice(0, 0, {id: null, text: gettext('---------')});
+                            if (!multiple && (page === 1)) data.data.splice(0, 0, {id: null, text: gettext('---------')});
                             return { results: data.data, more: more };
                         }
                     }
-                });
+                };
+                if (multiple) cfg['multiple'] = true;
+                var el = element.select2(cfg);
             }
             else
             var el = element.select2();

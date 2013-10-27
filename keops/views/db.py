@@ -6,26 +6,30 @@ from keops.db import get_db
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
 from keops.utils.filter import search_text
+from keops.forms.admin import site
+
 
 def get_model(context):
     # TODO Check model permission
     # TODO CACHE PERMISSION
-    model = context['model']
-    return models.get_model(*model.split('.'))
+    return site.get_model(context['model'])
     if isinstance(model, str):
         return ContentType.objects.get_by_natural_key(*model.split('.')).model_class()
     else:
         return model
 
+
 def _choice_fields(model):
     if not hasattr(model.Extra, '_cache_choice_fields'):
-        model.Extra._cache_choice_fields = { f.name: 'get_%s_display' % f.name for f in model._meta.fields if f.choices }
+        model.Extra._cache_choice_fields = {f.name: 'get_%s_display' % f.name for f in model._meta.fields if f.choices}
     return model.Extra._cache_choice_fields
+
 
 def fk_select_fields(model):
     if not hasattr(model.Extra, '_cache_fk_select_fields'):
-        model.Extra._cache_fk_select_fields = { f.name: f.custom_attrs['select_fields'] for f in model._meta.fields if 'select_fields' in f.custom_attrs }
+        model.Extra._cache_fk_select_fields = {f.name: f.custom_attrs['select_fields'] for f in model._meta.fields if 'select_fields' in f.custom_attrs}
     return model.Extra._cache_fk_select_fields
+
 
 def _display_fn(model):
     if not hasattr(model.Extra, '_cache_display_fn'):
@@ -35,19 +39,21 @@ def _display_fn(model):
                 display = field.custom_attrs.display_fn
             elif isinstance(field, models.ForeignKey) and field.custom_attrs.default_fields:
                 fields = field.custom_attrs.default_fields
-                display = lambda x : ' - '.join([ str(getattr(x, f, '') or '') for f in fields ])
+                display = lambda x: ' - '.join([str(getattr(x, f, '') or '') for f in fields])
             else:
                 display = str
             r[field.name] = display
         model.Extra._cache_display_fn = r
     return model.Extra._cache_display_fn
 
+
 def grid(request):
+    # TODO use grid method for specific model admin
     using = get_db(request)
     model = get_model(request.GET)
     pk = request.GET.get('pk')
     query = request.GET.get('query')
-    field = request.GET.get('field') # Check related field
+    field = request.GET.get('field')  # Check related field
     disp_fields = {}
     if field:
         obj = model.objects.using(using).get(pk=pk)
@@ -64,9 +70,9 @@ def grid(request):
             fields = None
         if isinstance(fields, tuple):
             fields = list(fields)
-    fields = fields or [ f.name for f in model._meta.concrete_fields if not f.primary_key ]
+    fields = fields or [f.name for f in model._meta.concrete_fields if not f.primary_key]
     start = int(request.GET.get('start', '0'))
-    limit = int(request.GET.get('limit', '50')) + start # settings
+    limit = int(request.GET.get('limit', '50')) + start  # settings
     count = request.GET.get('total', False)
 
     if query:
@@ -90,8 +96,8 @@ def grid(request):
 
 def _read_fields(model):
     if not hasattr(model.Extra, '_cache_read_fields'):
-        model.Extra._cache_read_fields = [ f.name for f in model._meta.fields if not f.primary_key ] +\
-            [ f.name for f in model._meta.virtual_fields if isinstance(f, models.PropertyField) ]
+        model.Extra._cache_read_fields = [f.name for f in model._meta.fields if not f.primary_key] +\
+            [f.name for f in model._meta.virtual_fields if isinstance(f, models.PropertyField)]
     return model.Extra._cache_read_fields
 
 def prepare_read(context, using):
@@ -105,7 +111,7 @@ def prepare_read(context, using):
         queryset = model.objects
     count = queryset
     start = int(context.get('start', '0'))
-    limit = int(context.get('limit', '1')) + start # settings
+    limit = int(context.get('limit', '1')) + start
     if pk:
         queryset = queryset.using(using).filter(pk=pk)
     else:
@@ -116,21 +122,25 @@ def prepare_read(context, using):
         count = count.using(using).all().count()
     else:
         count = None
+    queryset.select_related()
     fields = ['pk', '__str__'] + context.get('fields', _read_fields(model))
     disp_fields = _choice_fields(model)
     display_fn = _display_fn(model)
-    rows = [ { f: field_text(getattr(row, f), row, f, disp_fields.get(f, f), display_fn=display_fn.get(f, str)) for f in fields } for row in queryset ]
+    rows = [{f: field_text(getattr(row, f), row, f, disp_fields.get(f, f), display_fn=display_fn.get(f, str)) for f in fields} for row in queryset]
     return {'items': rows, 'total': count}
-    
+
+
 def read(request):
     # Prevent get all records
     assert not 'all' in request.GET
     model = get_model(request.GET)
     return model._admin.read(request)
 
+
 def _get_queryset_fields(model, obj, attr):
     # TODO get select fields for relation attr
     return getattr(obj, attr)
+
 
 def read_items(request):
     using = get_db(request)
@@ -149,27 +159,25 @@ def read_items(request):
         data[item] = prepare_read(context, using)
     return HttpJsonResponse(data)
 
+
 def lookup(request):
     model = get_model(request.GET)
     return model._admin.lookup(request, sel_fields=fk_select_fields(model), display_fn=_display_fn(model)[request.GET['field']])
 
+
 def new_item(request):
     return get_model(request.GET)._admin.new_item(request)
 
-def copy_item(request):
-    return get_model(request.GET)._admin.copy(request)
 
 def field_change(request):
     return get_model(request.GET)._admin.field_change(request)
+
 
 def submit(request):
     """
     Default data submit view.
     """
-    if request.method == 'DELETE':
-        data = request.GET
-    else:
-        data = json.loads(request.body.decode(settings.DEFAULT_CHARSET))
-        request.POST = data
+    data = json.loads(request.body.decode(settings.DEFAULT_CHARSET))
+    request.POST = data
     model = get_model(data)
     return model._admin.submit(request)

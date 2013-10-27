@@ -4,6 +4,7 @@ from keops.db import models
 from .module import *
 from .ui import *
 
+
 class ActionManager(ElementManager):
     def get_by_model_name(self, model):
         model = model.split('.')
@@ -15,14 +16,15 @@ class ActionManager(ElementManager):
         except:
             return
 
+
 class Action(ModuleElement):
     action_types = {}
     name = models.CharField(_('name'), max_length=128, null=False, unique=True)
     short_description = models.CharField(_('short description'), max_length=32)
     description = models.CharField(max_length=256, verbose_name=_('description'))
-    action_type = models.CharField(_('type'), max_length=32, null=False)
+    action_type = models.CharField(_('type'), max_length=32, null=False, readonly=True)
     context = models.TextField(_('context'))
-    dialog = models.BooleanField()
+    dialog = models.BooleanField(visible=False)
 
     objects = ActionManager()
 
@@ -54,6 +56,7 @@ class Action(ModuleElement):
     def execute(self, request, *args, **kwargs):
         return self.action_types[self.action_type].objects.get(pk=self.pk).execute(request, *args, **kwargs)
 
+
 class ViewAction(Action):
     view = models.ForeignKey(View, verbose_name=_('view'))
     content_type = models.ForeignKey(ContentType, verbose_name=_('content type'))
@@ -71,6 +74,7 @@ class ViewAction(Action):
     def get_action_type(self):
         return 'view'
 
+
 class URLAction(Action):
     url = models.URLField('URL', help_text=_('target URL'))
     target = models.CharField(_('target'), max_length=32)
@@ -83,7 +87,14 @@ class URLAction(Action):
     def get_action_type(self):
         return 'url'
 
+
 class FormAction(Action):
+    TARGET = (
+        ('window', _('Current Window')),
+        ('dialog', _('Dialog')),
+        ('new', _('New Window')),
+        ('popup', _('Browser Popup')),
+    )
     VIEW_TYPE = (
         ('form', 'Form'),
         ('list', 'List'),
@@ -97,10 +108,14 @@ class FormAction(Action):
         ('create', _('Create')),
         ('delete', _('Delete')),
     )
-    view = models.ForeignKey(View, verbose_name=_('view'))
-    model = models.ForeignKey('base.BaseModel', verbose_name=_('model'))
-    target = models.CharField(_('target'), max_length=32)
-    view_type = models.CharField(_('initial view'), max_length=16, choices=VIEW_TYPE, default='list')
+    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'))
+    is_admin = models.BooleanField(_('is admin'), default=False, db_index=True)
+    view = models.ForeignKey(View, verbose_name=_('view'), fieldset=_('form'), help_text=_('View to show'))
+    model = models.ForeignKey('base.BaseModel', verbose_name=_('model'), fieldset=_('form'),
+                              help_text=_('Model to show'))
+    target = models.CharField(_('target'), max_length=16, choices=TARGET, fieldset=_('form'))
+    view_type = models.CharField(_('initial view'), max_length=16, choices=VIEW_TYPE, default='list',
+                                 fieldset=_('form'))
     view_types = models.CharField(_('view types'), max_length=64)
     state = models.CharField(_('state'), max_length=16)
 
@@ -120,6 +135,7 @@ class FormAction(Action):
     def execute(self, request, *args, **kwargs):
         from .views import actions
         return actions.response_form(request, self, *args, **kwargs)
+
 
 class ReportAction(Action):
     report = models.ForeignKey(Report, verbose_name=_('report'))

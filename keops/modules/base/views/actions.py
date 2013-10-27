@@ -1,6 +1,6 @@
 import json
 from django.shortcuts import render
-from keops.forms.admin import ModelAdmin
+from keops.forms.admin.models import ModelAdmin
 #from keops.modules.form.options import ModelAdmin
 #from keops.modules.admin.sites import site
 

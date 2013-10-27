@@ -7,6 +7,7 @@
 %>
 % if isinstance(field.field, forms.DecimalField):
 	<span ng-show="!form.write${ro}">{{form.item.${field.name}|number:2}}</span>
+% elif isinstance(field.field, forms.ModelMultipleChoiceField):
 % elif isinstance(field.field, forms.ModelChoiceField):
 	<%
 		url = field.field.target_attr.get_resource_url()

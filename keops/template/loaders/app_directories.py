@@ -9,8 +9,10 @@ class Loader(app_directories.Loader):
             from keops.template.mako import Template
             source, origin = self.load_template_source(template_name, template_dirs)
             template = Template(source, lookup=self._get_lookup('mako'))
-        elif template_name.endswith('.jinja'):
-            pass
+        elif template_name.endswith('.jinja2'):
+            from keops.template.jinja2 import Template
+            source, origin = self.load_template_source(template_name, template_dirs)
+            template = Template(source)
         else:
             template, origin = super(Loader, self).load_template(template_name, template_dirs)
         return template, origin

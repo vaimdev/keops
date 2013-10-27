@@ -234,3 +234,9 @@ msgstr "idioma"
 
 msgid "reporting"
 msgstr "relatórios"
+
+msgid "Model to show"
+msgstr "Modelo a ser exibido"
+
+msgid "View to show"
+msgstr "Visão a ser exibida"

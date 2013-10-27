@@ -1,4 +1,6 @@
-% if isinstance(field.field, forms.ModelChoiceField):
+% if isinstance(field.field, forms.ModelMultipleChoiceField):
+	<%include file="/keops/forms/fields/modelmultiplechoice.html.mako"/>
+% elif isinstance(field.field, forms.ModelChoiceField):
 	<%include file="/keops/forms/fields/modelchoice.html.mako"/>
 % elif isinstance(field.field, forms.ChoiceField):
 	<%include file="/keops/forms/fields/choice.html.mako"/>

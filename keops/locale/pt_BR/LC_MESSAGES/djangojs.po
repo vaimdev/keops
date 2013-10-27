@@ -54,3 +54,6 @@ msgstr "Confirmação"
 
 msgid "No pending data to submit!"
 msgstr "Não há dados pendentes para envio!"
+
+msgid "<New>"
+msgstr "<Novo>"

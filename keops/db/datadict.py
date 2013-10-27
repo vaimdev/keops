@@ -1,16 +1,17 @@
 # This module implements ADD (Active Data Dictionary) on Django default classes
 # Sorry! Monkey patch is the only way to do this for now
 import copy
-from django.db import models, connections, router, transaction, DatabaseError
-from django import forms
-from django.utils.translation import ugettext_lazy as _
-from keops.forms.admin import ModelAdmin
+from django.db import models, router, DatabaseError
+from keops.forms.admin.models import ModelAdmin
 
 # Add data dict object to Django model (class Extra)
 extra_attrs = {
     # Extra attributes
     'default_fields': None,
-    'status_field': None, # main model status field representation
+    'status_field': None,  # main model status field representation
+    'queryset': None,  # default queryset
+    'list_queryset': None,  # default queryset for lists/grids
+    'lookup_queryset': None,  # default queryset for lookups
     'field_groups': {
         'display_fields': None,
         'editable_fields': None,
@@ -19,7 +20,6 @@ extra_attrs = {
         'searchable_fields': None,
         'filter_fields': None,
     },
-
     # Events
     'after_insert': None,
     'after_update': None,

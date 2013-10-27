@@ -12,7 +12,8 @@ from keops.db import models
 from .element import ElementManager
 
 
-Group.add_to_class('module_category', models.ForeignKey('base.modulecategory'))
+Group.add_to_class('module_category', models.ForeignKey('base.modulecategory', verbose_name=_('category')))
+
 
 class Category(models.Model):
     name = models.CharField(_('name'), max_length=64, help_text=_('Category name'))
@@ -24,13 +25,19 @@ class Category(models.Model):
         verbose_name = _('Contact Category')
         verbose_name_plural = _('Contact Categories')
 
+
+class ContactManager(models.Manager):
+    def get_queryset(self):
+        return super(ContactManager, self).get_queryset().defer('image')  # default defer image
+
+
 class Contact(models.Model):
     name = models.CharField(_('name'), max_length=128, null=False)
     image = models.ImageField(verbose_name=_('image'))
     active = models.BooleanField(_('active'), default=True)
     parent = models.ForeignKey('self')
     category = models.ForeignKey(Category, verbose_name=_('Contact Category'))
-    language = models.ForeignKey('base.Language')
+    language = models.ForeignKey('base.language')
     time_zone = models.CharField(_('time zone'), max_length=32)
     comments = models.TextField(_('comments'))
     is_customer = models.BooleanField(_('is customer'), default=False)
@@ -48,6 +55,8 @@ class Contact(models.Model):
     mobile = models.CharField(_('mobile'), max_length=64)
     birthdate = models.DateField(_('birthdate'))
     use_company_address = models.BooleanField(_('use company address'), default=False)
+
+    objects = ContactManager()
 
     class Meta:
         db_table = 'base_contact'
@@ -190,6 +199,7 @@ class PermissionsMixin(models.Model):
 
         return auth._user_has_module_perms(self, app_label)
 
+
 class AbstractUser(AbstractBaseUser, PermissionsMixin):
     """
     An abstract base class implementing a fully featured User model with
@@ -236,6 +246,11 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         auth.send_mail(subject, message, from_email, [self.email])
 
 
+class CompanyManager(ElementManager):
+    def get_queryset(self):
+        return super(CompanyManager, self).get_queryset().defer('image')  # default defer image
+
+
 # Company/data context
 class Company(Contact):
     """
@@ -247,7 +262,7 @@ class Company(Contact):
     report_header = models.TextField(_('report header'), page=_('Report Configurations'))
     report_footer = models.TextField(_('report footer'), page=_('Report Configurations'))
 
-    objects = ElementManager()
+    objects = CompanyManager()
 
     class Meta:
         db_table = 'base_company'
@@ -260,7 +275,6 @@ class Company(Contact):
             'list_fields': ('name', 'country', 'website'),
             'search_fields': ('name', 'country', 'website'),
         }
-
 
 
 class User(Contact, AbstractUser):
@@ -339,6 +353,7 @@ class UserContent(models.Model):
     class Meta:
         db_table = 'auth_user_content'
 
+
 class UserLog(models.Model):
     """
     User log record.
@@ -347,12 +362,13 @@ class UserLog(models.Model):
     content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False, related_name='+')
     object_id = models.PositiveIntegerField(_('object id'))
     content_object = generic.GenericForeignKey('content_type', 'object_id')
-    operation = models.CharField(max_length=64, null=False) # create, read, update, delete, print...
+    operation = models.CharField(max_length=64, null=False)  # create, read, update, delete, print...
     description = models.TextField()
     log_time = models.DateTimeField(_('date/time'), null=False, auto_now_add=True)
 
     class Meta:
         db_table = 'auth_log'
+
 
 class UserData(models.Model):
     user = models.ForeignKey(User, null=False)
@@ -362,6 +378,7 @@ class UserData(models.Model):
     class Meta:
         unique_together = (('user', 'key'),)
         db_table = 'auth_user_data'
+
 
 def user_logged_in(sender, request, user, *args, **kwargs):
     # Load basic user information

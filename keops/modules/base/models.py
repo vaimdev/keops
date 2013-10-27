@@ -13,6 +13,7 @@ from .menu import *
 from .ui import *
 from .module import *
 
+
 class File(models.Model):
     """
     Manage file contents.
@@ -22,16 +23,19 @@ class File(models.Model):
     file_format = models.CharField(max_length=10, null=False) # document file format
     body = models.BinaryField(null=False)
 
+
 class CompanyModel(models.Model):
     company = models.ForeignKey(Company, visible=False)
 
     class Meta:
         abstract = True
 
+
 class BaseModelManager(ElementManager):
     def get_by_natural_key(self, app_label, model):
         return BaseModel.objects.get(content_type=ContentType.objects.get_by_natural_key(app_label, model))
     
+
 class BaseModel(ModuleElement):
     content_type = models.OneToOneField(ContentType, verbose_name=_('content type'))
     ancestor = models.ForeignKey('self', verbose_name=_('base model'))
@@ -53,7 +57,8 @@ class BaseModel(ModuleElement):
         
     def __str__(self):
         return '%s.%s' % (self.content_type.app_label, self.content_type.model)
-        
+
+
 class Field(Element):
     model = models.ForeignKey(BaseModel, verbose_name=_('model'), null=False)
     name = models.CharField(max_length=64, null=False, unique=True, verbose_name=_('name'))
@@ -88,7 +93,8 @@ class Attachment(models.Model):
         db_table = 'base_attachment'
         verbose_name = _('attachment')
         verbose_name = _('attachments')
-        
+
+
 class Default(models.Model):
     model = models.ForeignKey(BaseModel, verbose_name=_('model'), on_delete='CASCADE')
     field = models.CharField(_('field'), max_length=64)
@@ -99,6 +105,7 @@ class Default(models.Model):
         db_table = 'base_default'
         verbose_name = _('default field value')
         verbose_name_plural = _('default field value')
+
 
 class Attribute(models.Model):
     """
@@ -129,6 +136,7 @@ class Attribute(models.Model):
     
     class Meta:
         db_table = 'base_attribute'
+
 
 class AttributeValue(models.Model):
     """
