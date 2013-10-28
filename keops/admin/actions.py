@@ -16,9 +16,10 @@ def delete_selected(modeladmin, request, queryset):
                 'success': False,
                 'action': 'DELETE',
                 'label': ugettext('Error'),
-                'msg': ugettext('Cannot delete the records because they are referenced through a protected foreign key!') +
-                        '<br>' + '<br>'.join([capfirst(str(obj.__class__._meta.verbose_name)) + ': ' + str(obj)
-                                             for obj in e.protected_objects]),
+                'msg': ugettext(
+                    'Cannot delete the records because they are referenced through a protected foreign key!') +
+                    '<br>' + '<br>'.join([capfirst(str(obj.__class__._meta.verbose_name)) + ': ' + str(obj)
+                                         for obj in e.protected_objects]),
             })
         except models.validators.ValidationError as e:
             return HttpJsonResponse({
@@ -36,9 +37,13 @@ def delete_selected(modeladmin, request, queryset):
         })
 
 delete_selected.short_description = capfirst(_('delete'))
+delete_selected.category = _('record')
+delete_selected.attrs = 'ng-click="confirmDelete()"'
 
 
 def duplicate_selected(modeladmin, request, queryset):
-    modeladmin.duplicate(request, queryset)
+    return modeladmin.duplicate(request, queryset.all()[0])
 
 duplicate_selected.short_description = capfirst(_('duplicate'))
+duplicate_selected.category = _('record')
+duplicate_selected.attrs = 'ng-click="form.newItem(form.item.pk)"'

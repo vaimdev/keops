@@ -1,13 +1,18 @@
 from collections import OrderedDict
+import copy
 from importlib import import_module
 from keops.admin import render
+from django.utils.translation import ugettext as _
 from django.contrib.admin import options
 from django.template.response import TemplateResponse
 from django.utils import formats
+from django.utils.text import capfirst
+from django.utils.encoding import force_text
 from django.contrib.contenttypes import generic
 from django.db import models
 from django import forms
 from keops.http import HttpJsonResponse
+from keops.utils import field_text
 from .reports import ReportLink, Reports
 
 
@@ -203,6 +208,19 @@ class ModelAdmin(options.ModelAdmin):
         cls._admin = self
         self.model = cls
 
+    def duplicate(self, request, obj):
+        """
+        Return model object copy.
+        """
+        from keops.db import models
+        self._prepare_form()
+        obj = copy.copy(obj)
+        r = {'pk': None}
+        for field in self.model_fields:
+            if not field.primary_key and not isinstance(field, (models.ManyToManyField, models.OneToManyField)):
+                r[field.name] = field_text(getattr(obj, field.name))
+        return HttpJsonResponse(r)
+
     def formfield_for_dbfield(self, db_field, **kwargs):
         f = db_field.formfield(**kwargs)
         if f:
@@ -241,7 +259,7 @@ class ModelAdmin(options.ModelAdmin):
         """
         Return all admin actions.
         """
-        actions = super(self.get_actions())
+        actions = super(ModelAdmin, self).get_actions(request)
         # Add form_actions
         if self.use_form_actions:
             actions.update(self.get_form_actions(request))
@@ -295,13 +313,25 @@ class ModelAdmin(options.ModelAdmin):
         self._prepare_form()
         opts = self.model._meta
         app_label = opts.app_label
+        kwargs['form'] = self
         kwargs['opts'] = opts
+
+        actions = self.get_actions(request)
+        groups = OrderedDict()
+        _cat = capfirst(_('more'))
+        for k, v in actions.items():
+            v = v[0]
+            cat = force_text(capfirst(getattr(v, 'category', _cat)))
+            if not cat in groups:
+                groups[cat] = []
+            print(v.attrs)
+            groups[cat].append((k, v.__dict__))
+
+        kwargs['action_groups'] = groups
 
         if view_type == 'list':
             list_display = self.get_list_display(request)
             list_filter = self.get_list_filter(request)
-
-
             kwargs['query'] = request.GET.get('query', '')
             kwargs['fields'] = [(render.get_filter(f, self.model)[0], self.get_formfield(f).label)
                                 for f in self.list_display]

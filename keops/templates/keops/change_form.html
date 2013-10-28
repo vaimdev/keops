@@ -23,12 +23,16 @@
                                 <button type="button" ng-show="form.write" class="btn btn-sm btn-danger" ng-click="form.cancel()" tooltip="{{ _('Cancel changes') }}">{{ _('cancel')|capfirst }}</button>
                             </td>
                             <td ng-show="!form.write">
-                                {% for actions in action_groups %}
-                                <div class="btn-group">
-                                <button class="btn btn-sm btn-info dropdown-toggle">{{ actions.0 }}<span style="margin-left: 8px;" class="caret"></span></button>
+                                {% for group, actions in action_groups.items %}
+                                <div class="btn-group" style="margin-left: 20px;">
+                                <button class="btn btn-sm btn-info dropdown-toggle">{{ group }}<span style="margin-left: 8px;" class="caret"></span></button>
                                 <ul class="dropdown-menu">
-                                    {% for action, description in actions.1 %}
-                                    <li><a style="cursor: pointer;">{{ description }}</a></li>
+                                    {% for action, obj in actions %}
+                                        {% if obj.attrs %}
+                                        <li {{ obj.attrs|safe }}><a style="cursor: pointer;">{{ obj.short_description|safe }}</a></li>
+                                        {% else %}
+                                        <li><a style="cursor: pointer;" ng-click="adminAction('{{ action }}')">{{ obj.short_description|safe }}</a></li>
+                                        {% endif %}
                                     {% endfor %}
                                 </ul>
                                 </div>
@@ -36,9 +40,9 @@
                             </td>
                                 <td ng-show="!form.write">
                                 {% if form.reports %}
-                                <div class="btn-group">
+                                <div class="btn-group" style="margin-left: 20px;">
                                 {% with form.reports.0 as first_report %}
-                                <a class="btn btn-sm btn-info button-label" style="margin-left: 20px;" href="{{ first_report.get_url }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <a class="btn btn-sm btn-info button-label" href="{{ first_report.get_url }}" target="_blank">{{ _('print')|capfirst }}</a>
                                 {% endwith %}
                                 <button class="btn btn-sm btn-info dropdown-toggle"><span class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">

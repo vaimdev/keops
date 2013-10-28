@@ -1,12 +1,38 @@
+from collections import OrderedDict
 from functools import update_wrapper
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib import admin
 from django.db import models
+from . import actions
 
 
 class AdminSite(admin.AdminSite):
+    def __init__(self, name='admin', app_name='admin'):
+        self._registry = {}  # model_class class -> admin_class instance
+        self.name = name
+        self.app_name = app_name
+        self._actions = OrderedDict()
+        self._actions['duplicate_selected'] = actions.duplicate_selected
+        self._actions['delete_selected'] = actions.delete_selected
+        self._global_actions = self._actions.copy()
+
+    def dispatch_action(self, request):
+        """
+        Dispatch the admin action.
+        """
+        from keops.db import get_db
+        using = get_db(request)
+        model = self.get_model(request.GET['model'])
+        admin = model._admin
+        pk = request.GET.get('pk')
+        action = admin.get_action(request.GET['action'])[0]
+        queryset = None
+        if pk:
+            queryset = model.objects.using(using).filter(pk=pk)
+        return action(admin, request, queryset)
+
     def index(self, request, extra_context=None):
         from keops.modules.base.models import Menu
         # TODO got last user menu
@@ -55,6 +81,9 @@ class AdminSite(admin.AdminSite):
             url(r'^menu/(\d+)/$',
                 wrap(self.menu),
                 name='menu'),
+            url(r'^action/$',
+                wrap(self.dispatch_action),
+                name='action'),
             url(r'^logout/$',
                 wrap(self.logout),
                 name='logout')

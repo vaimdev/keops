@@ -140,9 +140,10 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         var params = {model: this.model};
         var url = '/db/new';
         if (pk) {
+            params['action'] = 'duplicate_selected';
             params['pk'] = pk;
-            url = '/db/new/copy'
-        };
+            url = '/admin/action/';
+        }
         $http({
             method: 'GET',
             url: url,
