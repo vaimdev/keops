@@ -1,0 +1,90 @@
+<form name="dataForm" ng-controller="FormController" ng-init="form.initForm('{{ opts }}')" ng-submit="submit()">
+<table style="width: 100%;">
+    <tr>
+        <td class="form-head">
+            <table style="width: 100%; height: 70px">
+                <tr>
+                    <td class="form-title">
+                        <span>
+                            <span style="display: inline-block; padding-right: 10px;"><b><a href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a></b> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</span>
+                            <span class="badge">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</span>
+                        </span>
+                        <div class="form-help-text">
+                            <span>{{ form.help_text }}</span>
+                        </div>
+                        <table>
+                            <tr><td>
+                                <button type="button" ng-show="!form.write" class="btn btn-sm btn-primary" ng-click="form.newItem()" tooltip="{{ _('Create new record') }}">{{ _('create')|capfirst }}</button>
+                                <button type="button" ng-show="!form.write" class="btn btn-sm btn-info" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
+
+                                <input type="submit" ng-show="form.write" class="btn btn-sm btn-primary" value="{{ _('save')|capfirst }}" tooltip="{{ _('Save record changes') }}">
+                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-info" tooltip="{{ _('Save changes and create a new record') }}">{{ _('Save + New') }}</button>
+                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-info" tooltip="{{ _('Save changes and edit the created record') }}">{{ _('Save + Edit') }}</button>
+                                <button type="button" ng-show="form.write" class="btn btn-sm btn-danger" ng-click="form.cancel()" tooltip="{{ _('Cancel changes') }}">{{ _('cancel')|capfirst }}</button>
+                            </td>
+                            <td ng-show="!form.write">
+                                {% for actions in action_groups %}
+                                <div class="btn-group">
+                                <button class="btn btn-sm btn-info dropdown-toggle">{{ actions.0 }}<span style="margin-left: 8px;" class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    {% for action, description in actions.1 %}
+                                    <li><a style="cursor: pointer;">{{ description }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                                </div>
+                                {% endfor %}
+                            </td>
+                                <td ng-show="!form.write">
+                                {% if form.reports %}
+                                <div class="btn-group">
+                                {% with form.reports.0 as first_report %}
+                                <a class="btn btn-sm btn-info button-label" style="margin-left: 20px;" href="{{ first_report.get_url }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                {% endwith %}
+                                <button class="btn btn-sm btn-info dropdown-toggle"><span class="caret"></span></button>
+                                <ul class="dropdown-menu" style="margin-left: 20px;">
+                                {% for report in form.reports %}
+                                    <li>{{ report|safe }}</li>
+                                {% endfor %}
+                                </ul>
+                                </div>
+                                {% else %}
+                                <a style="margin-left: 20px;" class="btn btn-sm btn-info" href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                {% endif %}
+                            </td></tr>
+                        </table>
+                    </td>
+                    <td style="width: 250px;">
+                        <table style="float: right; height: 100%;">
+                            <tr>
+                                <td ng-show="!form.write" style="text-align: right; height: 100%;" colspan="2">
+                                    <input class="form-control input-sm" type="search" style="display: inline-block;" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" ng-enter="search('{{ action.get_absolute_url }}list', 'query=' + searchField)">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="height: auto;">
+                                    <div ng-show="!form.write" class="btn-group">
+                                        <a class="btn btn-default" ng-click="form.prevPage()"><i class="icon-chevron-left"></i></a>
+                                        <a class="btn btn-default" ng-click="form.nextPage()"><i class="icon-chevron-right"></i></a>
+                                    </div>
+                                </td>
+                                <td style="float: right; width: auto; height: auto;">
+                                    <div ng-show="!form.write" class="btn-group">
+                                        <a class="btn btn-default" href="#{{ action.get_absolute_url }}list/" title="{{ _("list")|capfirst }}"><i class="icon-reorder"></i></a>
+                                        <a class="btn btn-default active" title="{{ _("form")|capfirst }}"><i class="icon-edit"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<div>
+    <div style="margin: 6px;" ng-repeat="alert in alerts" ng-class="'alert alert-danger'" close="closeAlert($index)"><span ng-bind-html="alert.msg"></span>
+        <a class="close" ng-click="closeAlert($index)">&times;</a>
+    </div>
+</div>
+{{ form_view|safe }}
+</form>

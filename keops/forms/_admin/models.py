@@ -10,7 +10,6 @@ from django import forms
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.utils.text import capfirst
-from keops.contrib.reports import Reports, ReportLink
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
 from keops.forms.forms import View
@@ -325,7 +324,8 @@ class ModelAdmin(six.with_metaclass(ModelAdminBase, View)):
         else:
             self._prepare_change_view(request, kwargs)
             v = super(ModelAdmin, self).view
-        get_actions = lambda x: [(k, getattr(v, 'short_description', v), getattr(v, 'html', None) and getattr(v, 'html')(v)) for k, v in x]
+        get_actions = lambda x: [(k, getattr(v, 'short_description', v),
+                                  getattr(v, 'html', None) and getattr(v, 'html')(v)) for k, v in x]
         kwargs['actions'] = get_actions(self.get_actions(request).items())
         kwargs['global_actions'] = get_actions(self.get_global_actions(request).items())
         return v(request, **kwargs)

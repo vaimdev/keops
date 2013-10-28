@@ -1,8 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from keops.db import models
-from keops.forms.admin.models import ModelAdmin
+from keops.admin import ModelAdmin
 from keops.modules.base import auth
+
 
 class UserAdmin(ModelAdmin):
     model = auth.User
@@ -19,6 +20,7 @@ class UserAdmin(ModelAdmin):
             (None, {'fields': ('groups', 'user_permissions')}),
         ),)
     )
+
 
 class GroupAdmin(ModelAdmin):
     model = auth.Group

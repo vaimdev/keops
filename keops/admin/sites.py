@@ -3,6 +3,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib import admin
+from django.db import models
 
 
 class AdminSite(admin.AdminSite):
@@ -34,6 +35,9 @@ class AdminSite(admin.AdminSite):
         from keops.modules.base.models import Menu
         menu = Menu.objects.get(pk=request.GET['menulist'])
         return render(request, 'keops/menu_list.html', {'menu': menu})
+
+    def get_model(self, model_name):
+        return models.get_model(*model_name.split('.'))
 
     def get_urls(self):
         from django.conf.urls import patterns, url

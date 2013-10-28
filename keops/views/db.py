@@ -6,7 +6,7 @@ from keops.db import get_db
 from keops.http import HttpJsonResponse
 from keops.utils import field_text
 from keops.utils.filter import search_text
-from keops.forms.admin import site
+from keops.admin import site
 
 
 def get_model(context):

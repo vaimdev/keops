@@ -1,19 +1,12 @@
 # Active Data Dictionary for Django base field class
 from bisect import bisect
-from django.conf import settings
 from django.db import models
+from .custom import CustomAttrs
 
 __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey', 'ImageField',
            'VirtualField', 'PropertyField', 'OneToManyField', 'get_model_url']
 
 _custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter', 'default_fields', 'display_fn')
-
-class CustomAttrs(dict):
-    def __getattr__(self, item):
-        return self.get(item)
-
-    def __setattr__(self, key, value):
-        self[key] = value
 
 # Add custom_attrs to field instances
 # custom_attrs items:

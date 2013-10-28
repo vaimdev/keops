@@ -1,5 +1,5 @@
-from keops.forms.admin.models import ModelAdmin
-from keops.forms.admin import site
+from keops.admin import ModelAdmin
+from keops.admin import site
 
 
 def response_form(request, action, *args, **kwargs):
@@ -10,10 +10,11 @@ def response_form(request, action, *args, **kwargs):
     else:
         # Auto detect ModelAdmin
         model = action.model.content_type.model_class()
-        admin = getattr(model, '_admin', None)
-        if not admin:
+        try:
+            admin = model._admin
+        except:
             # Auto create ModelAdmin
-            admin = type("%sAdmin" % model.__name__, (ModelAdmin,), {'form': {}})()
+            admin = type(model.__name__ + 'Admin', (ModelAdmin,))(model, site)
             model.add_to_class('_admin', admin)
         return admin.view(request, view_type=view_type, action=action, state=state, **action.get_context())
 

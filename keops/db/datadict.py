@@ -10,10 +10,11 @@ extra_attrs = {
     'default_fields': None,
     'status_field': None,  # main model status field representation
     'queryset': None,  # default queryset
+    'reports': None,
     'field_groups': {
         'display_fields': None,
         'editable_fields': None,
-        'printable_fields': None,
+        'print_fields': None,
         'list_fields': None,
         'search_fields': None,
         'filter_fields': None,

@@ -1,0 +1,65 @@
+<div ng-controller="ListController" ng-init="searchField = '{{ query }}'">
+<table style="width: 100%;">
+    <tr>
+        <td class="form-head">
+            <table style="width: 100%; height: 76px">
+                <tr>
+                    <td class="form-title">
+                        <span>
+                            <span style="display: inline-block; padding-right: 10px;"><b>{{ form.title|capfirst }}</b></span>
+                            <span class="badge">{% verbatim %}{{list.start}} / {{list.total}}{% endverbatim %}</span>
+                        </span>
+                        <div class="form-help-text">
+                            <span>{{ form.help_text }}</span>
+                        </div>
+                        <div>
+                            <table><tr>
+                            <td>
+                                <a class="btn btn-sm btn-primary" href="#{{ action.get_absolute_url }}form/?state=new">{{ _('create')|capfirst }}</a>
+                                <a class="btn btn-sm btn-info">{{ _('record')|capfirst }}</a>
+                            </td>
+                            <td>
+                                {% if form.reports %}
+                                <div class="btn-group">
+                                <a class="btn btn-sm btn-info button-label" style="margin-left: 20px;"  href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <button class="btn btn-sm btn-info dropdown-toggle"><span class="caret"></span></button>
+                                <ul class="dropdown-menu" style="margin-left: 20px;">
+                                {% for report in form.reports %}
+                                    <li>{{ report|safe }}</li>
+                                {% endfor %}
+                                </ul>
+                                </div>
+                                {% else %}
+                                <a style="margin-left: 20px;" class="btn btn-sm btn-info" href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                {% endif %}
+                            </td>
+                            </tr></table>
+                        </div>
+                    </td>
+                    <td style="float: right; width: 400px; height: 100%; margin-right: -1px;">
+                        <table style="height: 100%; float: right;">
+                            <tr>
+                                <td style="height: 100%;">
+                                    <div class="input-group input-group-sm">
+                                        <input style="width: 350px;" class="form-control" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" value="{{ query }}" ng-enter="list.query('{{ opts }}', searchField)">
+                                        <span style="cursor: pointer;" class="btn btn-sm btn-primary" ng-click="list.query('{{ opts }}', searchField)"><span class="glyphicon glyphicon-search"></span></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="btn-group" style="float: right;">
+                                        <a class="btn btn-default active" title="{{ _("list")|capfirst }}"><i class="icon-reorder"></i></a>
+                                        <a class="btn btn-default" href="#{{ action.get_absolute_url }}form/" title="{{ _("form")|capfirst }}"><i class="icon-edit"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{% include "keops/forms/grid.html" %}
+</div>
