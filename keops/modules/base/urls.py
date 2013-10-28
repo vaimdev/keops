@@ -6,5 +6,5 @@ urlpatterns = patterns('keops.modules.base',
     (r'^menu/(\d+)/$', 'views.menu.index'),
     (r'^detail/$', 'views.detail.index'),
     (r'^accounts/password/change/$', password_change, {'template_name': 'keops/registration/password_change_form.html'}),
-    #(r'^login$', 'views.login')
+    (r'^action/$', 'views.actions.admin_action'),  # Admin action
 )

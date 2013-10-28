@@ -19,20 +19,20 @@ AUTH_USER_MODEL = 'base.user'
 
 INSTALLED_APPS = [
     'keops',
-    'keops.contrib.angular',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.messages',
     'keops.modules.base',
+    'django.contrib.admin',
 ]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'keops.middleware.threadlocal.ThreadLocalMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -43,14 +43,14 @@ MIDDLEWARE_CLASSES = (
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 SERIALIZATION_MODULES = {
-    'python' : 'keops.core.serializers.python',
-    'json' : 'keops.core.serializers.json',
-    'xml' : 'keops.core.serializers.xml_serializer',
-    'yaml' : 'keops.core.serializers.pyyaml',
-    'csv' : 'keops.core.serializers.csv_serializer',
-    'txt' : 'keops.core.serializers.txt_serializer',
-    'django' : 'keops.core.serializers.django_serializer',
-    'mako' : 'keops.core.serializers.mako_serializer',
+    'python': 'keops.core.serializers.python',
+    'json': 'keops.core.serializers.json',
+    'xml': 'keops.core.serializers.xml_serializer',
+    'yaml': 'keops.core.serializers.pyyaml',
+    'csv': 'keops.core.serializers.csv_serializer',
+    'txt': 'keops.core.serializers.txt_serializer',
+    'django': 'keops.core.serializers.django_serializer',
+    'mako': 'keops.core.serializers.mako_serializer',
 }
 
 TEMPLATE_PROCESSORS = (

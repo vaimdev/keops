@@ -10,13 +10,7 @@ from keops.forms.admin import site
 
 
 def get_model(context):
-    # TODO Check model permission
-    # TODO CACHE PERMISSION
     return site.get_model(context['model'])
-    if isinstance(model, str):
-        return ContentType.objects.get_by_natural_key(*model.split('.')).model_class()
-    else:
-        return model
 
 
 def _choice_fields(model):

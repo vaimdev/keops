@@ -16,8 +16,6 @@ from keops.utils import field_text
 from keops.forms.forms import View
 from .sites import site
 
-views = import_module(settings.FORM_RENDER_MODULE)
-
 class FieldLine(object):
     def __init__(self, form, fields):
         self.form = form

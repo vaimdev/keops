@@ -1,8 +1,6 @@
-import json
-from django.shortcuts import render
 from keops.forms.admin.models import ModelAdmin
-#from keops.modules.form.options import ModelAdmin
-#from keops.modules.admin.sites import site
+from keops.forms.admin import site
+
 
 def response_form(request, action, *args, **kwargs):
     view_type = kwargs.get('view_type') or action.view_type
@@ -18,3 +16,7 @@ def response_form(request, action, *args, **kwargs):
             admin = type("%sAdmin" % model.__name__, (ModelAdmin,), {'form': {}})()
             model.add_to_class('_admin', admin)
         return admin.view(request, view_type=view_type, action=action, state=state, **action.get_context())
+
+
+def admin_action(request):
+    return site.dispatch_action(request)

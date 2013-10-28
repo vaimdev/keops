@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.admin import AdminSite
 from collections import OrderedDict
 from .actions import delete_selected, duplicate_selected
 
@@ -37,9 +38,24 @@ class AdminSite(object):
         return self._global_actions.items()
 
     def dispatch_action(self, request):
-        model = request.GET['model']
+        from keops.db import get_db
+        using = get_db(request)
+        model = self.get_model(request.GET['model'])
+        admin = model._admin
+        action = request.GET['action']
+        pk = request.GET.get('pk')
+        if action in self._global_actions:
+            action = self._global_actions[action]
+        else:
+            action = admin.get_actions(request)[action]
+        queryset = None
+        if pk:
+            queryset = model.objects.using(using).filter(pk=pk)
+        return action(admin, request, queryset)
 
     def get_model(self, model):
+        # TODO Check model permission
+        # TODO CACHE PERMISSION
         return models.get_model(*model.split('.'))
 
 site = AdminSite()

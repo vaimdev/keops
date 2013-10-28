@@ -353,7 +353,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             console.log(form);
             $http({
                 method: 'DELETE',
-                url: '/db/submit',
+                url: '/admin/action/?action=delete_selected',
                 params: { pk: form.item.pk, model: form.model }
             }).success(function (data) {
                     $scope.addAlert(data.success ? 'success': 'error', data.msg);

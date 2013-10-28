@@ -2,22 +2,20 @@
 # Sorry! Monkey patch is the only way to do this for now
 import copy
 from django.db import models, router, DatabaseError
-from keops.forms.admin.models import ModelAdmin
+from keops.admin import modeladmin_factory, site
 
-# Add data dict object to Django model (class Extra)
+# Add data dict object to django model (class Extra)
 extra_attrs = {
     # Extra attributes
     'default_fields': None,
     'status_field': None,  # main model status field representation
     'queryset': None,  # default queryset
-    'list_queryset': None,  # default queryset for lists/grids
-    'lookup_queryset': None,  # default queryset for lookups
     'field_groups': {
         'display_fields': None,
         'editable_fields': None,
         'printable_fields': None,
         'list_fields': None,
-        'searchable_fields': None,
+        'search_fields': None,
         'filter_fields': None,
     },
     # Events
@@ -76,7 +74,7 @@ class ModelBase(object):
                 setattr(extra, d, copy.copy(v))
 
         # Add Admin meta class to _admin model attribute
-        new_class.add_to_class('_admin', ModelAdmin(admin))
+        new_class.add_to_class('_admin', modeladmin_factory(admin, new_class)(new_class, site))
 
         new_class._meta._log_fields = [f.name for f in new_class._meta.fields if not f.primary_key] +\
             [f.attname for f in new_class._meta.fields\

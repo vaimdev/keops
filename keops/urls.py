@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls import patterns, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from keops import admin
 from keops import forms
 
 js_info_dict = {
@@ -19,7 +20,7 @@ urlpatterns = patterns('',
     (r'^db/test/$', 'keops.views.test.index'),
     # additional
     (r'^accounts/', include('django.contrib.auth.urls')),
-    (r'^admin/', include('keops.modules.base.urls')),
+    (r'^admin/', include(admin.site.urls)),
     (r'^jsi18n/', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 

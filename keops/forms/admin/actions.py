@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.text import capfirst
 from django.db.models.deletion import ProtectedError
 from django.db import models
@@ -15,8 +15,8 @@ def delete_selected(modeladmin, request, queryset):
             return HttpJsonResponse({
                 'success': False,
                 'action': 'DELETE',
-                'label': _('Error'),
-                'msg': _('Cannot delete the records because they are referenced through a protected foreign key!') +
+                'label': ugettext('Error'),
+                'msg': ugettext('Cannot delete the records because they are referenced through a protected foreign key!') +
                         '<br>' + '<br>'.join([capfirst(str(obj.__class__._meta.verbose_name)) + ': ' + str(obj)
                                              for obj in e.protected_objects]),
             })
@@ -31,8 +31,8 @@ def delete_selected(modeladmin, request, queryset):
         return HttpJsonResponse({
             'success': True,
             'action': 'DELETE',
-            'label': _('Success'),
-            'msg': _('Record successfully deleted!'),
+            'label': ugettext('Success'),
+            'msg': ugettext('Record successfully deleted!'),
         })
 
 delete_selected.short_description = capfirst(_('delete'))
