@@ -13,25 +13,35 @@ legend {
     font-size: 15px;
 }
 
+a:hover {
+    text-decoration: none;
+}
+
 .navbar {
     margin-bottom: 0;
 }
 
 .navbar-keops {
     padding-left: 200px;
-    border-bottom: solid 1px rgb(216, 210, 210);
-
-    background-color: #eaeaea;
-    background-image: -moz-linear-gradient(#fafafa, #eaeaea);
-	background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
-	background-image: linear-gradient(#fefefe, #e9e9e9);
-	background-repeat: repeat-x;
-
-
-    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 0;
+    background: #2f2f2f;
+    border-radius: 0!important;
 }
+
+.navbar-keops .navbar-nav > .active > a {
+    background: #222;
+    color: #e7e7e7;
+}
+
+.dropdown-menu > li > a {
+    font-size: 13px;
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+  color: #ffffff;
+  background-color: #e5412d!important;
+}
+
 
 .form-help-text {
     font-size: 8pt;
@@ -53,18 +63,6 @@ legend {
     height: 100%;
     padding: 0;
     margin: 0;
-}
-
-#keops-app-head {
-    border-top: 2px solid #313131;
-    height: 69px;
-	table-layout: fixed;
-	border-spacing: 0;
-    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	text-shadow: 0 1px 1px #fff;
-    background-color: rgb(252, 252, 252);
 }
 
 #keops-app-site-name {
@@ -103,30 +101,6 @@ legend {
 	line-height: 39px;
 }
 
-#keops-app-menu il {
-	list-style: none;
-	float: left;
-	border-right: #D0D0D0 solid 1px;
-	border-left: #F7F7F7 solid 1px;
-}
-
-#keops-app-menu il.aHover {
-	background: #F9F8F8;
-}
-
-#keops-app-menu a {
-	color: rgb(93, 93, 93);
-	display: block;
-	padding: 0 8px 0 8px;
-	height: 38px;
-}
-
-#keops-app-menu a:hover {
-	background: #F9F8F8;
-    text-decoration: none;
-    transition: background-color linear 0.2s;
-}
-
 .keops-site-name {
     font-size: 11px;
     position: absolute;
@@ -147,13 +121,10 @@ legend {
 }
 
 #keops-app-left-menu {
-    padding-top: 20px;
     width: 220px;
-    background-color: rgb(252, 252, 252);
+    background-color: #666666;
 	box-shadow: 0 3px 0 rgba(255, 255, 255, 0.4), 0 0 5px rgba(0, 0, 0, 0.1);
-    border-right: solid 1px rgb(221, 221, 221);
 	text-shadow: 0 1px 0 #fff;
-    border-radius: 5px;
 }
 
 #keops-app-left-menu h4 {
@@ -173,21 +144,39 @@ legend {
 #keops-app-left-menu ul {
     margin: 0;
     padding: 0;
+    list-style: none;
 }
 
-#keops-app-left-menu il {
+#keops-app-left-menu ul :first-child {
+    border-top: none;
+}
+
+#keops-app-left-menu .panel {
+    background-color: transparent;
+    color: #f4f4f4;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
     display: block;
-    padding: 12px 0 5px 0;
-    margin-left: 16px;
+    position: relative;
+    padding: 10px 5px;
     font-weight: bold;
 }
 
+#keops-app-left-menu li {
+display: block;
+position: relative;
+border-width: 0;
+border-radius: 0;
+margin: 0;
+}
+
 #keops-app-left-menu a {
-    display: block;
-    padding: 2px 0 2px 25px;
-    text-decoration: none;
-    cursor: pointer;
-    color: #716b7a;
+color: #dfdfdf;
+text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+display: block;
+position: relative;
+padding: 5px 15px;
+cursor: pointer;
 }
 
 #keops-app-left-menu .menu-level-1 {
@@ -195,7 +184,8 @@ legend {
 }
 
 #keops-app-left-menu a:hover {
-    background-color: #e7e7e7;
+  background-color: #4d4d4d;
+  text-decoration: none;
 }
 
 #keops-app-left-menu .menu-level-3 {
@@ -226,6 +216,10 @@ legend {
     padding: 5px 10px 5px 10px;
 }
 
+.form-head .form-title span a {
+    color: #db4a39
+}
+
 #keops-app .data-grid {
     width: 100%;
     border-collapse: collapse;
@@ -244,7 +238,6 @@ legend {
 
 #keops-app .grid-field {
     border: 1px solid #d9d9d9;
-    border-radius: 4px;
     margin-top: 5px;
 
 }
@@ -290,44 +283,16 @@ legend {
     margin: 10px 10px 0 0;
 }
 
-#keops-app .data-grid th, #keops-app .grid-field th {
-    height: 24px;
-    padding-left: 8px;
-    text-align: left;
-}
-
 #keops-app .data-grid th {
     cursor: pointer;
 }
 
 #keops-app .data-grid td, #keops-app .grid-field td {
-    height: 21px;
-    padding-left: 8px;
     cursor: pointer;
-    vertical-align: middle;
-    color: #4f4f4f;
-    font-family: Arial, "helvetica neue", inherit;
-    border-bottom: solid 1px #dddddd;
-}
-
-#keops-app .grid-field td i:hover {
-    color: black;
 }
 
 #keops-app .data-grid tr, #keops-app .grid-field tr {
     transition: background-color linear 0.2s;
-}
-
-#keops-app .data-grid tbody tr:hover, #keops-app .grid-field tbody tr:hover {
-    background-color: #f0f0f0;
-}
-
-#keops-app .data-grid-row-even {
-    background-color: #ffffff;
-}
-
-#keops-app .data-grid-row-odd {
-    background-color: #fafafa;
 }
 
 #keops-app .form-view {
@@ -414,7 +379,7 @@ legend {
 }
 
 #keops-app .form-title span {
-	text-shadow: 0 1px 1px #fff;
+
 }
 
 #keops-app .form-title .badge {

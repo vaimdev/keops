@@ -189,7 +189,6 @@ class ModelAdmin(options.ModelAdmin):
 
         defaults = {
             "form": self.form,
-            "fields": self.fields,
             "exclude": self.exclude,
             "formfield_callback": self.formfield_for_dbfield,
         }
@@ -333,7 +332,6 @@ class ModelAdmin(options.ModelAdmin):
             cat = force_text(capfirst(getattr(v, 'category', _cat)))
             if not cat in groups:
                 groups[cat] = []
-            print(v.attrs)
             groups[cat].append((k, v.__dict__))
 
         kwargs['action_groups'] = groups

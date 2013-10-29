@@ -36,14 +36,14 @@
 </head>
 <body>
     <div id="keops-app">
-        <nav class="navbar navbar-default navbar-keops" role="navigation"  style="padding-left: 200px;">
+        <nav class="navbar navbar-inverse navbar-keops navbar-keops" role="navigation"  style="padding-left: 220px;">
             <a href="/admin/"><img src="{{ STATIC_URL }}keops/images/logo.png" id="keops-app-logo" title="{{ company.name }}"></a>
             <ul class="nav navbar-nav navbar-right">
               <li class="dropdown">
                 <a href="/accounts/logout/" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> {{ user.username }}<b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="#accounts/password/change/?user={{ user.pk }}">{{ _('Change password')|capfirst }}</a></li>
-                  <li><a href="/accounts/logout/">{{ _('Logout')|capfirst }}</a></li>
+                  <li><a href="#accounts/password/change/?user={{ user.pk }}">{{ _('Change password') }}</a></li>
+                  <li><a href="/accounts/logout/">{{ _('Logout') }}</a></li>
                 </ul>
               </li>
             </ul>
@@ -59,9 +59,9 @@
                     <ul>
                         {% for m in menu.menu_set.all %}
                         {% if m.closed %}
-                        <a class="menu-level-1" ng-click="closedMenuClick('{{ m.get_absolute_url }}')" style="cursor: pointer;">{{ m.name }}</a>
+                        <a class="panel" style="border: 0; margin-bottom: 0; border-radius: 0;" class="menu-level-1" ng-click="closedMenuClick('{{ m.get_absolute_url }}')" style="cursor: pointer;">{{ m.name }}</a>
                         {% else %}
-                        <il>{{ m.name }}</il>
+                        <li class="panel">{{ m.name }}</li>
                         {% endif %}
                             {% if not m.closed %}{% for sm in m.menu_set.all %}
                             <a ng-click="itemClick('{{ sm.get_absolute_url }}', {{ sm.dialog|lower|default:"false" }})">{{ sm.name }}</a>

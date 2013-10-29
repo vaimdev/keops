@@ -14,7 +14,7 @@ def response_form(request, action, *args, **kwargs):
             admin = model._admin
         except:
             # Auto create ModelAdmin
-            admin = type(model.__name__ + 'Admin', (ModelAdmin,))(model, site)
+            admin = type(model.__name__ + 'Admin', (ModelAdmin,), {'model': model})(model, site)
             model.add_to_class('_admin', admin)
         return admin.view(request, view_type=view_type, action=action, state=state, **action.get_context())
 

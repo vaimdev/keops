@@ -426,11 +426,11 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                 };
                 data[n] = nestedData;
             };
-            console.debug(data);
             return $http.post(
                 '/db/submit/', { model: this.form.model, pk: this.form.item.pk, data: data }
             ).
             success(function (data, status, headers, config) {
+                    console.log(data);
                 for (var i in data) {
                     i = data[i];
                     if (i.success && (typeof i.message === 'object')) {
@@ -440,9 +440,9 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                         jQuery.extend($scope.form.item, data.data);
                     }
                     else if (!i.success) {
+                        $scope.addAlert(i.alert, i.message);
                         throw i.message;
                     }
-                    if (typeof i.message !== 'object') $scope.addAlert(i.alert, i.message);
                 }
                 }.bind(this)).
                 error(function (data) {

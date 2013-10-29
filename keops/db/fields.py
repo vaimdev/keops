@@ -45,9 +45,10 @@ class Field(object):
         if not hasattr(cls._meta, 'all_fields'):
             cls._meta.all_fields = []
             for b in cls.__bases__:
-                if hasattr(b, '_meta') and hasattr(b._meta, 'all_fields'):
+                if hasattr(b, '_meta') and hasattr(b._meta, 'all_fields') and not b._meta.abstract:
                     cls._meta.all_fields += b._meta.all_fields
         cls._meta.all_fields.insert(bisect(cls._meta.all_fields, self), self)
+        # Register server-sive on_change field event
         if 'on_change' in self.custom_attrs:
             self.custom_attrs.setdefault('widget_attrs', {})['ng_change'] = 'fieldChangeCallback(\'%s\')' % name
         Field._contribute_to_class(self, cls, name, virtual_only=virtual_only)
