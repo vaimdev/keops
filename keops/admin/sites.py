@@ -38,6 +38,11 @@ class AdminSite(admin.AdminSite):
         # TODO got last user menu
         return HttpResponseRedirect('/admin/menu/%d' % Menu.objects.only('id').filter(parent=None)[0].pk)
 
+    def history(self, request):
+        model = self.get_model(request.GET['model'])
+        pk = request.GET['pk']
+        return model._admin.history_view(request, object_id=pk)
+
     def menu(self, request, menu_id):
         from keops.modules.base.models import Menu
         if 'action' in request.GET:
@@ -84,6 +89,9 @@ class AdminSite(admin.AdminSite):
             url(r'^action/$',
                 wrap(self.dispatch_action),
                 name='action'),
+            url(r'^history/$',
+                wrap(self.history),
+                name='history'),
             url(r'^logout/$',
                 wrap(self.logout),
                 name='logout')

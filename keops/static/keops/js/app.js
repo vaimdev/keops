@@ -1,6 +1,6 @@
 $.datepicker.setDefaults($.datepicker.regional[document.documentElement.lang]);
 
-var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ui.bootstrap', 'infinite-scroll', 'ui.keops']).config(
+var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ngCookies', 'ui.bootstrap', 'infinite-scroll', 'ui.keops']).config(
     function($routeProvider, $locationProvider) {
         $routeProvider.
             when('/action/:id/',
@@ -33,6 +33,12 @@ var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ui.bootstra
             {
                 templateUrl: function (params) {
                     return '/admin/accounts/password/change/';
+                }
+            }).
+            when('/history/:model/:id',
+            {
+                templateUrl: function (params) {
+                    return '/admin/history/?model=' + params.model + '&pk=' + params.id;
                 }
             }).
             when('/report/:option',
@@ -327,6 +333,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
     $scope.alerts = [];
 
     $scope.addAlert = function(type, msg) {
+        if (type == 'error') type = 'danger';
         $scope.alerts.push({type: type, msg: msg, timer: $timeout(function() {
             $scope.alerts.splice(0, 1); }, 10000)
         });
@@ -353,13 +360,19 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         dialog.result.then(function (form) {
             console.log(form);
             $http({
-                method: 'DELETE',
+                method: 'POST',
                 url: '/admin/action/?action=delete_selected',
                 params: { pk: form.item.pk, model: form.model }
             }).success(function (data) {
-                    $scope.addAlert(data.success ? 'success': 'error', data.msg);
-                    if (data.success) $scope.form.nextPage();
-                })
+                    for (var i in data) {
+                        var i = data[i];
+                        console.log(i);
+                    $scope.addAlert(i.alert, i.message);
+                    }
+                    if (data[data.length-1].success) $scope.form.nextPage();
+                }).error(function (data) {
+                    window.open('error').document.write(data);
+                });
         }, function () {
         });
     };
@@ -418,17 +431,23 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                 '/db/submit/', { model: this.form.model, pk: this.form.item.pk, data: data }
             ).
             success(function (data, status, headers, config) {
-                $scope.addAlert(data.success ? 'success' : 'error', data.msg);
-                if (data.success) {
-                    $scope.form.nestedDirty = false;
-                    form.$setPristine();
-                    $scope.form.write = false;
-                    jQuery.extend($scope.form.item, data.data);
+                for (var i in data) {
+                    i = data[i];
+                    if (i.success && (typeof i.message === 'object')) {
+                        $scope.form.nestedDirty = false;
+                        form.$setPristine();
+                        $scope.form.write = false;
+                        jQuery.extend($scope.form.item, data.data);
+                    }
+                    else if (!i.success) {
+                        throw i.message;
+                    }
+                    if (typeof i.message !== 'object') $scope.addAlert(i.alert, i.message);
                 }
-                else {
-                    throw data.msg;
-                }
-                }.bind(this));
+                }.bind(this)).
+                error(function (data) {
+                    window.open('error').document.write(data);
+                });
         }
         else $scope.addAlert('error', gettext('No pending data to submit!'))
     }
@@ -472,4 +491,8 @@ keopsApp.controller('DialogController', function($scope, $http, Form, $location,
     $scope.cancel = function () {
         $modalInstance.dismiss(false);
     }
+});
+
+keopsApp.run(function($rootScope, $http, $cookies){
+    $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
 });

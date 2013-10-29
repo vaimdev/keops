@@ -1,6 +1,6 @@
 import re
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 from django.contrib.auth import models as auth
 from django.contrib.auth.models import Group
 import django.contrib.auth.signals
@@ -8,6 +8,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db.models import validators
 from django.utils import timezone
+from django.contrib.admin.util import quote
+from django.utils.encoding import smart_text
 from keops.db import models
 from .element import ElementManager
 
@@ -354,23 +356,77 @@ class UserContent(models.Model):
         db_table = 'auth_user_content'
 
 
+# User log definition
+ADDITION = 'add'
+CHANGE = 'change'
+DELETION = 'delete'
+
+
+class UserLogManager(models.Manager):
+    def log_action(self, user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
+        e = self.model(None, None, user_id, content_type_id, smart_text(object_id), object_repr[:200], action_flag, change_message)
+        e.save()
+
+
 class UserLog(models.Model):
-    """
-    User log record.
-    """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), null=False, related_name='+')
-    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'), null=False, related_name='+')
-    object_id = models.PositiveIntegerField(_('object id'))
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
-    operation = models.CharField(max_length=64, null=False)  # create, read, update, delete, print...
-    description = models.TextField()
-    log_time = models.DateTimeField(_('date/time'), null=False, auto_now_add=True)
+    action_time = models.DateTimeField(_('action time'), auto_now=True, db_index=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    content_type = models.ForeignKey(ContentType, blank=True, null=True)
+    object_id = models.TextField(_('object id'), blank=True, null=True, db_index=True)
+    object_repr = models.CharField(_('object repr'), max_length=200)
+    action_flag = models.CharField(_('action flag'), db_index=True)
+    change_message = models.TextField(_('change message'), blank=True)
+
+    objects = UserLogManager()
 
     class Meta:
-        db_table = 'auth_log'
+        verbose_name = _('log entry')
+        verbose_name_plural = _('log entries')
+        db_table = 'auth_user_log'
+        ordering = ('-action_time',)
+
+    def __repr__(self):
+        return smart_text(self.action_time)
+
+    def __str__(self):
+        if self.action_flag == ADDITION:
+            return ugettext('Added "%(object)s".') % {'object': self.object_repr}
+        elif self.action_flag == CHANGE:
+            return ugettext('Changed "%(object)s" - %(changes)s') % {
+                'object': self.object_repr,
+                'changes': self.change_message,
+            }
+        elif self.action_flag == DELETION:
+            return ugettext('Deleted "%(object)s."') % {'object': self.object_repr}
+
+        return ugettext('LogEntry Object')
+
+    def is_addition(self):
+        return self.action_flag == ADDITION
+
+    def is_change(self):
+        return self.action_flag == CHANGE
+
+    def is_deletion(self):
+        return self.action_flag == DELETION
+
+    def get_edited_object(self):
+        "Returns the edited object represented by this log entry"
+        return self.content_type.get_object_for_this_type(pk=self.object_id)
+
+    def get_admin_url(self):
+        """
+        Returns the admin URL to edit the object represented by this log entry.
+        This is relative to the Django admin index page.
+        """
+        # TODO
+        return None
 
 
 class UserData(models.Model):
+    """
+    User profile data.
+    """
     user = models.ForeignKey(User, null=False)
     key = models.CharField(max_length=64, db_index=True)
     value = models.TextField()

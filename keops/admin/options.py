@@ -1,17 +1,25 @@
+import datetime
 from collections import OrderedDict
 import copy
+import json
 from importlib import import_module
 from keops.admin import render
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django.contrib.admin import options
+from django.contrib.admin.util import unquote
+from django.contrib.contenttypes.models import ContentType
 from django.template.response import TemplateResponse
 from django.utils import formats
 from django.utils.text import capfirst
 from django.utils.encoding import force_text
 from django.contrib.contenttypes import generic
 from django.db import models
+from django.core.exceptions import ValidationError
 from django import forms
-from keops.http import HttpJsonResponse
+from django.conf import settings
+from django.contrib import messages
+from keops.http import HttpJsonResponse, HttpMessagesResponse
 from keops.utils import field_text
 from .reports import ReportLink, Reports
 
@@ -186,6 +194,7 @@ class ModelAdmin(options.ModelAdmin):
             "formfield_callback": self.formfield_for_dbfield,
         }
         import django.forms.models
+        print(self.model)
         self.form = django.forms.models.modelform_factory(self.model, **defaults)
         self.bound_fields = {}
 
@@ -354,3 +363,214 @@ class ModelAdmin(options.ModelAdmin):
                 "keops/%s/change_form.html" % app_label,
                 "keops/change_form.html"
             ], kwargs, current_app=self.admin_site.name)
+
+    def log_addition(self, request, object):
+        """
+        Log that an object has been successfully added.
+
+        The default implementation creates an admin LogEntry object.
+        """
+        from keops.modules.base.auth import UserLog, ADDITION
+        UserLog.objects.log_action(
+            user_id=request.user.pk,
+            content_type_id=ContentType.objects.get_for_model(object).pk,
+            object_id=object.pk,
+            object_repr=force_text(object),
+            action_flag=ADDITION
+        )
+
+    def log_change(self, request, object, message):
+        """
+        Log that an object has been successfully changed.
+
+        The default implementation creates an admin LogEntry object.
+        """
+        from keops.modules.base.auth import UserLog, CHANGE
+        UserLog.objects.log_action(
+            user_id=request.user.pk,
+            content_type_id=ContentType.objects.get_for_model(object).pk,
+            object_id=object.pk,
+            object_repr=force_text(object),
+            action_flag=CHANGE,
+            change_message=message
+        )
+
+    def log_deletion(self, request, object, object_repr):
+        """
+        Log that an object will be deleted. Note that this method is called
+        before the deletion.
+
+        The default implementation creates an admin LogEntry object.
+        """
+        from keops.modules.base.auth import UserLog, DELETION
+        UserLog.objects.log_action(
+            user_id=request.user.pk,
+            content_type_id=ContentType.objects.get_for_model(self.model).pk,
+            object_id=object.pk,
+            object_repr=object_repr,
+            action_flag=DELETION
+        )
+
+    def save(self, context, using):
+        """
+        Save context data on using specified database.
+        """
+        from keops.views import db
+        from keops.db import models
+        from django.db.models import ForeignKey
+        pk = context.get('pk')
+        if 'model' in context:
+            model = context['model']
+            if isinstance(model, str):
+                model = db.get_model(context)
+        else:
+            model = self.model
+        data = context.get('data')
+        obj = None
+        related = OrderedDict()
+        if pk:
+            obj = model.objects.using(using).get(pk=pk)
+        if data:
+            if isinstance(data, str):
+                data = json.loads(data)
+            obj = obj or model()
+            for k, v in data.items():
+                try:
+                    field = model._admin.get_field(k)
+                    if isinstance(field, models.DateField):
+                        for format in settings.DATE_INPUT_FORMATS:  # TODO adjust on input widget
+                            try:
+                                v = datetime.datetime.strptime(v, format)
+                                break
+                            except:
+                                pass
+                    elif isinstance(field, ForeignKey):
+                        k = field.attname
+                    elif isinstance(field, models.OneToManyField):
+                        related[field] = v
+                        continue
+                except:
+                    raise
+                setattr(obj, k, v)
+
+            obj.full_clean()
+            obj.save(using=using)
+
+        # submit related data
+        for field, v in related.items():
+            self._save_related(field, v, obj, using)
+        return True, obj
+
+    def _save_related(self, field, data, parent, using):
+        """
+        Save related data rows (ManyToManyField/OneToManyField).
+        """
+        model = field.related.model
+        for obj in data:
+            action = obj['action']
+            record = obj['data']
+            pk = record.pop('pk', None)
+            if action == 'DELETE':
+                model.objects.using(using).get(pk=pk).delete()
+                continue
+            elif action == 'CREATE':
+                record[field.related.field.name] = parent.pk
+            try:
+                self.save({'pk': pk, 'model': model, 'data': record}, using)
+            except ValidationError as e:
+                raise ValidationError([str(model._meta)] + e.messages)
+
+    def lookup(self, request, sel_fields=None, display_fn=str):
+        """
+        Read lookup data list.
+        """
+        from keops.views import db
+        context = request.GET
+        field = context.get('field')
+        form_field = self.get_formfield(field).field
+        queryset = form_field.queryset
+        start = int(context.get('start', '0'))
+        limit = int(context.get('limit', '25')) + start # settings
+        query = context.get('query', '')
+        fields = form_field.target_attr.custom_attrs.fields
+        if query:
+            queryset = db.search_text(queryset, query)
+        data = {
+            'data': [field_text(obj, sel_fields=sel_fields.get(field), display_fn=display_fn)
+                     for obj in queryset[start:limit]],
+            'total': queryset.count()
+        }
+        return HttpJsonResponse(data)
+
+    def new_item(self, request):
+        """
+        Return form with default field values.
+        """
+        from keops.db import models
+        r = {'pk': None}
+        for field in self.model_fields:
+            if field.default != models.NOT_PROVIDED:
+                if callable(field.default):
+                    v = field.default()
+                else:
+                    v = field.default
+            else:
+                v = None
+            r[field.name] = field_text(v)
+        return HttpJsonResponse(r)
+
+    def submit(self, request, **kwargs):
+        """
+        Receive submit data.
+        """
+        from keops import context
+        from keops.views.db import prepare_read
+        using = context.get_db(request)
+        try:
+            success, obj = self.save(request.POST, using)
+            #self.message_user(request, obj, level=messages.SUCCESS)
+            form = self.form(request.POST['data'])
+            if request.POST['pk']:
+                change_message = self.construct_change_message(request, form, None)
+                self.log_change(request, obj, change_message)
+            else:
+                self.log_addition(request, obj)
+            self.message_user(request, prepare_read({'model': request.POST['model'], 'pk': obj.pk}, using)['items'][0], level=messages.SUCCESS)
+            self.message_user(request, _('Record successfully saved!'), level=messages.SUCCESS)
+        except ValidationError as e:
+            self.message_user(request, '<br>'.join(e.messages), level=messages.ERROR)
+        return HttpMessagesResponse(request._messages)
+
+    def history_view(self, request, object_id, extra_context=None):
+        "The 'history' admin view for this model."
+        from keops.modules.base.auth import UserLog
+        # First check if the user can see this history.
+        model = self.model
+        obj = get_object_or_404(model, pk=unquote(object_id))
+
+        #if not self.has_change_permission(request, obj):
+        #    raise PermissionDenied
+
+        # Then get the history for this object.
+        opts = model._meta
+        app_label = opts.app_label
+        action_list = UserLog.objects.filter(
+            object_id=unquote(object_id),
+            content_type__id__exact=ContentType.objects.get_for_model(model).id
+        ).select_related().order_by('action_time')
+
+        context = {
+            'title': _('Change history: %s') % force_text(obj),
+            'action_list': action_list,
+            'module_name': capfirst(force_text(opts.verbose_name_plural)),
+            'object': obj,
+            'app_label': app_label,
+            'opts': opts,
+            'preserved_filters': self.get_preserved_filters(request),
+        }
+        context.update(extra_context or {})
+        return TemplateResponse(request, self.object_history_template or [
+            "keops/%s/%s/object_history.html" % (app_label, opts.model_name),
+            "keops/%s/object_history.html" % app_label,
+            "keops/object_history.html"
+        ], context, current_app=self.admin_site.name)
