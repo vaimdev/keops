@@ -84,15 +84,17 @@ def grid(request):
     get_val = lambda x: '' if x is None else (callable(x) and x()) or x
     fields = ['pk'] + fields
     display_fn = _display_fn(model)
-    rows = [ { f: display_fn.get(f, str)(get_val(getattr(row, disp_fields.get(f, f)))) for f in fields } for row in queryset ]
+    rows = [{f: display_fn.get(f, str)(get_val(getattr(row, disp_fields.get(f, f)))) for f in fields} for row in queryset]
     data = {'items': rows, 'total': count}
     return HttpJsonResponse(data)
+
 
 def _read_fields(model):
     if not hasattr(model.Extra, '_cache_read_fields'):
         model.Extra._cache_read_fields = [f.name for f in model._meta.fields if not f.primary_key] +\
             [f.name for f in model._meta.virtual_fields if isinstance(f, models.PropertyField)]
     return model.Extra._cache_read_fields
+
 
 def prepare_read(context, using):
     pk = context.get('pk')
@@ -116,7 +118,6 @@ def prepare_read(context, using):
         count = count.using(using).all().count()
     else:
         count = None
-    queryset.select_related()
     fields = ['pk', '__str__'] + context.get('fields', _read_fields(model))
     disp_fields = _choice_fields(model)
     display_fn = _display_fn(model)
@@ -137,6 +138,7 @@ def _get_queryset_fields(model, obj, attr):
 
 
 def read_items(request):
+    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
     using = get_db(request)
     # Force get all items
     context = {'all': None}
@@ -148,9 +150,13 @@ def read_items(request):
     obj = model.objects.using(using).only(model._meta.pk.name).get(pk=pk)
     for item in items:
         field = getattr(model, item)
-        context['fields'] = field.list_fields
-        context['queryset'] = _get_queryset_fields(model, obj, item)
-        data[item] = prepare_read(context, using)
+        if getattr(field, 'list_display', None):
+            context['fields'] = field.list_display
+        if isinstance(field, ReverseManyRelatedObjectsDescriptor):
+            data[item] = [{'id': r.id, 'text': str(r)} for r in getattr(obj, item).all()]
+        else:
+            context['queryset'] = _get_queryset_fields(model, obj, item)
+            data[item] = prepare_read(context, using)
     return HttpJsonResponse(data)
 
 

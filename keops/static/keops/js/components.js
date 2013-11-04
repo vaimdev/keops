@@ -174,6 +174,7 @@ ui.directive('combobox', function() {
                     var data = el.select2('data');
                     if (data.id === null) controller.$setViewValue('');
                     else controller.$setViewValue(data);
+                    console.log(data);
                 });
             });
         }

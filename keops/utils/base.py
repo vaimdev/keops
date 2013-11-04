@@ -3,6 +3,7 @@ import decimal
 from django.utils import formats
 from django.db import models
 
+
 def field_text(value, obj=None, field=None, disp_field=None, sel_fields=None, display_fn=str):
     if value is None:
         return ''

@@ -6,7 +6,7 @@
                 <tr>
                     <td class="form-title">
                         <span>
-                            <span style="display: inline-block; padding-right: 10px;"><a href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</span>
+                            <span style="display: inline-block; padding-right: 10px;"><a style="font-weight: bold;" href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</span>
                             <span class="badge">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</span>
                         </span>
                         <div class="form-help-text">
@@ -79,7 +79,7 @@
                                 </td>
                                 <td style="padding-left: 20px;">
                                     <div ng-show="!form.write">
-                                        <a class="btn btn-xs btn-default" ng-href="#history/{{ opts }}/{% verbatim %}{{form.item.pk}}{% endverbatim %}">{{ _('History') }}</a>
+                                        <a class="btn btn-xs btn-warning" ng-href="#history/{{ opts }}/{% verbatim %}{{form.item.pk}}{% endverbatim %}">{{ _('History') }}</a>
                                     </div>
                                 </td>
                             </tr>

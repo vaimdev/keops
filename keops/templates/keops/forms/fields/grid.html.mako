@@ -9,10 +9,10 @@
 	fields = [ model._meta.get_field(f) for f in list_fields if related.field.name != f ]
 	disp = {f.name: {'name': (isinstance(f, models.ForeignKey) or f.choices) and (f.name + '.text') or f.name, 'style': isinstance(f, (models.IntegerField, models.DecimalField)) and 'text-align: right;' or '', 'filter': isinstance(f, (models.IntegerField, models.DecimalField)) and '|number:2' or ''} for f in fields }
 %>
-<div remoteitem style="max-height: 200px; overflow: auto;" name="${field.name}">
+<div remoteitem grid-field style="max-height: 200px; overflow: auto;" name="${field.name}">
 	<label class="field-label" style="display: inline-block; padding-right: 10px;">${field.label}</label>
 	<a ng-show="form.write" class="btn btn-sm btn-default" ng-click="showDetail('${field.field.target_attr.model._meta}', '${field.name}')">${_('add') | capfirst}</a>
-	<table class="grid-field">
+	<table class="table table-hover table-condensed">
 		<thead>
 		<tr>
 		% for f in fields:

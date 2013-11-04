@@ -1,7 +1,7 @@
 {% extends "keops/dialog.html" %}
 {% block css_class %}modal-huge{% endblock %}
 {% block content %}
-<form name="filterForm" ng-init="form.write = true;{{ initial_values }}">
+<form name="detailForm" ng-init="form.write = true;{{ initial_values }}">
 {{ content|safe }}
 </form>
 {% endblock %}

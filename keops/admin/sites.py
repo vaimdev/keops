@@ -5,7 +5,9 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib import admin
 from django.db import models
+from django.utils.text import capfirst
 from . import actions
+from .render import render_form
 
 
 class AdminSite(admin.AdminSite):
@@ -17,6 +19,21 @@ class AdminSite(admin.AdminSite):
         self._actions['duplicate_selected'] = actions.duplicate_selected
         self._actions['delete_selected'] = actions.delete_selected
         self._global_actions = self._actions.copy()
+
+    def detail_view(self, request):
+        state = request.GET.get('state', 'new')
+        model = self.get_model(request.GET['model'])
+        field = request.GET.get('field')
+        pk = request.GET.get('pk')
+        if field:
+            field = getattr(model, field)
+            related = field.related
+            rel_model = related.model
+            content = render_form(rel_model._admin, cols=2, exclude=[related.field.name], state='write')
+            return render(request, 'keops/forms/detail_dialog.html', {
+                'header': capfirst(field.verbose_name or field.name),
+                'content': content
+            })
 
     def dispatch_action(self, request):
         """
@@ -53,7 +70,8 @@ class AdminSite(admin.AdminSite):
         return render(request, 'keops/app.html', {
             'app_menu': Menu.objects.filter(parent=None),
             'menu': Menu.objects.get(pk=menu_id),
-            'user': request.user  # TODO get current company name
+            'user': request.user,  # TODO get current company name
+            'company': request.session['company']
         })
 
     def response_action(self, request):
@@ -89,6 +107,9 @@ class AdminSite(admin.AdminSite):
             url(r'^action/$',
                 wrap(self.dispatch_action),
                 name='action'),
+            url(r'^detail/$',
+                wrap(self.detail_view),
+                name='history'),
             url(r'^history/$',
                 wrap(self.history),
                 name='history'),

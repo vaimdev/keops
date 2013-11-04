@@ -476,7 +476,7 @@ class ModelAdmin(options.ModelAdmin):
             try:
                 self.save({'pk': pk, 'model': model, 'data': record}, using)
             except ValidationError as e:
-                raise ValidationError([str(model._meta)] + e.messages)
+                raise ValidationError([capfirst(field.verbose_name) + ':'] + ['%s: %s' % (capfirst(field.related.model._meta.get_field(k).verbose_name), ', '.join(v)) for k, v in e.message_dict.items()])
 
     def lookup(self, request, sel_fields=None, display_fn=str):
         """

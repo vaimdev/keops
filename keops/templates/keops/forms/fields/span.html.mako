@@ -8,6 +8,7 @@
 % if isinstance(field.field, forms.DecimalField):
 	<span ng-show="!form.write${ro}">{{form.item.${field.name}|number:2}}</span>
 % elif isinstance(field.field, forms.ModelMultipleChoiceField):
+	<div ng-show="!form.write${ro}" class="form-long-field"><label class="m2m-tag" ng-repeat="item in form.item.${field.name}">{{item.text}}</label></div>
 % elif isinstance(field.field, forms.ModelChoiceField):
 	<%
 		url = field.field.target_attr.get_resource_url()

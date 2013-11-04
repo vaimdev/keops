@@ -75,7 +75,6 @@ keopsApp.factory('List', function($http, SharedData) {
     List.prototype.nextPage = function(model, query) {
         if (this.loading || this.loaded) return;
         this.loading = true;
-        console.log('query', query);
         var params = {
             model: model,
             start: this.start,
@@ -207,7 +206,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         var remoteitems = [];
         for (var i = 0; i < items.length; i++) remoteitems.push(angular.element(items[i]).attr('name'));
         // make params
-        data = { model: this.model, pk: this.item.pk, items: angular.toJson(remoteitems) };
+        var data = { model: this.model, pk: this.item.pk, items: angular.toJson(remoteitems) };
         // load remote data
         $http({
             method: 'GET',
@@ -218,7 +217,8 @@ keopsApp.factory('Form', function($http, SharedData, $location){
             for (var i = 0; i < items.length; i++) {
                 var item = angular.element(items[i]);
                 var name = item.attr('name');
-                formItem[name] = data[name].items;
+                if (data[name].items) formItem[name] = data[name].items;
+                else formItem[name] = data[name];
             }
         });
     };
@@ -241,8 +241,8 @@ keopsApp.factory('Form', function($http, SharedData, $location){
             }.bind(this));
     };
 
-    Form.prototype.getNestedItems = function () {
-        var items = this.element.find('[remoteitem]');
+    Form.prototype.getGridFields = function () {
+        var items = this.element.find('[grid-field]');
         var r = {};
         // check item changes
         for (var i = 0; i < items.length; i++) {
@@ -358,7 +358,6 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         var dialog = $modal.open(options);
 
         dialog.result.then(function (form) {
-            console.log(form);
             $http({
                 method: 'POST',
                 url: '/admin/action/?action=delete_selected',
@@ -366,7 +365,6 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             }).success(function (data) {
                     for (var i in data) {
                         var i = data[i];
-                        console.log(i);
                     $scope.addAlert(i.alert, i.message);
                     }
                     if (data[data.length-1].success) $scope.form.nextPage();
@@ -398,11 +396,22 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                 if (i[0] !== '$') {
                     var el = form[i];
                     var v = $scope.form.item[i];
-                    if (el.$dirty) data[el.$name] = typeof v === 'object' ? v['id'] : v;
+                    if (el.$dirty) {
+                        if (typeof v === 'object') {
+                            if (v.length) {
+                                var r = [];
+                                for (var n in v) r.push(v[n].id);
+                                data[el.$name] = r;
+                            }
+                            else data[el.$name] = v['id'];
+
+                        }
+                        else data[el.$name] = v;
+                    }
                 }
             };
             // detect nested grid fields
-            var nested = $scope.form.getNestedItems();
+            var nested = $scope.form.getGridFields();
             for (var n in nested) {
                 var nestedData = [];
                 for (i = 0; i < nested[n].length; i++) {
@@ -411,7 +420,6 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                     if (item.__state__ === 'deleted') obj.action = 'DELETE';
                     else if (item.__state__ === 'modified') obj.action = 'UPDATE';
                     else if (item.__state__ === 'created') obj.action = 'CREATE';
-                    delete item.__state__;
                     if (obj.action) {
                         obj.data = {};
                         jQuery.extend(obj.data, item);
@@ -419,13 +427,13 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                             var v = obj.data[x];
                             if (typeof v === 'object')
                                 obj.data[x] = v.id;
-
                         };
                         nestedData.push(obj);
                     };
                 };
-                data[n] = nestedData;
+                if (nestedData.length > 0) data[n] = nestedData;
             };
+            console.log(data);
             return $http.post(
                 '/db/submit/', { model: this.form.model, pk: this.form.item.pk, data: data }
             ).
@@ -443,6 +451,7 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
                         $scope.addAlert(i.alert, i.message);
                         throw i.message;
                     }
+                    else $scope.addAlert(i.alert, i.message);
                 }
                 }.bind(this)).
                 error(function (data) {
@@ -486,6 +495,7 @@ keopsApp.controller('DialogController', function($scope, $http, Form, $location,
         var v = true;
         if ($scope.form) v = $scope.form;
         $modalInstance.close(v);
+        console.log('detail', this.detailForm);
     }
 
     $scope.cancel = function () {

@@ -3,6 +3,7 @@ from django.utils.text import capfirst
 from keops.db import get_db
 from keops.views.db import get_model
 
+
 def index(request):
     using = get_db(request)
     view_type = request.GET.get('type', 'dialog')

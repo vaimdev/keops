@@ -439,6 +439,6 @@ class UserData(models.Model):
 def user_logged_in(sender, request, user, *args, **kwargs):
     # Load basic user information
     # Select default user company
-    pass
+    request.session['company'] = user.company
 
 django.contrib.auth.user_logged_in.connect(user_logged_in)
