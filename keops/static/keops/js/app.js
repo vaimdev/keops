@@ -1,5 +1,10 @@
 $.datepicker.setDefaults($.datepicker.regional[document.documentElement.lang]);
 
+var getval = function (val) {
+    if ((val == null) || (val == '')) return null;
+    else return val;
+};
+
 var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ngCookies', 'ui.bootstrap', 'infinite-scroll', 'ui.keops']).config(
     function($routeProvider, $locationProvider) {
         $routeProvider.
@@ -500,6 +505,12 @@ keopsApp.controller('DialogController', function($scope, $http, Form, $location,
 
     $scope.cancel = function () {
         $modalInstance.dismiss(false);
+    }
+
+    $scope.submit = function () {
+        if (this.detailForm.$invalid)
+        console.log(this.detailForm);
+        else $scope.ok();
     }
 });
 

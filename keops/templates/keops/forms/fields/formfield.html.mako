@@ -6,12 +6,12 @@
 % else:
 	<td class="form-label-cell"
 	% if field.field.required:
-		ng-class="form.item.${field.name} == '' ? 'has-error' : ''"
+		ng-class="!dataForm.${field.name}.$valid ? 'has-error' : ''"
     % endif
 			>${field.label_tag(attrs={'class': 'control-label'})}</td>
 	<td class="form-field-cell"${ro}
 	% if field.field.required:
-		ng-class="form.item.${field.name} == '' ? 'has-error' : ''"
+		ng-class="!dataForm.${field.name}.$valid ? 'has-error' : ''"
     % endif
 			>
 		<%include file="/keops/forms/fields/widget.html.mako"/>

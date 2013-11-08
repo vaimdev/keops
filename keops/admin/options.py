@@ -232,6 +232,8 @@ class ModelAdmin(options.ModelAdmin):
     def formfield_for_dbfield(self, db_field, **kwargs):
         f = db_field.formfield(**kwargs)
         if f:
+            if f.required:
+                f.widget.attrs['required'] = True
             if db_field.custom_attrs.widget_attrs:
                 f.widget.attrs.update(db_field.custom_attrs.widget_attrs)
             if f.help_text:
@@ -242,11 +244,6 @@ class ModelAdmin(options.ModelAdmin):
                 f.widget.attrs.setdefault('class', 'form-control input-sm form-date-field')
                 f.widget.attrs.setdefault('ui-mask', _('9999-99-99'))
             elif isinstance(f, forms.DecimalField):
-                f.widget.attrs['type'] = 'text'
-                f.widget.attrs['ui-money'] = 'ui-money'
-                f.widget.attrs['ui-money-thousands'] = formats.get_format('THOUSAND_SEPARATOR')
-                f.widget.attrs['ui-money-decimal'] = formats.get_format('DECIMAL_SEPARATOR')
-                f.widget.attrs['ui-money-negative'] = True
                 f.widget.attrs.setdefault('class', 'form-control input-sm form-decimal-field')
             elif isinstance(f, forms.IntegerField):
                 f.widget.attrs.setdefault('class', 'form-control input-sm form-int-field')

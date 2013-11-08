@@ -78,26 +78,27 @@ ui.directive('uiMoney', function($filter) {
     return {
         restrict: 'A',
         require : 'ngModel',
-        link : function (scope, element, attrs, ngModel, controller) {
+        link : function (scope, element, attrs, controller) {
 
             var precision = attrs.uiMoneyPrecision || 2;
+
+            controller.$render = function () {
+                if (controller.$viewValue) element.val($filter('number')(controller.$viewValue, precision));
+                else element.val('');
+            };
+
             $(function() {
-                var thousands = attrs.uiMoneyThousands;
-                var decimal = attrs.uiMoneyDecimal;
+                var thousands = attrs.uiMoneyThousands || django.get_format('THOUSAND_SEPARATOR');
+                var decimal = attrs.uiMoneyDecimal || django.get_format('DECIMAL_SEPARATOR');
                 var symbol = attrs.uiMoneySymbol;
-                var negative = attrs.uiMoneyNegative;
+                var negative = attrs.uiMoneyNegative || true;
                 element.maskMoney({symbol: symbol, thousands: thousands, decimal: decimal, precision: precision, allowNegative: negative, allowZero: true}).
                 bind('keyup blur', function(event) {
-                        ngModel.$setViewValue(element.val().replace(RegExp('\\' + thousands, 'g'), '').replace(RegExp('\\' + decimal, 'g'), '.'));
+                        controller.$setViewValue(element.val().replace(RegExp('\\' + thousands, 'g'), '').replace(RegExp('\\' + decimal, 'g'), '.'));
                         scope.$apply();
                     }
                 );
             });
-
-            ngModel.$render = function () {
-                if (ngModel.$viewValue) element.val($filter('number')(ngModel.$viewValue, precision));
-                else element.val('');
-            };
         }
     }
 });

@@ -1,7 +1,15 @@
 {% extends "keops/dialog.html" %}
+{% block start %}
+<form name="dataForm" ng-init="form.write = true;{{ initial_values }}" ng-submit="submit()">
+{% endblock %}
 {% block css_class %}modal-huge{% endblock %}
 {% block content %}
-<form name="detailForm" ng-init="form.write = true;{{ initial_values }}">
 {{ content|safe }}
+{% endblock %}
+{% block footer %}
+    <input class="btn btn-primary" type="submit" value="{{ ok|default:'OK' }}">
+    <button class="btn btn-danger" ng-click="cancel()">{{ cancel|default:_('cancel')|capfirst }}</button>
+{% endblock %}
+{% block end %}
 </form>
 {% endblock %}

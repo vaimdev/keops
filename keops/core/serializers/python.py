@@ -131,7 +131,7 @@ def Deserializer(object_list, **options):
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
                 if field_value is not None:
                     if isinstance(field_value, dict):
-                        obj = field.rel.to._default_manager.db_manager(db).filter(**field_value)[0]
+                        obj = field.rel.to.objects.db_manager(db).only('id').filter(**field_value)[0]
                         data[field.attname] = obj.pk
                     elif hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
                         if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):

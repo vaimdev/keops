@@ -104,7 +104,7 @@ def prepare_read(context, using):
         model = queryset.model
     else:
         model = get_model(context)
-        queryset = model.objects
+        queryset = model._default_manager
     count = queryset
     start = int(context.get('start', '0'))
     limit = int(context.get('limit', '1')) + start
