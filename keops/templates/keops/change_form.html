@@ -14,18 +14,18 @@
                         </div>
                         <table>
                             <tr><td>
-                                <button type="button" ng-show="!form.write" class="btn btn-sm btn-primary" ng-click="form.newItem()" tooltip="{{ _('Create new record') }}">{{ _('create')|capfirst }}</button>
-                                <button type="button" ng-show="!form.write" class="btn btn-sm btn-default" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
+                                <button type="button" ng-show="!form.write" class="btn btn-danger" ng-click="form.newItem()" tooltip="{{ _('Create new record') }}">{{ _('create')|capfirst }}</button>
+                                <button type="button" ng-show="!form.write" class="btn btn-default" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
 
-                                <input type="submit" ng-show="form.write" class="btn btn-sm btn-success" value="{{ _('save')|capfirst }}" tooltip="{{ _('Save record changes') }}">
-                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-success" tooltip="{{ _('Save changes and create a new record') }}">{{ _('Save + New') }}</button>
-                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-success" tooltip="{{ _('Save changes and edit the created record') }}">{{ _('Save + Edit') }}</button>
-                                <button type="button" ng-show="form.write" class="btn btn-sm btn-danger" ng-click="form.cancel()" tooltip="{{ _('Cancel changes') }}">{{ _('cancel')|capfirst }}</button>
+                                <input type="submit" ng-show="form.write" class="btn btn-primary" value="{{ _('save')|capfirst }}" tooltip="{{ _('Save record changes') }}">
+                                <button type="submit" ng-show="form.write" class="btn btn-primary" tooltip="{{ _('Save changes and create a new record') }}">{{ _('Save + New') }}</button>
+                                <button type="submit" ng-show="form.write" class="btn btn-primary" tooltip="{{ _('Save changes and edit the created record') }}">{{ _('Save + Edit') }}</button>
+                                <button type="button" ng-show="form.write" class="btn btn-default" ng-click="form.cancel()" tooltip="{{ _('Cancel changes') }}">{{ _('cancel')|capfirst }}</button>
                             </td>
                             <td ng-show="!form.write">
                                 {% for group, actions in action_groups.items %}
                                 <div class="btn-group" style="margin-left: 20px;">
-                                <button class="btn btn-sm btn-default dropdown-toggle">{{ group }}<span style="margin-left: 8px;" class="caret"></span></button>
+                                <button class="btn btn-default dropdown-toggle">{{ group }}<span style="margin-left: 8px;" class="caret"></span></button>
                                 <ul class="dropdown-menu">
                                     {% for action, obj in actions %}
                                         {% if obj.attrs %}
@@ -42,17 +42,17 @@
                                 {% if form.reports %}
                                 <div class="btn-group" style="margin-left: 20px;">
                                 {% with form.reports.0 as first_report %}
-                                <a class="btn btn-sm btn-default button-label" href="{{ first_report.get_url }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <a class="btn btn-default button-label" href="{{ first_report.get_url }}" target="_blank">{{ _('print')|capfirst }}</a>
                                 {% endwith %}
-                                <button class="btn btn-sm btn-default dropdown-toggle"><span class="caret"></span></button>
-                                <ul class="dropdown-menu" style="margin-left: 20px;">
+                                <button class="btn btn-default dropdown-toggle"><span class="caret"></span></button>
+                                <ul class="dropdown-menu">
                                 {% for report in form.reports %}
                                     <li>{{ report|safe }}</li>
                                 {% endfor %}
                                 </ul>
                                 </div>
                                 {% else %}
-                                <a style="margin-left: 20px;" class="btn btn-sm btn-default" href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <a style="margin-left: 20px;" class="btn btn-default" href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
                                 {% endif %}
                             </td></tr>
                         </table>

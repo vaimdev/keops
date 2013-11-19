@@ -1,38 +1,36 @@
 {% extends "keops/base.html" %}
+{% block title %}Login{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/login.css">
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-      <div class="modal-dialog" style="width: 400px;">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Login</h4>
-          </div>
-          <div class="modal-body">
-            {% block message %}{% endblock %}
-            {% if form.errors %}
-            <p>{{ _('Invalid user name/password! Please try again.') }}</p>
-            {% endif %}
+    <div class="container">
 
-                {% csrf_token %}
-                    <table style="width: 100%;">
-                    <tr>
-                        <td><input id="id_username" name="username" class="form-control" placeholder="{{ form.username.label }}"></td>
-                    </tr>
-                    <tr>
-                        <td><input id="id_password" name="password" class="form-control" type="password" placeholder="{{ form.password.label }}"></td>
-                    </tr>
-                    </table>
+      <h2 class="form-signin-heading text-center">{{ _('Sign in with your account') }}</h2>
 
-          </div>
+      <div class="card card-signin">
+        <img class="img-circle profile-img" src="{{ STATIC_URL }}/keops/images/avatar.png" alt="">
+        <form class="form-signin" method="post" action="{% url 'django.contrib.auth.views.login' %}">
+          <input type="text" class="form-control" placeholder="{{ form.username.label }}" name="username" required autofocus>
+          <input type="password" class="form-control" placeholder="{{ form.password.label }}" name="password" required>
+          <button class="btn btn-lg btn-primary btn-block" type="submit">{{ _('Sign in') }}</button>
+          {% csrf_token %}
           <input class="btn" type="hidden" name="next" value="{{ next }}" />
-          <div class="modal-footer">
-              <input class="btn btn-primary" type="submit" value="{{ _('enter')|capfirst }}" />
+            <div>
+            <a class="pull-right">Need help?</a>
+            <label class="checkbox">
+              <input type="checkbox" value="remember-me"> {{ _('Stay signed in') }}
+            </label>
           </div>
-        </div>
+
+        </form>
       </div>
-    </form>
-</div>
+
+      <p class="text-center">
+        <a>{{ _('Create an account') }}</a>
+      </p>
+    </div>
 {% block project %}
 <span style="position: fixed; bottom: 5px; right: 5px;">
     <a href="http://www.djangoproject.com/"><img src="https://www.djangoproject.com/m/img/badges/djangoproject120x25.gif" border="0" alt="A Django project." title="A Django project." /></a>

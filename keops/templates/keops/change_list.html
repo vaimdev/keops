@@ -15,14 +15,14 @@
                         <div>
                             <table><tr>
                             <td>
-                                <a class="btn btn-sm btn-primary" href="#{{ action.get_absolute_url }}form/?state=new">{{ _('create')|capfirst }}</a>
-                                <a class="btn btn-sm btn-default">{{ _('record')|capfirst }}</a>
+                                <a class="btn btn-danger" href="#{{ action.get_absolute_url }}form/?state=new">{{ _('create')|capfirst }}</a>
+                                <a class="btn btn-default">{{ _('record')|capfirst }}</a>
                             </td>
                             <td>
                                 {% if form.reports %}
                                 <div class="btn-group">
-                                <a class="btn btn-sm btn-default button-label" style="margin-left: 20px;"  href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
-                                <button class="btn btn-sm btn-default dropdown-toggle"><span class="caret"></span></button>
+                                <a class="btn btn-default button-label" style="margin-left: 20px;"  href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <button class="btn btn-default dropdown-toggle"><span class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">
                                 {% for report in form.reports %}
                                     <li>{{ report|safe }}</li>
@@ -30,7 +30,7 @@
                                 </ul>
                                 </div>
                                 {% else %}
-                                <a style="margin-left: 20px;" class="btn btn-sm btn-default" href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <a style="margin-left: 20px;" class="btn btn-default" href="/report/autoreport/?model={{ opts }}" target="_blank">{{ _('print')|capfirst }}</a>
                                 {% endif %}
                             </td>
                             </tr></table>
@@ -40,9 +40,12 @@
                         <table style="height: 100%; float: right;">
                             <tr>
                                 <td style="height: 100%;">
-                                    <div class="input-group input-group-sm">
+                                    <div class="input-group">
                                         <input style="width: 350px;" class="form-control" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" value="{{ query }}" ng-enter="list.query('{{ opts }}', searchField)">
-                                        <span style="cursor: pointer;" class="btn btn-sm btn-primary" ng-click="list.query('{{ opts }}', searchField)"><span class="glyphicon glyphicon-search"></span></span>
+                                        <span style="cursor: pointer;" class="input-group-btn">
+                                            <button type="button" class="btn btn-default"><span class="caret"></span></button>
+                                            <button type="button" class="btn btn-primary" ng-click="list.query('{{ opts }}', searchField)"><span class="glyphicon glyphicon-search"></span></button>
+                                            </span>
                                     </div>
                                 </td>
                             </tr>

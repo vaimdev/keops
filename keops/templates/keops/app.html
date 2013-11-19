@@ -2,12 +2,13 @@
 <html ng-app="keopsApp" lang="{{ LANGUAGE_CODE }}">
 <head>
     <title>{{ company.name }}</title>
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/app.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/forms.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui-1.10.0.custom.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}js/select2/select2.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/datepicker.css">
     <!--[if IE 7]>
     <link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome-ie7.css">
     <![endif]-->
@@ -15,29 +16,31 @@
     <script src="{{ STATIC_URL }}js/moment+langs.min.js"></script>
     <script src="{{ STATIC_URL }}js/jquery-2.0.3.min.js"></script>
     <script src="{{ STATIC_URL }}js/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="{{ STATIC_URL }}js/jquery-ui-timepicker-addon.js"></script>
+    <script src="{{ STATIC_URL }}js/datepicker/bootstrap-datepicker.js"></script>
     <script src="{{ STATIC_URL }}js/jquery.maskedinput.js"></script>
     <script src="{{ STATIC_URL }}js/jquery.maskMoney.js"></script>
     <script src="{{ STATIC_URL }}js/select2/select2.min.js"></script>
-    <script src="{{ STATIC_URL }}js/angular.min.js"></script>
-    <script src="{{ STATIC_URL }}js/angular-route.min.js"></script>
-    <script src="{{ STATIC_URL }}js/angular-sanitize.min.js"></script>
-    <script src="{{ STATIC_URL }}js/angular-animate.min.js"></script>
-    <script src="{{ STATIC_URL }}js/angular-cookies.min.js"></script>
+    <script src="{{ STATIC_URL }}js/angular/angular.min.js"></script>
+    <script src="{{ STATIC_URL }}js/angular/angular-route.min.js"></script>
+    <script src="{{ STATIC_URL }}js/angular/angular-sanitize.min.js"></script>
+    <script src="{{ STATIC_URL }}js/angular/angular-animate.min.js"></script>
+    <script src="{{ STATIC_URL }}js/angular/angular-cookies.min.js"></script>
     <script src="{{ STATIC_URL }}js/ui-bootstrap-tpls-0.6.0.min.js"></script>
     <script src="{{ STATIC_URL }}js/ng-infinite-scroll.min.js"></script>
     <script src="{{ STATIC_URL }}js/select2/select2_locale_{{ LANGUAGE_CODE }}.js"></script>
     <script src="{{ STATIC_URL }}keops/js/components.js"></script>
     <script src="{{ STATIC_URL }}keops/js/app.js"></script>
-    <script src="{{ STATIC_URL }}js/i18n/angular-locale_{{ LANGUAGE_CODE }}.js"></script>
+    <script src="{{ STATIC_URL }}js/angular/i18n/angular-locale_{{ LANGUAGE_CODE }}.js"></script>
+    <script src="{{ STATIC_URL }}js/datepicker/locales/bootstrap-datepicker.{{ LANGUAGE_CODE }}.js"></script>
     <script>
         moment.lang('{{ LANGUAGE_CODE }}');
     </script>
 </head>
 <body>
+    <a style="position: absolute; left: 0" href="/admin/"><img src="{{ STATIC_URL }}keops/images/logo.png" id="keops-app-logo" title="{{ company.name }}">
+    </a>
     <div id="keops-app">
-        <nav class="navbar navbar-inverse navbar-keops navbar-keops" role="navigation"  style="padding-left: 220px; max-height: 50px;">
-            <a style="position: absolute; left: 0" href="/admin/"><img src="{{ STATIC_URL }}keops/images/logo.png" id="keops-app-logo" title="{{ company.name }}"></a>
+        <nav class="navbar navbar-default" role="navigation"  style="padding-left: 120px; margin: 0;">
             <ul class="nav navbar-nav navbar-right">
               <li class="dropdown">
                 <a href="/accounts/logout/" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> {{ user.username }}<b class="caret"></b></a>
@@ -56,19 +59,19 @@
         <table id="keops-app-table">
             <tr>
                 <td id="keops-app-left-menu" ng-controller="MenuController">
-                    <ul>
+                    <ul class="list-group">
                         {% for m in menu.menu_set.all %}
                         {% if m.closed %}
                         <a class="panel" style="border: 0; margin-bottom: 0; border-radius: 0;" class="menu-level-1" ng-click="closedMenuClick('{{ m.get_absolute_url }}')" style="cursor: pointer;">{{ m.name }}</a>
                         {% else %}
-                        <li class="panel">{{ m.name }}</li>
+                        <li class="list-group-header">{{ m.name }}</li>
                         {% endif %}
                             {% if not m.closed %}{% for sm in m.menu_set.all %}
-                            <a ng-click="itemClick('{{ sm.get_absolute_url }}', {{ sm.dialog|lower|default:"false" }})">{{ sm.name }}</a>
+                            <li class="list-group-item"><a class="menu-level-2" ng-click="itemClick('{{ sm.get_absolute_url }}', {{ sm.dialog|lower|default:"false" }})">{{ sm.name }}</a></li>
                                 {% if not sm.closed %}{% for sm2 in sm.menu_set.all %}
-                                <a class="menu-level-3" ng-click="itemClick('{{ sm2.get_absolute_url }}', {{ sm.dialog|lower|default:"false" }})">{{ sm2.name }}</a>
+                                <li class="list-group-item"><a class="menu-level-3" ng-click="itemClick('{{ sm2.get_absolute_url }}', {{ sm.dialog|lower|default:"false" }})">{{ sm2.name }}</a></li>
                                     {% if not sm2.closed %}{% for sm3 in sm2.menu_set.all %}
-                                    <a class="menu-level-4" ng-click="itemClick('{{ sm3.get_absolute_url }}', {{ sm.dialog|lower|default:"false" }})">{{ sm3.name }}</a>
+                                    <li><a class="menu-level-4" ng-click="itemClick('{{ sm3.get_absolute_url }}', {{ sm.dialog|lower|default:"false" }})">{{ sm3.name }}</a></li>
                                     {% endfor %}{% endif %}
                                 {% endfor %}{% endif %}
                             {% endfor %}{% endif %}

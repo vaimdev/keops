@@ -133,5 +133,17 @@ msgstr "finalizar sessão"
 msgid "change password"
 msgstr "mudar senha"
 
-msgid "enter"
-msgstr "entrar"
+msgid "Sign in"
+msgstr "Entrar"
+
+msgid "Sign in with your account"
+msgstr "Entre com a sua conta"
+
+msgid "Stay signed in"
+msgstr "Permanecer conectado"
+
+msgid "Need help?"
+msgstr "Precisa de ajuda?"
+
+msgid "Create an account"
+msgstr "Criar uma conta"

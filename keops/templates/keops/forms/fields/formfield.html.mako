@@ -8,7 +8,7 @@
 	% if field.field.required:
 		ng-class="!dataForm.${field.name}.$valid ? 'has-error' : ''"
     % endif
-			>${field.label_tag(attrs={'class': 'control-label'})}</td>
+			>${field.label_tag(label_suffix='', attrs={'class': 'control-label'})}</td>
 	<td class="form-field-cell"${ro}
 	% if field.field.required:
 		ng-class="!dataForm.${field.name}.$valid ? 'has-error' : ''"

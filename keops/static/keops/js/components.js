@@ -13,20 +13,21 @@ ui.directive('ngEnter', function() {
     };
 });
 
-ui.directive('datePicker', function() {
+ui.directive('datePicker', function($locale) {
     return {
         restrict: 'A',
         require : 'ngModel',
         link: function(scope, element, attrs, controller) {
             attrs.uiMaskStore = 1;
             var el = element.datepicker({
-                dateFormat: attrs.dateFormat,
-                showOn: 'button',
-                onSelect: function(dateText, datepicker) {
-                    controller.$setViewValue(dateText);
-                }
+                todayBtn: true,
+                todayHighlight: true,
+                language: document.documentElement.lang,
+                format: attrs.format || $locale.DATETIME_FORMATS.mediumDate.toLowerCase()
             });
-            el.next('.ui-datepicker-trigger').addClass('btn btn-sm btn-default').html('<span class="glyphicon glyphicon-calendar"></span>');
+            controller.$render = function () {
+                el.datepicker('update', controller.$viewValue);
+            };
         }
     }
 });
@@ -74,7 +75,7 @@ ui.directive('uiMask', function() {
     }
 });
 
-ui.directive('uiMoney', function($filter) {
+ui.directive('decimal', function($filter) {
     return {
         restrict: 'A',
         require : 'ngModel',
@@ -82,23 +83,24 @@ ui.directive('uiMoney', function($filter) {
 
             var precision = attrs.uiMoneyPrecision || 2;
 
-            controller.$render = function () {
-                if (controller.$viewValue) element.val($filter('number')(controller.$viewValue, precision));
-                else element.val('');
-            };
-
-            $(function() {
+//            $(function() {
                 var thousands = attrs.uiMoneyThousands || django.get_format('THOUSAND_SEPARATOR');
                 var decimal = attrs.uiMoneyDecimal || django.get_format('DECIMAL_SEPARATOR');
                 var symbol = attrs.uiMoneySymbol;
                 var negative = attrs.uiMoneyNegative || true;
-                element.maskMoney({symbol: symbol, thousands: thousands, decimal: decimal, precision: precision, allowNegative: negative, allowZero: true}).
+                var el = element.maskMoney({symbol: symbol, thousands: thousands, decimal: decimal, precision: precision, allowNegative: negative, allowZero: true}).
                 bind('keyup blur', function(event) {
                         controller.$setViewValue(element.val().replace(RegExp('\\' + thousands, 'g'), '').replace(RegExp('\\' + decimal, 'g'), '.'));
                         scope.$apply();
                     }
                 );
-            });
+//            });
+
+            controller.$render = function () {
+                if (controller.$viewValue) element.val($filter('number')(controller.$viewValue, precision));
+                else element.val('');
+            };
+
         }
     }
 });

@@ -1,1 +1,1 @@
-<input type="text" ng-model="form.item.${field.name}" ui-money name="${field.name}" id="${field.auto_id}" ng-show="form.write && !form.readonly.${field.name}" ${' '.join('%s="%s"' % (k, v) for k, v in field.field.widget.attrs.items())}>
+<input type="text" ng-model="form.item.${field.name}" decimal name="${field.name}" id="${field.auto_id}" ng-show="form.write && !form.readonly.${field.name}" ${' '.join('%s="%s"' % (k, v) for k, v in field.field.widget.attrs.items())}>

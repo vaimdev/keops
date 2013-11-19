@@ -15,14 +15,14 @@
                         <div>
                             <table><tr>
                             <td>
-                                <a class="btn btn-sm btn-primary" href="#{{ action.get_absolute_url }}form/?state=new">{{ _('create')|capfirst }}</a>
-                                <a class="btn btn-sm btn-info">{{ _('record')|capfirst }}</a>
+                                <a class="btn btn-primary" href="#{{ action.get_absolute_url }}form/?state=new">{{ _('create')|capfirst }}</a>
+                                <a class="btn btn-info">{{ _('record')|capfirst }}</a>
                             </td>
                             <td>
                                 {% if form.reports %}
                                 <div class="btn-group">
-                                <a class="btn btn-sm btn-info button-label" style="margin-left: 20px;"  href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
-                                <button class="btn btn-sm btn-info dropdown-toggle"><span class="caret"></span></button>
+                                <a class="btn button-label" style="margin-left: 20px;"  href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <button class="btn dropdown-toggle"><span class="caret"></span></button>
                                 <ul class="dropdown-menu" style="margin-left: 20px;">
                                 {% for report in form.reports %}
                                     <li>{{ report|safe }}</li>
@@ -30,7 +30,7 @@
                                 </ul>
                                 </div>
                                 {% else %}
-                                <a style="margin-left: 20px;" class="btn btn-sm btn-info" href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
+                                <a style="margin-left: 20px;" class="btn btn-info" href="/report/autoreport/?model={{ model_name }}" target="_blank">{{ _('print')|capfirst }}</a>
                                 {% endif %}
                             </td>
                             </tr></table>
