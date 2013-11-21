@@ -6,7 +6,7 @@
                 <tr>
                     <td class="form-title">
                         <span>
-                            <span style="display: inline-block; padding-right: 10px;"><a style="font-weight: bold;" href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</span>
+                            <span style="display: inline-block; padding-right: 10px;"><a style="font-weight: 600;" href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</span>
                             <span class="badge">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</span>
                         </span>
                         <div class="form-help-text">
