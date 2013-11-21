@@ -61,7 +61,12 @@
                         <table style="float: right; height: 100%;">
                             <tr>
                                 <td ng-show="!form.write" style="text-align: right; height: 100%;" colspan="3">
-                                    <input class="form-control input-sm" type="search" style="display: inline-block;" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" ng-enter="search('{{ action.get_absolute_url }}list', 'query=' + searchField)">
+                                    <div class="input-group" style="width: 100%;">
+                                        <input class="form-control" type="search" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" ng-enter="search('{{ action.get_absolute_url }}list', 'query=' + searchField)">
+                                        <span style="cursor: pointer;" class="input-group-btn">
+                                            <button type="button" class="btn btn-primary" ng-click="list.query('{{ opts }}', searchField)"><span class="glyphicon glyphicon-search"></span></button>
+                                            </span>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -79,7 +84,12 @@
                                 </td>
                                 <td style="padding-left: 20px;">
                                     <div ng-show="!form.write">
-                                        <a class="btn btn-xs btn-warning" ng-href="#history/{{ opts }}/{% verbatim %}{{form.item.pk}}{% endverbatim %}">{{ _('History') }}</a>
+                                    <div class="btn-group nav navbar-nav navbar-right" style="margin-left: 20px;">
+                                        <button type="button" class="btn btn-default dropdown-toggle"><i class="icon-cog"></i><span style="margin-left: 8px;" class="caret"></span></button>
+                                        <ul class="dropdown-menu">
+                                            <li><a ng-href="#history/{{ opts }}/{% verbatim %}{{form.item.pk}}{% endverbatim %}">{{ _('History') }}</a></li>
+                                        </ul>
+                                    </div>
                                     </div>
                                 </td>
                             </tr>

@@ -239,7 +239,7 @@ class ModelAdmin(options.ModelAdmin):
             if f.help_text:
                 f.widget.attrs.setdefault('tooltip', f.help_text)
                 f.widget.attrs.setdefault('tooltip-trigger', 'focus')
-                f.widget.attrs.setdefault('tooltip-placement', 'right')
+                f.widget.attrs.setdefault('tooltip-placement', 'left')
             if db_field.readonly:
                 f.widget.attrs.setdefault('readonly', True)
             elif isinstance(f, forms.DateField):

@@ -6,7 +6,8 @@ body {
     height: 100%;
     overflow-y: scroll;
     padding: 0;
-    font-size: 12px;
+    font-size: 13px;
+    font-family: "Open Sans", "Trebuchet MS", Arial, "Helvetica Neue", Helvetica;
 }
 
 legend {
@@ -23,6 +24,10 @@ a:hover {
     border-bottom: 1px solid #bfbfbf;
 }
 
+input[type="radio"], input[type="checkbox"] {
+    margin: 0;
+}
+
 .form-help-text {
     font-size: 8pt;
     min-height: 20px;
@@ -36,7 +41,15 @@ a:hover {
 }
 
 .form-control {
-    font-size: 12px;
+    font-size: 13px;
+}
+
+.dropdown-menu {
+    font-size: 13px;
+}
+
+.btn {
+    font-size: 13px;
 }
 
 #keops-app {
@@ -282,8 +295,9 @@ a:hover {
     width: 100%;
 }
 
-.select2-container .select2-choice {
-    height: 30px;
+.select2-container > a {
+    border-radius: 3px !important;
+    height: 30px !important;
 }
 
 .select2-results .select2-highlighted {

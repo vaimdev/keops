@@ -22,6 +22,7 @@ ui.directive('datePicker', function($locale) {
             var el = element.datepicker({
                 todayBtn: true,
                 todayHighlight: true,
+                autoclose: true,
                 language: document.documentElement.lang,
                 format: attrs.format || $locale.DATETIME_FORMATS.mediumDate.toLowerCase()
             });
@@ -172,6 +173,7 @@ ui.directive('combobox', function() {
                 else
                 element.select2('val', controller.$viewValue);
             };
+            el.attr('tooltip', 'test');
             el.on('change', function () {
                 scope.$apply(function () {
                     var data = el.select2('data');
