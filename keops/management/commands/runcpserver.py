@@ -48,17 +48,17 @@ Examples:
 """
 
 CPSERVER_OPTIONS = {
-'host': 'localhost',
-'port': 8088,
-'server_name': 'localhost',
-'threads': 10, 
-'daemonize': False,
-'workdir': None,
-'pidfile': None,
-'server_user': 'www-data',
-'server_group': 'www-data',
-'ssl_certificate': None,
-'ssl_private_key': None,
+    'host': 'localhost',
+    'port': 8080,
+    'server_name': 'localhost',
+    'threads': 10,
+    'daemonize': False,
+    'workdir': None,
+    'pidfile': None,
+    'server_user': 'www-data',
+    'server_group': 'www-data',
+    'ssl_certificate': None,
+    'ssl_private_key': None,
 }
 
 
