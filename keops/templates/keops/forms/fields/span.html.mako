@@ -14,20 +14,20 @@
 		url = field.field.target_attr.get_resource_url()
 	%>
 	% if url:
-		<a style="cursor: pointer" ng-show="!form.write${ro}" ng-bind="form.item.${field.name}.text" ng-click="openResource('${url}', 'pk=' + form.item.${field.name}.id, ${field.name})"></a>
+		<a style="cursor: pointer" ng-show="!form.write${ro}" ng-bind="${form_field}.text" ng-click="openResource('${url}', 'pk=' + ${form_field}.id, ${field.name})"></a>
 	% else:
-        <a ng-show="!form.write${ro}" ng-bind="form.item.${field.name}.text"></a>
+        <a ng-show="!form.write${ro}" ng-bind="${form_field}.text"></a>
     % endif
 % elif isinstance(field.field, forms.ChoiceField):
-    <span ng-show="!form.write${ro}" ng-bind="form.item.${field.name}.text"></span>
+    <span ng-show="!form.write${ro}" ng-bind="${form_field}.text"></span>
 % elif isinstance(field.field, forms.DateField):
-	<span ng-show="!form.write${ro}">{{form.item.${field.name} | dateFrom}}</span>
+	<span ng-show="!form.write${ro}">{{${form_field} | dateFrom}}</span>
 % elif isinstance(field.field, forms.DateTimeField):
-	<span ng-show="!form.write${ro}">{{form.item.${field.name} | dateFromNow}}</span>
+	<span ng-show="!form.write${ro}">{{${form_field} | dateFromNow}}</span>
 % elif isinstance(field.field.widget, forms.Textarea):
-    <span ng-show="!form.write${ro}" class="text-field-span">{{form.item.${field.name}}}</span>
+    <span ng-show="!form.write${ro}" class="text-field-span">{{${form_field}}}</span>
 % elif isinstance(field.field, forms.BooleanField):
-	<span ng-show="!form.write${ro}" ng-bind="form.item.${field.name} ? '${_('yes')|capfirst}': '${_('no')|capfirst}'"></span>
+	<span ng-show="!form.write${ro}" ng-bind="${form_field} ? '${_('yes')|capfirst}': '${_('no')|capfirst}'"></span>
 % else:
-	<span ng-show="!form.write${ro}">{{form.item.${field.name}}}</span>
+	<span ng-show="!form.write${ro}">{{${form_field}}}</span>
 % endif

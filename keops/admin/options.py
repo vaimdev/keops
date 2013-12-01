@@ -84,6 +84,7 @@ class ModelAdmin(options.ModelAdmin):
     title = None
     label = None
     help_text = None
+    readonly = None
 
     def __iter__(self):
         for page, fieldsets in self.pages:
@@ -107,17 +108,23 @@ class ModelAdmin(options.ModelAdmin):
         # Load data dict by model Extra class
         extra = getattr(self.model, 'Extra', None)
         if extra:
-            if not self.fields and extra.field_groups and extra.field_groups.get('display_fields', None):
+            if not self.fields and extra.field_groups and extra.field_groups.get('display_fields'):
                 self.fields = extra.field_groups['display_fields']
 
-            if not list_display and extra.field_groups and extra.field_groups.get('list_fields', None):
+            if not list_display and extra.field_groups and extra.field_groups.get('list_fields'):
                 list_display = extra.field_groups['list_fields']
 
-            if not self.print_fields and extra.field_groups and extra.field_groups.get('print_fields', None):
+            if not self.print_fields and extra.field_groups and extra.field_groups.get('print_fields'):
                 self.print_fields = extra.field_groups['print_fields']
 
             if not self.reports and getattr(extra, 'reports', None):
                 self.reports = Reports([ReportLink(report, import_module(self.model.__module__)) for report in extra.reports])
+
+            if not self.list_editable and extra.field_groups and extra.field_groups.get('list_editable'):
+                self.list_editable = extra.field_groups['list_editable']
+
+            if self.readonly is None:
+                self.readonly = getattr(extra, 'readonly', None)
 
         if self.model._meta.abstract:
             return
@@ -193,7 +200,6 @@ class ModelAdmin(options.ModelAdmin):
             "formfield_callback": self.formfield_for_dbfield,
         }
         import django.forms.models
-        print(self.model)
         self.form = django.forms.models.modelform_factory(self.model, **defaults)
         self.bound_fields = {}
 
@@ -236,15 +242,12 @@ class ModelAdmin(options.ModelAdmin):
                 f.widget.attrs['required'] = True
             if db_field.custom_attrs.widget_attrs:
                 f.widget.attrs.update(db_field.custom_attrs.widget_attrs)
-            if f.help_text:
-                f.widget.attrs.setdefault('tooltip', f.help_text)
-                f.widget.attrs.setdefault('tooltip-trigger', 'focus')
-                f.widget.attrs.setdefault('tooltip-placement', 'left')
             if db_field.readonly:
                 f.widget.attrs.setdefault('readonly', True)
             elif isinstance(f, forms.DateField):
                 f.widget.attrs.setdefault('class', 'form-control input-sm form-date-field')
                 f.widget.attrs.setdefault('ui-mask', _('9999-99-99'))
+                f.widget.attrs.setdefault('date-picker', 'date-picker')
             elif isinstance(f, forms.DecimalField):
                 f.widget.attrs.setdefault('class', 'form-control input-sm form-decimal-field')
             elif isinstance(f, forms.IntegerField):
@@ -341,9 +344,9 @@ class ModelAdmin(options.ModelAdmin):
             kwargs['query'] = request.GET.get('query', '')
             kwargs['fields'] = [(render.get_filter(f, self.model)[0], self.get_formfield(f).label)
                                 for f in self.list_display]
-            kwargs['list_display'] = ['<td%s>{{item.%s}}</td>' % render.get_filter(f, self.model)
-                                      for f in self.list_display]
+            kwargs['list_display'] = [render.get_field(self.get_field(f), self, view_type='list', context=kwargs) for f in self.list_display]
             kwargs.setdefault('pagesize', 50)
+            kwargs['selection_note'] = force_text(_('0 of %(cnt)s selected')).replace('0', '{{selection}}') % {'cnt': '{{list.start}} / {{list.total}}'}
 
             return TemplateResponse(request, self.change_list_template or [
                 'keops/%s/%s/change_list.html' % (app_label, opts.model_name),

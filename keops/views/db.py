@@ -1,3 +1,4 @@
+import datetime
 import json
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
@@ -81,7 +82,7 @@ def grid(request):
 
     # TODO Check content type permissions permissions
 
-    get_val = lambda x: '' if x is None else (callable(x) and x()) or x
+    get_val = lambda x: isinstance(x, datetime.date) and field_text(x) or ('' if x is None else (callable(x) and x()) or x)
     fields = ['pk'] + fields
     display_fn = _display_fn(model)
     rows = [{f: display_fn.get(f, str)(get_val(getattr(row, disp_fields.get(f, f)))) for f in fields} for row in queryset]

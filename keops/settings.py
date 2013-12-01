@@ -1,3 +1,5 @@
+from django.conf import global_settings
+
 DEBUG = True
 
 SITE_ID = 1
@@ -26,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'keops.modules.base',
     'django.contrib.admin',
+    'django.contrib.admindocs',
 ]
 
 MIDDLEWARE_CLASSES = (
@@ -53,7 +56,7 @@ SERIALIZATION_MODULES = {
     'mako': 'keops.core.serializers.mako_serializer',
 }
 
-TEMPLATE_PROCESSORS = (
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     "django.core.context_processors.request",
 )
 

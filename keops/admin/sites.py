@@ -70,7 +70,7 @@ class AdminSite(admin.AdminSite):
         return render(request, 'keops/app.html', {
             'app_menu': Menu.objects.filter(parent=None),
             'menu': Menu.objects.get(pk=menu_id),
-            'user': request.user,  # TODO get current company name
+            'user': request.user,
             'company': request.session['company']
         })
 
@@ -78,7 +78,6 @@ class AdminSite(admin.AdminSite):
         from keops.modules.base.models import Action
         action = Action.objects.get(pk=request.GET.get('action'))
         return action.execute(request, view_type=request.GET.get('view_type'))
-
 
     def response_menu_list(self, request):
         from keops.modules.base.models import Menu
@@ -115,7 +114,13 @@ class AdminSite(admin.AdminSite):
                 name='history'),
             url(r'^logout/$',
                 wrap(self.logout),
-                name='logout')
+                name='logout'),
+            url(r'^password_change/$',
+                wrap(self.password_change, cacheable=True),
+                name='password_change'),
+            url(r'^password_change/done/$',
+                wrap(self.password_change_done, cacheable=True),
+                name='password_change_done'),
         )
 
         return urlpatterns

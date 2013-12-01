@@ -49,7 +49,7 @@ class Contact(models.Model):
     address = models.CharField(_('address'), max_length=256)
     city = models.CharField(_('city'), max_length=64)
     zip_code = models.CharField(_('zip'), max_length=32)
-    country = models.ForeignKey('base.Country', verbose_name=_('country'))
+    country = models.ForeignKey('base.country', verbose_name=_('country'))
     email = models.EmailField('email')
     website = models.URLField('website')
     phone = models.CharField(_('phone'), max_length=64)

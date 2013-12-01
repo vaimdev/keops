@@ -118,11 +118,25 @@ keopsApp.factory('List', function($http, SharedData) {
 
 keopsApp.controller('ListController', function($scope, $location, List) {
     $scope.list = new List();
+    $scope.selection = 0;
 
     $scope.itemClick = function(url, search, index) {
         $scope.list.index = index;
         $location.path(url).search(search);
     };
+
+    $scope.toggleCheckAll = function() {
+        var c = $('#action-toggle')[0].checked;
+        $('.action-select').each(function () { $(this).checked = true; $(this).prop('checked', c); });
+        $scope.selection = $('.action-select:checked').length;
+    };
+
+    $scope.selectItem = function() {
+        $('#action-toggle').prop('checked', $('.action-select:not(:checked)').length === 0);
+        $scope.selection = $('.action-select:checked').length;
+    };
+
+
 });
 
 

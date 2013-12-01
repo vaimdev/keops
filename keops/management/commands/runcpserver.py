@@ -79,6 +79,7 @@ class Command(BaseCommand):
     def usage(self, subcommand):
         return CPSERVER_HELP
 
+
 def change_uid_gid(uid, gid=None):
     """Try to change UID and GID to the provided values.
     UID and GID are given as names like 'nobody' not integer.
@@ -91,6 +92,7 @@ def change_uid_gid(uid, gid=None):
     (uid, gid) = get_uid_gid(uid, gid)
     os.setgid(gid)
     os.setuid(uid)
+
 
 def get_uid_gid(uid, gid=None):
     """Try to change UID and GID to the provided values.
@@ -120,13 +122,14 @@ def poll_process(pid):
         try:
             # poll the process state
             os.kill(pid, 0)
-        except OSError, e:
+        except OSError as e:
             if e[0] == errno.ESRCH:
                 # process has died
                 return False
             else:
                 raise #TODO
     return True
+
 
 def stop_server(pidfile):
     """
@@ -144,8 +147,9 @@ def stop_server(pidfile):
             #process didn't exit cleanly, make one last effort to kill it
             os.kill(pid, signal.SIGKILL)
             if still_alive(pid):
-                raise OSError, "Process %s did not stop."
+                raise OSError("Process %s did not stop.")
         os.remove(pidfile)
+
 
 def start_server(options):
     """
@@ -185,7 +189,7 @@ def runcpserver(argset=[], **kwargs):
         options[k.lower()] = v
     
     if "help" in options:
-        print CPSERVER_HELP
+        print(CPSERVER_HELP)
         return
         
     if "stop" in options:
@@ -208,7 +212,7 @@ def runcpserver(argset=[], **kwargs):
         fp.close()
     
     # Start the webserver
-    print 'starting server with options %s' % options
+    print('starting server with options %s' % options)
     start_server(options)
 
 

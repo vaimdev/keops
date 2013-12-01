@@ -1,5 +1,5 @@
 <%
-	ro = (field.field.widget.attrs.get('readonly') and ' ng-init="form.readonly.' + field.name + '=true"') or ''
+	ro = ((field.field.widget.attrs.get('readonly') or form.readonly) and ' ng-init="form.readonly.' + field.name + '=true"') or ''
 %>
 % if isinstance(field.field, forms.GridField):
 	<td colspan="2" class="form-grid-cell"><%include file="/keops/forms/fields/grid.html.mako"/></td>
@@ -16,5 +16,8 @@
 			>
 		<%include file="/keops/forms/fields/widget.html.mako"/>
 		<%include file="/keops/forms/fields/span.html.mako"/>
+		% if field.help_text and not isinstance(field.field, forms.BooleanField):
+			<p class="help">${field.help_text}</p>
+		% endif
 	</td>
 % endif

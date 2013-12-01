@@ -24,10 +24,18 @@ def get_filter(field, model=None):
     return '', field
 
 
-def get_field(bound_field, form):
-    return loader.render_to_string('keops/forms/fields/formfield.html.mako', {
-        'field': bound_field, 'forms': keops.forms, 'models': models, 'model': form.model
-    })
+def get_field(field, form, view_type='form', context={}):
+    if view_type == 'form':
+        return loader.render_to_string('keops/forms/fields/formfield.html.mako', {
+            'field': field, 'forms': keops.forms, 'models': models, 'model': form.model,
+            'form_field': 'form.item.' + field.name, 'form': form
+        })
+    else:
+        if field.name in form.list_editable:
+            return '<td>%s</td>' % form.get_formfield(field.name).as_widget(attrs={'ng-model': 'item.' + field.name})
+        else:
+            f = get_filter(field, form.model)
+            return '<td%s ng-click="itemClick(\'action/%s/form/\', \'pk=\' + item.pk, $index)">{{item.%s}}</td>' % (f[0], context['action'].pk, f[1])
 
 
 def get_form_fields(form):

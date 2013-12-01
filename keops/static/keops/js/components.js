@@ -23,6 +23,7 @@ ui.directive('datePicker', function($locale) {
                 todayBtn: true,
                 todayHighlight: true,
                 autoclose: true,
+                forceParse: false,
                 language: document.documentElement.lang,
                 format: attrs.format || $locale.DATETIME_FORMATS.mediumDate.toLowerCase()
             });

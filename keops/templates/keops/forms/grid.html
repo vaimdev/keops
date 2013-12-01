@@ -1,13 +1,15 @@
 <table class="data-grid table table-condensed table-hover" ng-init="list.q = '{{ query }}'" infinite-scroll="list.nextPage('{{ opts }}', list.q)" infinite-scroll-distance="1">
     <thead>
         <tr>
+            <th style="width: 1px;"><input type="checkbox" id="action-toggle" ng-click="toggleCheckAll()"></th>
             {% for field in fields %}
             <th{{ field.0|safe }}>{{ field.1 }}</th>
             {% endfor %}
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="item in list.items" ng-click="itemClick('action/{{ action.pk }}/form/', 'pk=' + item.pk, $index)">
+        <tr ng-repeat="item in list.items">
+            <td class="action-checkbox"><input class="action-select" type="checkbox" name="_selected_action" ng-bind="item.pk" ng-click="selectItem()"></td>
             {% for field in list_display %}
             {{ field|safe }}
             {% endfor %}

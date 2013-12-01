@@ -9,7 +9,8 @@ js_info_dict = {
 }
 
 urlpatterns = patterns('',
-    # db
+    (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    (r'^admin/', include(admin.site.urls)),
     (r'^db/grid/$', 'keops.views.db.grid'),
     (r'^db/read/$', 'keops.views.db.read'),
     (r'^db/read/items/$', 'keops.views.db.read_items'),
@@ -20,11 +21,10 @@ urlpatterns = patterns('',
     (r'^db/test/$', 'keops.views.test.index'),
     # additional
     (r'^accounts/', include('django.contrib.auth.urls')),
-    (r'^admin/', include(admin.site.urls)),
     (r'^jsi18n/', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
 urlpatterns += staticfiles_urlpatterns()
 
-# Autodiscover apps forms
+# Autodiscover forms
 forms.autodiscover()

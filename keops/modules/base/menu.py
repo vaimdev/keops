@@ -3,6 +3,7 @@ from keops.db import models
 from .module import *
 from .action import *
 
+
 class MenuManager(ElementManager):
     def add_menu(self, path, action, icon=None, using=None):
         menu = self.model()
@@ -11,14 +12,15 @@ class MenuManager(ElementManager):
         menu.image = icon
         menu.save(using=using)
 
+
 class Menu(ModuleElement):
     parent = models.ForeignKey('self', verbose_name=_('parent'))
     name = models.CharField(_('name'), max_length=128, null=False, db_index=True)
     description = models.TextField(_('description'))
     action = models.ForeignKey(Action, verbose_name=_('action'))
-    image = models.CharField(_('image'), max_length=256, help_text=_('menu image file path'))
+    icon = models.CharField(_('icon'), max_length=256, help_text=_('menu icon class'))
     sequence = models.PositiveIntegerField(_('sequence'), help_text=_('menu item sequence'), default=0, db_index=True)
-    closed = models.BooleanField(_('close'), default=False) # dont show sub items
+    closed = models.BooleanField(_('close'), default=False)  # dont show sub items
     direct_url = models.URLField('url')
 
     objects = MenuManager()
@@ -31,7 +33,7 @@ class Menu(ModuleElement):
 
     class Extra:
         field_groups = {
-            'list_fields': ('name', 'parent', 'action', 'image', 'sequence')
+            'list_fields': ('name', 'parent', 'action', 'icon', 'sequence')
         }
 
     def __str__(self):
@@ -82,6 +84,7 @@ class Menu(ModuleElement):
     def get_model(self):
         if self.action and self.action.action_type == 'form':
             return FormAction.objects.using(self._state.db).get(pk=self.action.pk).model
+
     def set_model(self, model):
         db = self._state.db
         from keops.modules.base.models import BaseModel
@@ -102,6 +105,7 @@ class Menu(ModuleElement):
     def get_form(self):
         if self.action and self.action.action_type == 'form':
             return FormAction.objects.get(pk=self.action.pk).view
+
     def set_form(self, form):
         if isinstance(form, str):
             form = View.objects.get(name=form)
@@ -114,6 +118,7 @@ class Menu(ModuleElement):
     def get_report(self):
         if self.action and self.action.action_type == 'report':
             return ReportAction.objects.using(self._state.db).get(pk=self.action.pk).report
+
     def set_report(self, report):
         if isinstance(report, str):
             try:

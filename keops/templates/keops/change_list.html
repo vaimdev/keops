@@ -7,7 +7,7 @@
                     <td class="form-title">
                         <span>
                             <span style="display: inline-block; padding-right: 10px; font-weight: 600;">{{ form.title|capfirst }}</span>
-                            <span class="badge">{% verbatim %}{{list.start}} / {{list.total}}{% endverbatim %}</span>
+                            <span class="badge">{{ selection_note }}</span>
                         </span>
                         <div class="form-help-text">
                             <span>{{ form.help_text }}</span>
@@ -15,8 +15,23 @@
                         <div>
                             <table><tr>
                             <td>
-                                <a class="btn btn-danger" href="#{{ action.get_absolute_url }}form/?state=new">{{ _('create')|capfirst }}</a>
-                                <a class="btn btn-default">{{ _('record')|capfirst }}</a>
+                                <a class="btn btn-danger" href="#{{ action.get_absolute_url }}form/?state=new"><span class="glyphicon glyphicon-file"></span> {{ _('create')|capfirst }}</a>
+
+                                {% for group, actions in action_groups.items %}
+                                <div ng-show="selection > 0" class="btn-group" style="margin-left: 20px;">
+                                <button class="btn btn-default dropdown-toggle">{{ group }}<span style="margin-left: 8px;" class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    {% for action, obj in actions %}
+                                        {% if obj.attrs %}
+                                        <li {{ obj.attrs|safe }}><a style="cursor: pointer;">{{ obj.short_description|safe }}</a></li>
+                                        {% else %}
+                                        <li><a style="cursor: pointer;" ng-click="adminAction('{{ action }}')">{{ obj.short_description|safe }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                </div>
+                                {% endfor %}
+
                             </td>
                             <td>
                                 {% if form.reports %}
@@ -43,7 +58,7 @@
                                     <div class="input-group">
                                         <input style="width: 350px;" class="form-control" placeholder="{{ _("search")|capfirst }}" ng-model="searchField" value="{{ query }}" ng-enter="list.query('{{ opts }}', searchField)">
                                         <span style="cursor: pointer;" class="input-group-btn">
-                                            <button type="button" class="btn btn-default"><span class="caret"></span></button>
+                                            <button type="button" class="btn btn-default" popover="test" popover-placement="bottom"><span class="caret"></span></button>
                                             <button type="button" class="btn btn-primary" ng-click="list.query('{{ opts }}', searchField)"><span class="glyphicon glyphicon-search"></span></button>
                                             </span>
                                     </div>

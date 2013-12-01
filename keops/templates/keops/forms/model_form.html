@@ -17,7 +17,7 @@
                                 <button type="button" ng-show="!form.write" class="btn btn-sm btn-primary" ng-click="form.newItem()" tooltip="{{ _('Create new record') }}">{{ _('create')|capfirst }}</button>
                                 <button type="button" ng-show="!form.write" class="btn btn-sm btn-info" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
 
-                                <input type="submit" ng-show="form.write" class="btn btn-sm btn-primary" value="{{ _('save')|capfirst }}" tooltip="{{ _('Save record changes') }}">
+                                <button type="submit" ng-show="form.write" class="btn btn-sm btn-primary" tooltip="{{ _('Save record changes') }}"><span class="glyphicon glyphicon-floppy-disk"></span>{{ _('save')|capfirst }}</button>
                                 <button type="submit" ng-show="form.write" class="btn btn-sm btn-info" tooltip="{{ _('Save changes and create a new record') }}">{{ _('Save + New') }}</button>
                                 <button type="submit" ng-show="form.write" class="btn btn-sm btn-info" tooltip="{{ _('Save changes and edit the created record') }}">{{ _('Save + Edit') }}</button>
                                 <button type="button" ng-show="form.write" class="btn btn-sm btn-danger" ng-click="form.cancel()" tooltip="{{ _('Cancel changes') }}">{{ _('cancel')|capfirst }}</button>
