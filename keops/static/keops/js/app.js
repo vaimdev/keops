@@ -116,6 +116,7 @@ keopsApp.factory('List', function($http, SharedData) {
     return List;
 });
 
+
 keopsApp.controller('ListController', function($scope, $location, List) {
     $scope.list = new List();
     $scope.selection = 0;
@@ -135,7 +136,6 @@ keopsApp.controller('ListController', function($scope, $location, List) {
         $('#action-toggle').prop('checked', $('.action-select:not(:checked)').length === 0);
         $scope.selection = $('.action-select:checked').length;
     };
-
 
 });
 
@@ -169,7 +169,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
             url = '/admin/action/';
         }
         $http({
-            method: 'GET',
+            method: 'POST',
             url: url,
             params: params
         }).success(function(data) {
@@ -280,7 +280,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
     return Form;
 });
 
-keopsApp.controller('FormController', function($scope, $http, Form, $location, $element, $modal, $timeout) {
+keopsApp.controller('FormController', function($scope, $http, Form, $location, $element, $modal, $timeout, $sce) {
     $scope.form = new Form();
     $scope.form.element = $element;
 
@@ -352,9 +352,11 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
     $scope.alerts = [];
 
     $scope.addAlert = function(type, msg) {
+        msg = $sce.trustAsHtml(msg);
         if (type == 'error') type = 'danger';
         $scope.alerts.push({type: type, msg: msg, timer: $timeout(function() {
-            $scope.alerts.splice(0, 1); }, 10000)
+            //$scope.alerts.splice(0, 1);
+            }, 10000)
         });
     };
 
@@ -458,20 +460,9 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
             ).
             success(function (data, status, headers, config) {
                     console.log(data);
-                for (var i in data) {
-                    i = data[i];
-                    if (i.success && (typeof i.message === 'object')) {
-                        $scope.form.nestedDirty = false;
-                        form.$setPristine();
-                        $scope.form.write = false;
-                        jQuery.extend($scope.form.item, data.data);
-                    }
-                    else if (!i.success) {
-                        $scope.addAlert(i.alert, i.message);
-                        throw i.message;
-                    }
-                    else $scope.addAlert(i.alert, i.message);
-                }
+
+                $scope._evalData(data);
+
                 }.bind(this)).
                 error(function (data) {
                     window.open('error').document.write(data);
@@ -479,6 +470,38 @@ keopsApp.controller('FormController', function($scope, $http, Form, $location, $
         }
         else $scope.addAlert('error', gettext('No pending data to submit!'))
     }
+
+    $scope.adminAction = function(action, data) {
+        $scope.alerts.length = 0;
+        var params = {model: this.model};
+        var url = '/admin/action/';
+        var pk = this.form.pk;
+        params['action'] = action;
+        params['pk'] = this.form.pk;
+        params['model'] = this.form.model;
+        params['data'] = data;
+        $http.post(url, params).success(function(data) {
+                $scope._evalData(data);
+            });
+    };
+
+    $scope._evalData = function(data) {
+        for (var i in data) {
+            i = data[i];
+            var s = i.message;
+            if (i.success && (typeof i.message === 'object')) {
+                $scope.form.nestedDirty = false;
+                form.$setPristine();
+                $scope.form.write = false;
+                jQuery.extend($scope.form.item, data.data);
+            }
+            else if (!i.success) {
+                $scope.addAlert(i.alert, s);
+            }
+            else $scope.addAlert(i.alert, s);
+        }
+    };
+
 });
 
 keopsApp.controller('MenuController', function($scope, $http, Form, $location, $modal, $route) {

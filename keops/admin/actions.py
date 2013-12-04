@@ -30,7 +30,7 @@ def delete_selected(modeladmin, request, queryset):
 
     return HttpMessagesResponse(request._messages)
 
-delete_selected.short_description = capfirst(ugettext_lazy('delete'))
+delete_selected.short_description = ugettext_lazy('Delete')
 delete_selected.category = ugettext_lazy('record')
 delete_selected.attrs = 'ng-click="confirmDelete()"'
 

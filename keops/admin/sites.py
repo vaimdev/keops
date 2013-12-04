@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from functools import update_wrapper
+import json
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -41,10 +42,15 @@ class AdminSite(admin.AdminSite):
         """
         from keops.db import get_db
         using = get_db(request)
-        model = self.get_model(request.GET['model'])
+        if request.body:
+            data = json.loads(request.body.decode(settings.DEFAULT_CHARSET))
+            request.POST = data
+        else:
+            data = request.GET
+        model = self.get_model(data['model'])
         admin = model._admin
         pk = request.GET.get('pk')
-        action = admin.get_action(request.GET['action'])[0]
+        action = admin.get_action(data['action'])[0]
         queryset = None
         if pk:
             queryset = model.objects.using(using).filter(pk=pk)

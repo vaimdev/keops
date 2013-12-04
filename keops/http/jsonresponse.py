@@ -25,4 +25,5 @@ def json_response(func):
 
 
 def HttpMessagesResponse(msgs):
-    return HttpJsonResponse([{'success': m.level in [messages.INFO, messages.SUCCESS, messages.WARNING], 'alert': m.tags, 'message': m.message} for m in msgs])
+    return HttpJsonResponse([{'success': m.level in [messages.INFO, messages.SUCCESS, messages.WARNING],
+                              'alert': m.tags, 'message': m.message} for m in msgs])

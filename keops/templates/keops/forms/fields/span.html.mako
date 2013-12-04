@@ -14,7 +14,7 @@
 		url = field.field.target_attr.get_resource_url()
 	%>
 	% if url:
-		<a style="cursor: pointer" ng-show="!form.write${ro}" ng-bind="${form_field}.text" ng-click="openResource('${url}', 'pk=' + ${form_field}.id, ${field.name})"></a>
+		<a style="cursor: pointer" ng-show="!form.write${ro}" ng-bind="${form_field}.text" ng-href="#/${url}?pk={{${form_field}.id}}"></a>
 	% else:
         <a ng-show="!form.write${ro}" ng-bind="${form_field}.text"></a>
     % endif

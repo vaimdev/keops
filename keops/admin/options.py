@@ -19,6 +19,7 @@ from django.core.exceptions import ValidationError
 from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.template import loader, RequestContext
 from keops.http import HttpJsonResponse, HttpMessagesResponse
 from keops.utils import field_text
 from .reports import ReportLink, Reports
@@ -85,6 +86,7 @@ class ModelAdmin(options.ModelAdmin):
     label = None
     help_text = None
     readonly = None
+    confirm_action_template = None
 
     def __iter__(self):
         for page, fieldsets in self.pages:
@@ -574,3 +576,8 @@ class ModelAdmin(options.ModelAdmin):
             "keops/%s/object_history.html" % app_label,
             "keops/object_history.html"
         ], context, current_app=self.admin_site.name)
+
+    def confirm_action(self, request, content):
+        context = {'content': content}
+        return loader.render_to_string(self.confirm_action_template or 'keops/admin_action.html',
+                                       context, RequestContext(request))

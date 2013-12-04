@@ -101,8 +101,9 @@
     </tr>
 </table>
 <div>
-    <div style="margin: 6px;" ng-repeat="alert in alerts" ng-class="'alert alert-' + alert.type" close="closeAlert($index)"><span ng-bind-html="alert.msg"></span>
-        <a class="close" ng-click="closeAlert($index)">&times;</a>
+    <div style="margin: 6px;" ng-repeat="alert in alerts" ng-class="'alert alert-' + alert.type" close="closeAlert($index)">
+        <button class="close" ng-click="closeAlert($index)">&times;</button>
+        <div ng-bind-html="alert.msg" dynamic="html"></div>
     </div>
 </div>
 {{ form_view|safe }}

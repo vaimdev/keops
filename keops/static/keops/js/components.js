@@ -26,7 +26,10 @@ ui.directive('datePicker', function($locale) {
                 forceParse: false,
                 language: document.documentElement.lang,
                 format: attrs.format || $locale.DATETIME_FORMATS.mediumDate.toLowerCase()
-            });
+            }).on('changeDate', function() {
+                    controller.$setViewValue(el.val());
+                    scope.$apply();
+                });
             controller.$render = function () {
                 el.datepicker('update', controller.$viewValue);
             };
@@ -207,5 +210,18 @@ ui.filter('dateFrom', function ($locale) {
             return m.format('LL') + ' (' + m.fromNow() + ')';
         }
         else return '';
+    };
+});
+
+ui.directive('dynamic', function ($compile) {
+    return {
+        restrict: 'A',
+        replace: true,
+        link: function (scope, ele, attrs) {
+            scope.$watch(attrs.dynamic, function(html) {
+                ele.html(html);
+                $compile(ele.contents())(scope);
+            });
+        }
     };
 });
