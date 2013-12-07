@@ -9,7 +9,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="item in list.items">
-            <td class="action-checkbox"><input class="action-select" type="checkbox" name="_selected_action" ng-bind="item.pk" ng-click="selectItem()"></td>
+            <td class="action-checkbox"><input class="action-select" type="checkbox" name="_selected_action" ng-bind="item.pk" ng-click="selectItem()" ng-model="item._selected_action"></td>
             {% for field in list_display %}
             {{ field|safe }}
             {% endfor %}

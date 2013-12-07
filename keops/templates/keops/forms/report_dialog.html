@@ -1,0 +1,9 @@
+{% extends "keops/forms/filter_form.html" %}
+{% block start %}
+<form name="dataForm" ng-init="form.write = true;{{ initial_values }}" action="/report/showreport/" target="_blank">
+<input type="hidden" name="report" value="{{ report }}">
+{% endblock %}
+{% block footer %}
+    <button class="btn btn-info" type="submit">{{ ok|default:'OK' }}</button>
+    <a class="btn btn-default" ng-click="cancel()">{{ cancel|default:_('cancel')|capfirst }}</a>
+{% endblock %}

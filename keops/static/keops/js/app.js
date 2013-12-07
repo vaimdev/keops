@@ -5,7 +5,35 @@ var getval = function (val) {
     else return val;
 };
 
-var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ngCookies', 'ui.bootstrap', 'infinite-scroll', 'ui.keops']).config(
+var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ngCookies', 'ui.bootstrap', 'infinite-scroll', 'ui.keops'], function ($routeProvider, $locationProvider, $httpProvider) {
+
+    var interceptor = ['$rootScope', '$q', function (scope, $q) {
+
+        function success(response) {
+            // check ajax response is html document
+            if ((typeof response.data === 'string') && (response.data.substring(0, 5) == '<!DOC')) {
+                window.document.write(response.data);
+                // check html document is login form
+                var el = window.document.getElementsByName('next')[0];
+                $(el).val(window.location);
+                return;
+            }
+            return response;
+        }
+
+        function error(response) {
+            // check error status
+            return $q.reject(response);
+
+        }
+
+        return function (promise) {
+            return promise.then(success, error);
+        }
+
+    }];
+$httpProvider.responseInterceptors.push(interceptor);
+}).config(
     function($routeProvider, $locationProvider) {
         $routeProvider.
             when('/action/:id/',
@@ -132,7 +160,11 @@ keopsApp.controller('ListController', function($scope, $location, List) {
         $scope.selection = $('.action-select:checked').length;
     };
 
-    $scope.selectItem = function() {
+    $scope.selectItem = function(item) {
+        if (item) {
+            item._selected_action = true;
+            $scope.$apply();
+        }
         $('#action-toggle').prop('checked', $('.action-select:not(:checked)').length === 0);
         $scope.selection = $('.action-select:checked').length;
     };
@@ -162,7 +194,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
 
     Form.prototype.newItem = function (pk) {
         var params = {model: this.model};
-        var url = '/db/new';
+        var url = '/db/new/';
         if (pk) {
             params['action'] = 'duplicate_selected';
             params['pk'] = pk;
@@ -553,4 +585,5 @@ keopsApp.controller('DialogController', function($scope, $http, Form, $location,
 
 keopsApp.run(function($rootScope, $http, $cookies){
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+    $http
 });

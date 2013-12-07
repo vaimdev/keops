@@ -15,7 +15,9 @@
     % endif
 			>
 		<%include file="/keops/forms/fields/widget.html.mako"/>
+		% if not nospan:
 		<%include file="/keops/forms/fields/span.html.mako"/>
+        % endif
 		% if field.help_text and not isinstance(field.field, forms.BooleanField):
 			<p class="help">${field.help_text}</p>
 		% endif

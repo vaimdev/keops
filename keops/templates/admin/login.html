@@ -16,7 +16,7 @@
           <input type="password" class="form-control" placeholder="{{ form.password.label }}" name="password" required>
           <button class="btn btn-lg btn-primary btn-block" type="submit">{{ _('Sign in') }}</button>
           {% csrf_token %}
-          <input class="btn" type="hidden" name="next" value="{{ next }}" />
+          <input type="hidden" name="next" value="{{ next }}" />
             <div>
             <a class="pull-right">Need help?</a>
             <label class="checkbox">
