@@ -136,16 +136,14 @@ ui.directive('uiTableRow', function() {
     }
 });
 
-//var s = $.fn.select2.defaults.formatNoMatches();
-//$.fn.select2.defaults.formatNoMatches = function () { return s + ' <a style="position: absolute; right: 10px; cursor: pointer;">' + gettext('Create...') + '</a>'; },
-
-ui.directive('combobox', function() {
+ui.directive('combobox', function($sce) {
     return {
         restrict: 'A',
         require : 'ngModel',
-        link: function(scope, element, attrs, controller) {
+        link: function(scope, element, attrs, controller, $compile) {
             var url = attrs.lookupUrl;
             var multiple = attrs['multiple'];
+            var allowCreate = attrs.comboboxShowCreate;
             if (url) {
                 var cfg = {
                     ajax: {
@@ -161,12 +159,16 @@ ui.directive('combobox', function() {
                         },
                         results: function (data, page) {
                             var more = (page * 10) < data.total;
-                            if (!multiple && (page === 1)) data.data.splice(0, 0, {id: null, text: gettext('---------')});
+                            if (!multiple && (page === 1)) {
+                                data.data.splice(0, 0, {id: null, text: gettext('---------')});
+                            };
+                            if (allowCreate && !more) data.data.push({id: {}, text: '<b><i>' + gettext('Create new...') + '</i></b>'});
                             return { results: data.data, more: more };
                         }
                     }
                 };
                 if (multiple) cfg['multiple'] = true;
+                cfg['escapeMarkup'] = function (m) { return m; };
                 var el = element.select2(cfg);
             }
             else
@@ -182,6 +184,7 @@ ui.directive('combobox', function() {
                 scope.$apply(function () {
                     var data = el.select2('data');
                     if (data.id === null) controller.$setViewValue('');
+                    else if (typeof data.id === 'object') {controller.$setViewValue(''); el.select2('data', '');}
                     else controller.$setViewValue(data);
                     console.log(data);
                 });

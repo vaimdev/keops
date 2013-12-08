@@ -246,6 +246,8 @@ class ModelAdmin(options.ModelAdmin):
                 f.widget.attrs.update(db_field.custom_attrs.widget_attrs)
             if db_field.readonly:
                 f.widget.attrs.setdefault('readonly', True)
+            if isinstance(f, forms.ModelChoiceField):
+                f.widget.attrs['combobox-show-create'] = '1'
             elif isinstance(f, forms.DateField):
                 f.widget.attrs.setdefault('class', 'form-control input-sm form-date-field')
                 f.widget.attrs.setdefault('ui-mask', _('9999-99-99'))

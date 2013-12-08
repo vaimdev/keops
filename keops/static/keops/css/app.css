@@ -14,7 +14,7 @@ legend {
     font-size: 15px;
 }
 
-label, th {
+label, th, b {
     font-weight: 600;
 }
 

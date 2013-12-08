@@ -57,3 +57,6 @@ msgstr "Não há dados pendentes para envio!"
 
 msgid "<New>"
 msgstr "<Novo>"
+
+msgid "Create new..."
+msgstr "Criar novo..."
