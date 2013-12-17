@@ -136,11 +136,11 @@ ui.directive('uiTableRow', function() {
     }
 });
 
-ui.directive('combobox', function($sce) {
+ui.directive('combobox', function($location) {
     return {
         restrict: 'A',
         require : 'ngModel',
-        link: function(scope, element, attrs, controller, $compile) {
+        link: function(scope, element, attrs, controller) {
             var url = attrs.lookupUrl;
             var multiple = attrs['multiple'];
             var allowCreate = attrs.comboboxShowCreate;
@@ -184,7 +184,11 @@ ui.directive('combobox', function($sce) {
                 scope.$apply(function () {
                     var data = el.select2('data');
                     if (data.id === null) controller.$setViewValue('');
-                    else if (typeof data.id === 'object') {controller.$setViewValue(''); el.select2('data', '');}
+                    else if (typeof data.id === 'object') {
+                        window.open(window.location.pathname + '#/' + allowCreate);
+                        controller.$setViewValue(''); el.select2('data', '');
+
+                    }
                     else controller.$setViewValue(data);
                     console.log(data);
                 });

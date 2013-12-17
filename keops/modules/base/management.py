@@ -12,6 +12,7 @@ def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwarg
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
+    return
     ContentType.objects.clear_cache()
     mod_name = '.'.join(app.__name__.split('.')[:-1])
     app_models = get_models(app)
@@ -34,8 +35,11 @@ def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwarg
         module = module[0]
     else:
         from keops.db import scripts
-        scripts.install(mod_name, db)
-        module = Module.objects.using(db).get(app_label=app_label)
+        try:
+            scripts.install(mod_name, db)
+            module = Module.objects.using(db).get(app_label=app_label)
+        except:
+            pass
 
     # Get all the content types
     content_types = dict(

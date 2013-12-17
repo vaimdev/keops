@@ -247,7 +247,7 @@ class ModelAdmin(options.ModelAdmin):
             if db_field.readonly:
                 f.widget.attrs.setdefault('readonly', True)
             if isinstance(f, forms.ModelChoiceField):
-                f.widget.attrs['combobox-show-create'] = '1'
+                f.widget.attrs['combobox-show-create'] = db_field.get_resource_url()
             elif isinstance(f, forms.DateField):
                 f.widget.attrs.setdefault('class', 'form-control input-sm form-date-field')
                 f.widget.attrs.setdefault('ui-mask', _('9999-99-99'))
