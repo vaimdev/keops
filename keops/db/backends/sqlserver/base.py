@@ -22,6 +22,10 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 
+class DatabaseFeatures(BaseDatabaseFeatures):
+    can_return_id_from_insert = True
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'sqlserver'
     operators = {
@@ -45,3 +49,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
+
+        opts = self.settings_dict["OPTIONS"]
+        self.features = DatabaseFeatures(self)
+        self.ops = DatabaseOperations(self)
+        self.client = DatabaseClient(self)
+        self.creation = DatabaseCreation(self)
+        self.introspection = DatabaseIntrospection(self)
+        self.validation = BaseDatabaseValidation(self)
+
