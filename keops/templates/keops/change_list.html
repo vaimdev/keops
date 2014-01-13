@@ -15,6 +15,7 @@
                         <div>
                             <table><tr>
                             <td>
+                            {% block buttons %}
                                 <a class="btn btn-danger" href="#{{ action.get_absolute_url }}form/?state=new"><span class="glyphicon glyphicon-file"></span> {{ _('create')|capfirst }}</a>
 
                                 {% for group, actions in action_groups.items %}
@@ -31,6 +32,7 @@
                                 </ul>
                                 </div>
                                 {% endfor %}
+                            {% endblock %}
 
                             </td>
                             <td>

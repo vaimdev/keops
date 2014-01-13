@@ -13,7 +13,9 @@
                             <span>{{ form.help_text }}</span>
                         </div>
                         <table>
-                            <tr><td>
+                            <tr>
+                                {% block buttons %}
+                                <td>
                                 <button type="button" ng-show="!form.write" class="btn btn-danger" ng-click="form.newItem()" tooltip="{{ _('Create new record') }}"><span class="glyphicon glyphicon-file"></span> {{ _('create')|capfirst }}</button>
                                 <button type="button" ng-show="!form.write" class="btn btn-default" ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
 
@@ -38,6 +40,7 @@
                                 </div>
                                 {% endfor %}
                             </td>
+                                {% endblock %}
                                 <td ng-show="!form.write">
                                 {% if form.reports %}
                                 <div class="btn-group" style="margin-left: 20px;">

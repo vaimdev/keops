@@ -246,7 +246,7 @@ class ModelAdmin(options.ModelAdmin):
                 f.widget.attrs.update(db_field.custom_attrs.widget_attrs)
             if db_field.readonly:
                 f.widget.attrs.setdefault('readonly', True)
-            if isinstance(f, forms.ModelChoiceField):
+            if isinstance(f, forms.ModelChoiceField) and not isinstance(db_field, models.ManyToManyField):
                 f.widget.attrs['combobox-show-create'] = db_field.get_resource_url()
             elif isinstance(f, forms.DateField):
                 f.widget.attrs.setdefault('class', 'form-control input-sm form-date-field')
