@@ -4,6 +4,7 @@ from django.conf import settings
 
 __all__ = ['register_modules', 'adjust_dependencies']
 
+
 def register_modules(prefix, path):
     lst = os.listdir(path)
     for s in lst:
@@ -14,8 +15,8 @@ def register_modules(prefix, path):
                 settings.INSTALLED_APPS.append(mod)
             except:
                 pass
-
     adjust_dependencies(settings.INSTALLED_APPS)
+
 
 def get_dependencies(app):
     r = []
@@ -27,6 +28,7 @@ def get_dependencies(app):
             r += get_dependencies(dep)
         return r + deps
     return []
+
 
 def adjust_dependencies(apps):
     # adjust module dependency priority

@@ -21,13 +21,13 @@ def _choice_fields(model):
 
 
 def fk_select_fields(model):
-    if not hasattr(model.Extra, '_cache_fk_select_fields'):
-        model.Extra._cache_fk_select_fields = {f.name: f.custom_attrs['select_fields'] for f in model._meta.fields if 'select_fields' in f.custom_attrs}
-    return model.Extra._cache_fk_select_fields
+    if not hasattr(model._meta.admin, '_cache_fk_select_fields'):
+        model._meta.admin._cache_fk_select_fields = {f.name: f.custom_attrs['select_fields'] for f in model._meta.fields if 'select_fields' in f.custom_attrs}
+    return model._meta.admin._cache_fk_select_fields
 
 
 def _display_fn(model):
-    if not hasattr(model.Extra, '_cache_display_fn'):
+    if not hasattr(model._meta.admin, '_cache_display_fn'):
         r = {}
         for field in model._meta.all_fields:
             if field.custom_attrs.display_fn:
@@ -38,8 +38,8 @@ def _display_fn(model):
             else:
                 display = str
             r[field.name] = display
-        model.Extra._cache_display_fn = r
-    return model.Extra._cache_display_fn
+        model._meta.admin._cache_display_fn = r
+    return model._meta.admin._cache_display_fn
 
 
 def grid(request):
@@ -130,7 +130,7 @@ def read(request):
     # Prevent get all records
     assert not 'all' in request.GET
     model = get_model(request.GET)
-    return model._admin.read(request)
+    return model._meta.admin.model_admin.read(request)
 
 
 def _get_queryset_fields(model, obj, attr):
@@ -163,7 +163,7 @@ def read_items(request):
 
 def lookup(request):
     model = get_model(request.GET)
-    return model._admin.lookup(request, sel_fields=fk_select_fields(model), display_fn=_display_fn(model)[request.GET['field']])
+    return model._meta.admin.model_admin.lookup(request, sel_fields=fk_select_fields(model), display_fn=_display_fn(model)[request.GET['field']])
 
 
 def new_item(request):

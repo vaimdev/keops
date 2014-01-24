@@ -2,7 +2,6 @@ from . import settings
 
 settings.BASE_APPS = settings.INSTALLED_APPS[:]
 
-
 class Context(object):
     @property
     def request(self):

@@ -2,37 +2,7 @@
 # Sorry! Monkey patch is the only way to do this for now
 import copy
 from django.db import models, router, DatabaseError
-from keops.admin import modeladmin_factory, site
 
-# Add data dict object to django model (class Extra)
-extra_attrs = {
-    # Extra attributes
-    'default_fields': None,
-    'status_field': None,  # main model status field representation
-    'queryset': None,  # default queryset
-    'reports': None,
-    'readonly': None,
-    'field_groups': {
-        'display_fields': None,
-        'editable_fields': None,
-        'print_fields': None,
-        'list_fields': None,
-        'list_editable': None,
-        'search_fields': None,
-        'filter_fields': None,
-    },
-    # Events
-    'after_insert': None,
-    'after_update': None,
-    'after_delete': None,
-    'after_save': None,
-    'after_change': None,
-    'before_insert': None,
-    'before_update': None,
-    'before_delete': None,
-    'before_save': None,
-    'before_change': None,
-}
 
 models.base.ModelState._modified_fields = []
 
@@ -41,7 +11,6 @@ class ModelBase(object):
     _new = models.base.ModelBase.__new__
 
     def __new__(cls, name, bases, attrs):
-        admin = attrs.pop('Admin', None)
         meta = attrs.get('Meta')
 
         # IMPORTANT
@@ -53,64 +22,14 @@ class ModelBase(object):
 
         new_class = ModelBase._new(cls, name, bases, attrs)
 
-        if not admin:
-            admin = getattr(new_class, 'Admin', None)
-
         # Add proxy fields
         if proxy_fields:
             for f in proxy_fields:
                 new_class.add_to_class(f[0], f[1])
 
-        # Add Extra class
-        extra = getattr(new_class, 'Extra', None)
-        if extra:
-            base = extra
-        else:
-            base = object
-
-        if not 'Extra' in attrs:
-            extra = type('Extra', (base,), {})
-            new_class.add_to_class('Extra', extra)
-
-        for d, v in extra_attrs.items():
-            if not hasattr(extra, d):
-                setattr(extra, d, copy.copy(v))
-
-        # Add Admin meta class to _admin model attribute
-        new_class.add_to_class('_admin', modeladmin_factory(admin, new_class)(new_class, site))
-
         new_class._meta._log_fields = [f.name for f in new_class._meta.fields if not f.primary_key] +\
             [f.attname for f in new_class._meta.fields\
              if isinstance(f, models.ForeignKey) and not f.primary_key]
-
-        # Auto detect display_expression
-        if extra.default_fields is None:
-            fk = None
-            for f in new_class._meta.fields:
-                if isinstance(f, models.CharField):
-                    extra.default_fields = (f.name,)
-                    break
-                if isinstance(f, models.ForeignKey) and not fk:
-                    fk = (f.name,)
-            extra.default_fields = extra.default_fields or fk
-
-        if not extra.field_groups.get('list_fields'):
-            extra.field_groups['list_fields'] = [
-                f.name for f in new_class._meta.fields \
-                if not isinstance(f, (models.AutoField, models.ManyToManyField)) and\
-                getattr(f, 'custom_attrs', {}).get('visible', not f.primary_key)]
-
-        if not extra.field_groups.get('search_fields'):
-            extra.field_groups['search_fields'] = extra.default_fields
-
-        # Auto detect status_field
-        if extra.status_field is None:
-            try:
-                f = new_class._meta.get_field('status')
-                if f.choices:
-                    extra.state_field = 'status'
-            except:
-                pass
 
         return new_class
 
@@ -295,10 +214,10 @@ class Model(object):
         return self
 
     # Monkey patch
-    models.Model.__init__ = __init__
-    models.Model.delete = delete
+    #models.Model.__init__ = __init__
+    #models.Model.delete = delete
     #models.Model.save = save
     #models.Model._save_table = _save_table
     #models.Model.__setattr__ = __setattr__
-    models.Model.__str__ = __str__
-    models.Model.__copy__ = __copy__
+    #models.Model.__str__ = __str__
+    #models.Model.__copy__ = __copy__

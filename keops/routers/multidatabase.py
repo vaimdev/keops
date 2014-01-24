@@ -3,6 +3,7 @@
 # by default keops installs all apps defined on BASE_APPS settings
 from keops.middleware.threadlocal import get_db
 
+
 class MultiDatabaseRouter(object):
     _app_cache = {}
 
@@ -18,7 +19,7 @@ class MultiDatabaseRouter(object):
             try:
                 # cache all installed modules
                 from keops.modules.base import models
-                apps.extend([ r.app_label for r in models.Module.objects.using(db).all() ])
+                apps.extend([r.app_label for r in models.Module.objects.using(db).all()])
             except:
                 pass
             self._app_cache[db] = apps

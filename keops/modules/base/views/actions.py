@@ -11,8 +11,9 @@ def response_form(request, action, *args, **kwargs):
         # Auto detect ModelAdmin
         model = action.model.content_type.model_class()
         try:
-            admin = model._admin
+            admin = model._meta.admin.model_admin
         except:
+            raise
             # Auto create ModelAdmin
             admin = type(model.__name__ + 'Admin', (ModelAdmin,), {'model': model})(model, site)
             model.add_to_class('_admin', admin)

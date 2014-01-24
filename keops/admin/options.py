@@ -66,14 +66,6 @@ class TabPage(object):
             yield Fieldset(name, self.form, fieldset)
 
 
-def modeladmin_factory(cls, model):
-    if cls:
-        data = {k: v for k, v in cls.__dict__.items() if not k.startswith('__')}
-    else:
-        data = {}
-    return type(model.__name__ + 'Admin', (ModelAdmin,), data)
-
-
 class ModelAdmin(options.ModelAdmin):
     _bound_form = None
     _prepared = False
@@ -103,12 +95,15 @@ class ModelAdmin(options.ModelAdmin):
         if self._prepared:
             return
 
+        if self.exclude is None:
+            self.exclude = []
+
         list_display = self.list_display
         if list_display is options.ModelAdmin.list_display:
             list_display = None
 
         # Load data dict by model Extra class
-        extra = getattr(self.model, 'Extra', None)
+        extra = getattr(self.model, 'admin', None)
         if extra:
             if not self.fields and extra.field_groups and extra.field_groups.get('display_fields'):
                 self.fields = extra.field_groups['display_fields']
@@ -194,7 +189,7 @@ class ModelAdmin(options.ModelAdmin):
 
         self.title = self.title or self.model._meta.verbose_name_plural
         self.label = self.label or self.model._meta.verbose_name
-        self.help_text = self.help_text or getattr(self.model.Extra, 'help_text', '')
+        self.help_text = self.help_text or getattr(extra, 'help_text', '')
 
         defaults = {
             "form": self.form,
@@ -583,3 +578,7 @@ class ModelAdmin(options.ModelAdmin):
         context = {'content': content}
         return loader.render_to_string(self.confirm_action_template or 'keops/admin_action.html',
                                        context, RequestContext(request))
+
+
+def modeladmin_factory(model):
+    return type(model.__name__ + 'Admin', (ModelAdmin,), {'model': model})

@@ -8,19 +8,6 @@ __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKe
 
 _custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter', 'default_fields', 'display_fn')
 
-# Add custom_attrs to field instances
-# custom_attrs items:
-#   widget -> field widget type (html5/angular/jquery compatible widgets)
-#   page -> field will be placed on specified page
-#   fieldset -> field will be placed on specified fieldset
-#   mask -> field widget input mask
-#   on_change -> on field change server side event
-#   change_default -> if user can change field default value
-#   insert_default -> default value for new objects
-#   update_default -> default value for updated objects
-#   translate -> field content translation (True/False)
-#   filter -> field filter type: None = no filter, BasicFieldFilter and AdvancedFieldFilter
-#   widget_attrs -> client side widget attributes (all html5, angular, jquery compatible attributes are supported)
 
 class Field(object):
     _init = models.Field.__init__
@@ -48,19 +35,22 @@ class Field(object):
                 if hasattr(b, '_meta') and hasattr(b._meta, 'all_fields') and not b._meta.abstract:
                     cls._meta.all_fields += b._meta.all_fields
         cls._meta.all_fields.insert(bisect(cls._meta.all_fields, self), self)
-        # Register server-sive on_change field event
-        if 'on_change' in self.custom_attrs:
+        # Register server-side on_change field event
+        if hasattr(self, 'custom_attrs') and 'on_change' in self.custom_attrs:
             self.custom_attrs.setdefault('widget_attrs', {})['ng_change'] = 'fieldChangeCallback(\'%s\')' % name
         Field._contribute_to_class(self, cls, name, virtual_only=virtual_only)
 
     models.Field.__init__ = __init__
     models.Field.contribute_to_class = contribute_to_class
 
+
 class BasicFieldFilter(object):
     pass
 
+
 class AdvancedFieldFilter(object):
     pass
+
 
 class NullCharField(models.CharField):
     """
@@ -76,10 +66,12 @@ class NullCharField(models.CharField):
         """
         return None if value == "" else value
 
+
 class DecimalField(models.DecimalField):
     def __init__(self, verbose_name=None, max_digits=18, decimal_places=4, **kwargs):
         super(DecimalField, self).__init__(verbose_name=verbose_name, max_digits=max_digits,
                                            decimal_places=decimal_places, **kwargs)
+
 
 class MoneyField(models.DecimalField):
     def __init__(self, verbose_name=None, name=None, max_digits=18, decimal_places=4, **kwargs):
@@ -89,12 +81,14 @@ class MoneyField(models.DecimalField):
 # Change default BooleanField to NullBooleanField
 BooleanField = models.NullBooleanField
 
+
 # Change default CharField to NullCharField
 def CharField(verbose_name=None, max_length=100, empty_null=True, *args, **options):
     if empty_null:
         return NullCharField(verbose_name=verbose_name, max_length=max_length, *args, **options)
     else:
         return models.CharField(verbose_name=verbose_name, max_length=max_length, **options)
+
 
 def get_model_url(cls):
     """
@@ -108,6 +102,7 @@ def get_model_url(cls):
     else:
         return ''
 
+
 def get_resource_url(field, *args, **kwargs):
     """
     Auto detect resource url from a foreignkey field.
@@ -118,12 +113,14 @@ def get_resource_url(field, *args, **kwargs):
 
 models.ForeignKey.get_resource_url = get_resource_url
 
+
 # Change ForeignKey fields for business model
 class ForeignKey(models.ForeignKey):
     def __init__(self, to, to_field=None, rel_class=models.ManyToOneRel, db_constraint=True, **kwargs):
         # Protect foreign key delete cascade
         kwargs.setdefault('on_delete', models.PROTECT)
         super(ForeignKey, self).__init__(to=to, to_field=to_field, rel_class=rel_class, **kwargs)
+
 
 class VirtualField(models.Field):
     """
@@ -139,7 +136,6 @@ class VirtualField(models.Field):
             blank=blank,
             editable=editable,
             **options)
-
 
     def contribute_to_class(self, cls, name):
         super(VirtualField, self).contribute_to_class(cls, name, True)
@@ -233,6 +229,7 @@ class OneToManyField(VirtualField):
             return getattr(instance, self.related_name, None)
         else:
             return self
+
 
 class ImageField(models.BinaryField):
     pass
