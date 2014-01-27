@@ -51,6 +51,7 @@ class ModelBase(object):
     models.base.Options.get_all_related_objects = get_all_related_objects
     models.base.ModelBase.__new__ = __new__
 
+
 # Change Model.save method to trigger events
 class Model(object):
 
@@ -194,7 +195,7 @@ class Model(object):
         Model._setattr(self, key, value)
 
     def __str__(self):
-        extra = self.__class__.Extra
+        extra = self.__class__._meta.admin
         if getattr(extra, 'default_fields', None):
             s = "class _C():\n    def __str__(self):\n        return %s"
             l = {}
@@ -219,5 +220,5 @@ class Model(object):
     #models.Model.save = save
     #models.Model._save_table = _save_table
     #models.Model.__setattr__ = __setattr__
-    #models.Model.__str__ = __str__
-    #models.Model.__copy__ = __copy__
+    models.Model.__str__ = __str__
+    models.Model.__copy__ = __copy__

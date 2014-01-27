@@ -15,9 +15,9 @@ def get_model(context):
 
 
 def _choice_fields(model):
-    if not hasattr(model.Extra, '_cache_choice_fields'):
-        model.Extra._cache_choice_fields = {f.name: 'get_%s_display' % f.name for f in model._meta.fields if f.choices}
-    return model.Extra._cache_choice_fields
+    if not hasattr(model._meta.admin, '_cache_choice_fields'):
+        model._meta.admin._cache_choice_fields = {f.name: 'get_%s_display' % f.name for f in model._meta.fields if f.choices}
+    return model._meta.admin._cache_choice_fields
 
 
 def fk_select_fields(model):
@@ -58,11 +58,8 @@ def grid(request):
         fields = field.list_fields
     else:
         queryset = model.objects.using(using)
-        if hasattr(model, 'Extra'):
-            fields = model.Extra.field_groups.get('list_fields')
-            disp_fields = _choice_fields(model)
-        else:
-            fields = None
+        fields = model._meta.admin.field_groups.get('list_fields')
+        disp_fields = _choice_fields(model)
         if isinstance(fields, tuple):
             fields = list(fields)
     fields = fields or [f.name for f in model._meta.concrete_fields if not f.primary_key]
@@ -91,10 +88,10 @@ def grid(request):
 
 
 def _read_fields(model):
-    if not hasattr(model.Extra, '_cache_read_fields'):
-        model.Extra._cache_read_fields = [f.name for f in model._meta.fields if not f.primary_key] +\
+    if not hasattr(model._meta.admin, '_cache_read_fields'):
+        model._meta.admin._cache_read_fields = [f.name for f in model._meta.fields if not f.primary_key] +\
             [f.name for f in model._meta.virtual_fields if isinstance(f, models.PropertyField)]
-    return model.Extra._cache_read_fields
+    return model._meta.admin._cache_read_fields
 
 
 def prepare_read(context, using):

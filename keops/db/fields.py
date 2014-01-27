@@ -207,7 +207,7 @@ class OneToManyField(VirtualField):
     @property
     def list_fields(self):
         if not self._list_fields:
-            self._list_fields = self.related.model.Extra.field_groups.get('list_fields') or\
+            self._list_fields = self.related.model._meta.admin.field_groups.get('list_fields') or\
                 [f.name for f in self.related.model._meta.concrete_fields\
                  if not f.primary_key and not f is self.related.field]
         return self._list_fields

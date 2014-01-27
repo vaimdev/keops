@@ -103,7 +103,7 @@ class ModelAdmin(options.ModelAdmin):
             list_display = None
 
         # Load data dict by model Extra class
-        extra = getattr(self.model, 'admin', None)
+        extra = getattr(self.model._meta, 'admin', None)
         if extra:
             if not self.fields and extra.field_groups and extra.field_groups.get('display_fields'):
                 self.fields = extra.field_groups['display_fields']
