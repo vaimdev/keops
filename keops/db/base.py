@@ -3,8 +3,8 @@
 import copy
 from django.db import models, router, DatabaseError
 
-
 models.base.ModelState._modified_fields = []
+
 
 class ModelBase(object):
 
