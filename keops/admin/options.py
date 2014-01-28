@@ -22,7 +22,7 @@ from django.contrib import messages
 from django.template import loader, RequestContext
 from keops.http import HttpJsonResponse, HttpMessagesResponse
 from keops.utils import field_text
-from .reports import ReportLink, Reports
+from keops.admin.reports import ReportLink, Reports
 
 
 __all__ = ['modeladmin_factory', 'ModelAdmin']
