@@ -90,7 +90,10 @@ class Menu(ModuleElement):
         from keops.modules.base.models import BaseModel
         if isinstance(model, str):
             model = model.split('.')
-            model = BaseModel.objects.using(db).get(content_type__app_label=model[0], content_type__model=model[1])
+            try:
+                model = BaseModel.objects.using(db).get(content_type__app_label=model[0], content_type__model=model[1])
+            except Exception as e:
+                print(str(e))
         action_name = '%s "%s.%s"' % (('showmodel',) + model.content_type.natural_key())
         action = FormAction.objects.using(db).filter(name=action_name)
         if action:

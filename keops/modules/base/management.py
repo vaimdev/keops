@@ -1,18 +1,19 @@
 from copy import copy
 from django.contrib.contenttypes.models import ContentType
-from .models import Module, BaseModel
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import get_app, get_apps, get_models, signals
 from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
 
+
 def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwargs):
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
-    return
+    from keops.modules.base.models import Module, BaseModel
+
     ContentType.objects.clear_cache()
     mod_name = '.'.join(app.__name__.split('.')[:-1])
     app_models = get_models(app)
@@ -20,7 +21,7 @@ def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwarg
         return
     # They all have the same app_label, get the first one.
     app_label = app_models[0]._meta.app_label
-    
+
     if not router.allow_syncdb(db, ContentType.objects.using(db).get(app_label=app_label, model=app_models[0]._meta.model_name).model_class()):
         return
 
