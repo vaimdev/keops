@@ -15,7 +15,17 @@ STATIC_URL = '/static/'
 TEMPLATE_DIRS = []
 
 DATABASE_ROUTERS = ['keops.routers.multidatabase.MultiDatabaseRouter']
-DATABASES = {'default': {}}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+        'USER': '',
+        'SCHEMA': '',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 AUTH_USER_MODEL = 'base.user'
 

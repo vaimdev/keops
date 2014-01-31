@@ -3,12 +3,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from keops.db import models
 
+
 class Currency(models.Model):
     name = models.CharField(_('name'), max_length=32, null=False, unique=True)
     symbol = models.CharField(_('symbol'), max_length=10, null=False)
     rounding = models.MoneyField(_('rounding'), default=0.01)
     active = models.BooleanField(_('active'), default=True)
     display_format = models.CharField(_('display format'), max_length=16)
+
 
 class Language(models.Model):
     code = models.CharField(_('locale code'), max_length=5, null=False, unique=True)
@@ -19,6 +21,7 @@ class Language(models.Model):
 
     class Meta:
         verbose_name = _('language')
+
 
 class Translation(models.Model):
     """
@@ -35,6 +38,7 @@ class Translation(models.Model):
         verbose_name = _('translation')
         verbose_name_plural = _('translations')
 
+
 class Country(models.Model):
     name = models.CharField(_('name'), max_length=64, unique=True)
     code = models.CharField(_('country code'), max_length=2, help_text='The ISO country code')
@@ -44,6 +48,7 @@ class Country(models.Model):
     class Meta:
         verbose_name = _('country')
         verbose_name_plural = _('countries')
+
 
 class State(models.Model):
     country = models.ForeignKey(Country, verbose_name=_('country'), null=False)

@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
 
+
 class ModelData(models.Model):
     name = models.CharField(max_length=128, db_index=True)
     content_type = models.ForeignKey(ContentType)
@@ -14,6 +15,7 @@ class ModelData(models.Model):
     class Meta:
         db_table = 'base_model_data'
 
+
 class ElementManager(models.Manager):
     def get_by_natural_key(self, id):
         """
@@ -23,6 +25,7 @@ class ElementManager(models.Manager):
 
     def filter_by_user(self, user, **kwargs):
         return self.filter(**kwargs).filter(Q(groups__id__in=user.groups.all().values('id')) | Q(users=user))
+
 
 class Element(models.Model):
     users = models.ManyToManyField('base.User', verbose_name=_('users'), custom_attrs={'page': _('Permissions')})

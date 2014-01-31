@@ -2,6 +2,7 @@ from django.db import models
 from django.db.backends import creation
 from django.db.backends.util import truncate_name
 
+
 # Monkey patch base database creation class, to improve create model proxy additional fields
 class BaseDatabaseCreation(object):
     _sql_create_model = creation.BaseDatabaseCreation.sql_create_model

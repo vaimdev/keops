@@ -5,6 +5,7 @@ from django.contrib.contenttypes import generic
 from keops.db import models
 from .element import *
 
+
 class ModuleCategoryManager(models.Manager):
     def get_category(self, category_name):
         """
@@ -16,6 +17,7 @@ class ModuleCategoryManager(models.Manager):
             except:
                 return self.create(name=category_name)
 
+
 class ModuleCategory(Element):
     name = models.CharField(_('name'), max_length=128, null=False)
     parent = models.ForeignKey('self', verbose_name=_('parent'))
@@ -25,8 +27,10 @@ class ModuleCategory(Element):
 
     objects = ModuleCategoryManager()
 
-    class Extra:
-        display_expression = ('name',)
+    class Meta:
+        class Admin:
+            display_expression = ('name',)
+
 
 class Module(Element):
     STATUS = (
@@ -62,14 +66,15 @@ class Module(Element):
     class Meta:
         verbose_name = _('module')
 
-    class Extra:
-        field_groups = {
-            'list_fields': ('name', 'app_label', 'module_name', 'short_description'),
-            'search_fields': ('name', 'app_label', 'module_name', 'short_description'),
-        }
+        class Admin:
+            field_groups = {
+                'list_fields': ('name', 'app_label', 'module_name', 'short_description'),
+                'search_fields': ('name', 'app_label', 'module_name', 'short_description'),
+            }
 
     def __str__(self):
         return '%s (%s)' % (self.app_label, self.name)
+
 
 class ModuleElement(Element):
     module = models.ForeignKey(Module, verbose_name=_('module'))

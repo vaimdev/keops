@@ -85,7 +85,6 @@ options.Options.admin = property(get_admin)
 
 
 def class_prepared(sender, *args, **kwargs):
-    print(sender._meta)
     d = {'model': sender}
     if hasattr(sender._meta, 'Admin') and not issubclass(sender._meta.Admin, ModelAdmin):
         d.update(sender._meta.Admin.__dict__)

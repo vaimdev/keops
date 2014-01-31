@@ -271,12 +271,12 @@ class Company(Contact):
         verbose_name = _('company')
         verbose_name_plural = _('companies')
 
-    class Extra:
-        display_expression = ('name',)
-        field_groups = {
-            'list_fields': ('name', 'country', 'website'),
-            'search_fields': ('name', 'country', 'website'),
-        }
+        class Admin:
+            display_expression = ('name',)
+            field_groups = {
+                'list_fields': ('name', 'country', 'website'),
+                'search_fields': ('name', 'country', 'website'),
+            }
 
 
 class User(Contact, AbstractUser):
@@ -295,11 +295,11 @@ class User(Contact, AbstractUser):
     class Meta:
         db_table = 'auth_user'
 
-    class Extra:
-        field_groups = {
-            'list_fields': ('username', 'name', 'email'),
-            'search_fields': ('username', 'name', 'email'),
-        }
+        class Admin:
+            field_groups = {
+                'list_fields': ('username', 'name', 'email'),
+                'search_fields': ('username', 'name', 'email'),
+            }
 
 
     def __str__(self):
