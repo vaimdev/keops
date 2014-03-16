@@ -1,24 +1,24 @@
 {% block start %}{% endblock %}
 <div class="modal-dialog {% block css_class %}{% endblock %}">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h4>{{ header }}</h4>
-        </div>
-        <div class="modal-body">
-        {% block content %}
-            {{ content|safe }}
-        {% endblock %}
-        </div>
-        <div class="modal-footer">
-        {% block footer %}
-            {% if footer %}
-                {{ footer }}
-            {% else %}
-                <button class="btn btn-info" ng-click="ok()">{{ ok|default:'OK' }}</button>
-                <button class="btn btn-default" ng-click="cancel()">{{ cancel|default:_('cancel')|capfirst }}</button>
-            {% endif %}
-        {% endblock %}
-        </div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h4>{{ header }}</h4>
     </div>
+    <div class="modal-body">
+      {% block content %}
+        {{ content|safe }}
+      {% endblock %}
+    </div>
+    <div class="modal-footer">
+      {% block footer %}
+        {% if footer %}
+          {{ footer }}
+        {% else %}
+          <button class="btn btn-info" ng-click="ok()">{{ ok|default:'OK' }}</button>
+          <button class="btn btn-default" ng-click="cancel()">{{ cancel|default:_('cancel')|capfirst }}</button>
+        {% endif %}
+      {% endblock %}
+    </div>
+  </div>
 </div>
 {% block end %}{% endblock %}

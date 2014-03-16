@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Page{% endblock %}</title>
-    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/forms.css">
-    <script src="{{ STATIC_URL }}js/jquery-2.0.3.min.js"></script>
-{% block head %}{% endblock %}
+  <title>{% block title %}Page{% endblock %}</title>
+  <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ STATIC_URL }}keops/css/forms.css">
+  <script src="{{ STATIC_URL }}js/jquery-2.0.3.min.js"></script>
+  {% block head %}{% endblock %}
 </head>
 {% block content %}
 {% endblock %}
 <script>
-    $(document).ready(function () {
-        $(".form-control").first().focus();
-    });
+  $(document).ready(function () {
+    $(".form-control").first().focus();
+  });
 </script>
 </html>

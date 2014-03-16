@@ -23,7 +23,7 @@ def get_dependencies(app):
     mod = import_module(app)
     info = getattr(mod, 'app_info', None)
     if info and 'dependencies' in info:
-        deps = [ d.replace('-', '_') for d in list(info.get('dependencies')) ]
+        deps = [d.replace('-', '_') for d in list(info.get('dependencies'))]
         for dep in deps:
             r += get_dependencies(dep)
         return r + deps
@@ -50,5 +50,8 @@ def adjust_dependencies(apps):
             else:
                 apps.insert(i + 1, app)
 
-# Auto register modules on settings.INSTALLED_APPS
-register_modules('keops.modules', os.path.dirname(__file__))
+    print(apps)
+
+# Adjust modules dependencies
+adjust_dependencies(settings.INSTALLED_APPS)
+# TODO: Enable multiple database support

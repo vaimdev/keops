@@ -20,7 +20,7 @@ class File(models.Model):
     This will improve performance, preventing queryset objects to select binary field value
     """
     name = models.CharField(_('name'))
-    file_format = models.CharField(max_length=10, null=False) # document file format
+    file_format = models.CharField(max_length=10, null=False)  # document file format
     body = models.BinaryField(null=False)
 
 
@@ -34,14 +34,14 @@ class CompanyModel(models.Model):
 class BaseModelManager(ElementManager):
     def get_by_natural_key(self, app_label, model):
         return BaseModel.objects.get(content_type=ContentType.objects.get_by_natural_key(app_label, model))
-    
+
 
 class BaseModel(ModuleElement):
     content_type = models.OneToOneField(ContentType, verbose_name=_('content type'))
     ancestor = models.ForeignKey('self', verbose_name=_('base model'))
     description = models.CharField(_('description'), max_length=128)
     is_abstract = models.BooleanField(_('is abstract'), default=False)
-    
+
     objects = BaseModelManager()
 
     class Meta:
@@ -54,7 +54,7 @@ class BaseModel(ModuleElement):
             'list_fields': ('module', 'content_type', 'description'),
             'search_fields': ('content_type__name', 'description'),
         }
-        
+
     def __str__(self):
         return '%s.%s' % (self.content_type.app_label, self.content_type.model)
 
@@ -69,6 +69,7 @@ class Field(Element):
         db_table = 'base_field'
         verbose_name = _('field')
         verbose_name_plural = _('fields')
+
 
 class Attachment(models.Model):
     """
@@ -100,7 +101,7 @@ class Default(models.Model):
     field = models.CharField(_('field'), max_length=64)
     value = models.TextField(_('value'))
     user = models.ForeignKey('base.User', verbose_name=_('user'), help_text=_('Leave blank for all users'))
-    
+
     class Meta:
         db_table = 'base_default'
         verbose_name = _('default field value')
@@ -111,7 +112,7 @@ class Attribute(models.Model):
     """
     Define model extension attributes.
     """
-    ATT_TYPE =(
+    ATT_TYPE = (
         ('text', _('Text')),
         ('date', _('Date')),
         ('time', _('Time')),
@@ -133,7 +134,7 @@ class Attribute(models.Model):
     widget_attrs = models.TextField(_('widget attributes'))
     default_value = models.TextField(_('default value'), help_text=_('Default attribute value'))
     trigger = models.TextField(_('attribute trigger'), help_text=_('Trigger attribute code'))
-    
+
     class Meta:
         db_table = 'base_attribute'
 
@@ -153,7 +154,7 @@ class AttributeValue(models.Model):
     decimal_value = models.MoneyField()
     float_value = models.FloatField()
     date_value = models.DateTimeField()
-    
+
     class Meta:
         db_table = 'base_attribute_value'
 

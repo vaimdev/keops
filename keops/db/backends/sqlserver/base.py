@@ -16,6 +16,7 @@ from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText, SafeBytes
 from django.utils.timezone import utc
+from keops.db.backends.sqlserver import util
 
 try:
     import pyodbc as Database
@@ -118,6 +119,24 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             conn.append('Integrated Security=SSPI')
         return Database.connect(';'.join(conn), autocommit=autocommit, unicode_results=True)
+
+    def make_debug_cursor(self, cursor):
+        """
+        Creates a cursor that logs all queries in self.queries.
+        """
+        return util.CursorDebugWrapper(cursor, self)
+
+    def cursor(self):
+        """
+        Creates a cursor, opening a connection if necessary.
+        """
+        self.validate_thread_sharing()
+        if (self.use_debug_cursor or
+            (self.use_debug_cursor is None and settings.DEBUG)):
+            cursor = self.make_debug_cursor(self._cursor())
+        else:
+            cursor = util.CursorWrapper(self._cursor(), self)
+        return cursor
 
     def _set_autocommit(self, autocommit):
         """

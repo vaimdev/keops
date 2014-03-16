@@ -7,6 +7,7 @@ app_info = {
     'website': 'http://katrid.com',
     'short_description': 'Enterprise Social Network',
     'description': _('Comments, Discussions, Mailing List, News, Document Followers'),
+    'dependencies': ['keops.modules.contact'],
     'category': _('Communication'),
     'version': '0.2',
 }

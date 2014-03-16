@@ -40,7 +40,7 @@ def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwarg
             scripts.install(mod_name, db)
             module = Module.objects.using(db).get(app_label=app_label)
         except:
-            pass
+            module = None
 
     # Get all the content types
     content_types = dict(

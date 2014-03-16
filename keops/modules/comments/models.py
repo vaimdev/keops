@@ -28,6 +28,7 @@ class Group(models.Model):
     class Meta:
         db_table = 'comments_group'
 
+
 # Object followers
 class Follower(models.Model):
     """
@@ -44,6 +45,7 @@ class Follower(models.Model):
     class Meta:
         db_table = 'comments_follower'
 
+
 # User content comment
 class Comment(models.Model):
     """
@@ -57,15 +59,16 @@ class Comment(models.Model):
     submit_date = models.DateTimeField(_('date/time submitted'), default=datetime.datetime.now())
     ip_address = models.GenericIPAddressField(_('IP address'), unpack_ipv4=True)
     is_public = models.BooleanField(_('is public'), default=True,
-                    help_text=_('Uncheck this box to make the comment effectively ' \
-                                'disappear from the site.'))
+                                    help_text=_('Uncheck this box to make the comment effectively ' \
+                                                'disappear from the site.'))
     is_removed = models.BooleanField(_('is removed'), default=False,
-                    help_text=_('Check this box if the comment is inappropriate. ' \
-                                'A "This comment has been removed" message will ' \
-                                'be displayed instead.'))
+                                     help_text=_('Check this box if the comment is inappropriate. ' \
+                                                 'A "This comment has been removed" message will ' \
+                                                 'be displayed instead.'))
 
     class Meta:
         db_table = 'comments_content'
+
 
 class Subtype(models.Model):
     name = models.CharField(_('name'), max_length=32, null=False)
@@ -74,6 +77,7 @@ class Subtype(models.Model):
     content_type = models.ForeignKey(ContentType)
     relation_field = models.CharField(_('relation field'))
     default = models.BooleanField(_('default'), default=True)
+
 
 class Message(models.Model):
     """
@@ -103,6 +107,7 @@ class Message(models.Model):
     class Meta:
         db_table = 'comments_message'
 
+
 class Mail(models.Model):
     STATUS = (
         ('outgoing', _('Outgoing')),
@@ -122,11 +127,13 @@ class Mail(models.Model):
     body = models.TextField(_('body'))
     is_notification = models.BooleanField(_('is notification'))
 
+
 class Notification(models.Model):
-    contact = models.ForeignKey('base.contact', null=False)
+    contact = models.ForeignKey('contact.contact', null=False)
     message = models.ForeignKey(Message, null=False)
     read = models.BooleanField(_('read'), default=False)
     starred = models.BooleanField(_('starred'), default=False)
+
 
 class Vote(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=False, on_delete=models.CASCADE)

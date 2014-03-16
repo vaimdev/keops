@@ -14,7 +14,7 @@ USE_L10N = True
 STATIC_URL = '/static/'
 TEMPLATE_DIRS = []
 
-DATABASE_ROUTERS = ['keops.routers.multidatabase.MultiDatabaseRouter']
+#DATABASE_ROUTERS = ['keops.routers.multidatabase.MultiDatabaseRouter']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

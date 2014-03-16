@@ -585,5 +585,4 @@ keopsApp.controller('DialogController', function($scope, $http, Form, $location,
 
 keopsApp.run(function($rootScope, $http, $cookies){
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
-    $http
 });

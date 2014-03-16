@@ -28,3 +28,23 @@ class DatabaseCreation(BaseDatabaseCreation):
         'TextField':         'text',
         'TimeField':         'time',
     }
+
+    def _destroy_test_db(self, test_database_name, verbosity):
+        """
+        Internal implementation - remove the test db tables.
+        """
+        # Remove the test database to clean up after
+        # ourselves. Connect to the previous database (not the test database)
+        # to do so, because it's not allowed to delete a database while being
+        # connected to it.
+        cursor = self.connection.cursor()
+        # Wait to avoid "database is being accessed by other users" errors.
+        cursor.execute('ALTER DATABASE %s SET SINGLE_USER WITH ROLLBACK IMMEDIATE;' % self.connection.ops.quote_name(test_database_name))
+        cursor.execute("DROP DATABASE %s"
+                       % self.connection.ops.quote_name(test_database_name))
+        self.connection.close()
+
+    def _prepare_for_test_db_ddl(self):
+        self.connection.connection.rollback()
+        self.connection.connection.autocommit = True
+
