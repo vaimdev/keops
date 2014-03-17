@@ -50,8 +50,6 @@ def adjust_dependencies(apps):
             else:
                 apps.insert(i + 1, app)
 
-    print(apps)
-
 # Adjust modules dependencies
 adjust_dependencies(settings.INSTALLED_APPS)
 # TODO: Enable multiple database support

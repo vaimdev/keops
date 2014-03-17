@@ -2,9 +2,9 @@
 from django.utils.translation import ugettext_lazy as _
 
 app_info = {
-    'name': 'ERP',
-    'short_description': _('ERP integration module'),
-    'description': _('ERP integration module'),
+    'name': 'currency',
+    'short_description': _('Currency integration module'),
+    'description': _('Currency integration module'),
     'category': _('Business'),
     'version': '0.1',
 }
