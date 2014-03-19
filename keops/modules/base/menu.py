@@ -88,6 +88,7 @@ class Menu(ModuleElement):
     def set_model(self, model):
         db = self._state.db
         from keops.modules.base.models import BaseModel
+
         if isinstance(model, str):
             model = model.split('.')
             try:

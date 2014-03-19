@@ -6,6 +6,7 @@ from keops.middleware.threadlocal import get_db
 
 class MultiDatabaseRouter(object):
     _app_cache = {}
+    _models = {}
 
     def _get_connection_apps(self, db):
         apps = self._app_cache.get(db, [])

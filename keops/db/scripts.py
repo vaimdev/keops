@@ -104,6 +104,8 @@ def install(app_name, db):
     from keops.modules.base import models as base
     from keops.routers.multidatabase import MultiDatabaseRouter
     app_list = []
+    if not MultiDatabaseRouter._app_cache:
+        MultiDatabaseRouter()._get_connection_apps(db)
     app_cache = MultiDatabaseRouter._app_cache[db]
 
     def install_app(app_name):

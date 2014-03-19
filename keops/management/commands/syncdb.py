@@ -8,6 +8,7 @@ from django.db import models
 from django.conf import settings
 from keops.db import scripts
 
+
 class Command(syncdb.Command):
 
     def handle_noargs(self, **options):
@@ -18,12 +19,14 @@ class Command(syncdb.Command):
         load_initial_data = options.get('load_initial_data')
         options['load_initial_data'] = False
         apps = []
+
         def app_sync(sender, *args, **kwargs):
             created_models = kwargs.get('created_models')
             for model in created_models:
                 mod_name = '.'.join(model.__module__.split('.')[:-1])
                 if not mod_name in apps:
                     apps.append(mod_name)
+
         models.signals.post_syncdb.connect(app_sync)
         super(Command, self).handle_noargs(**options)
         models.signals.post_syncdb.disconnect(app_sync)
