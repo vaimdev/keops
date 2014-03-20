@@ -53,10 +53,10 @@ class Country(models.Model):
 class State(models.Model):
     country = models.ForeignKey(Country, verbose_name=_('country'), null=False)
     code = models.CharField(_('state code'), max_length=3, null=False, db_index=True)
-    name = models.CharField(_('name'), max_length=64, null=False)
+    name = models.CharField(_('name'), max_length=64, null=False, db_index=True)
 
     class Meta:
         db_table = 'base_state'
         unique_together = (('country', 'code'), ('country', 'name'))
         verbose_name = _('state')
-        ordering = ('code',)
+        ordering = ('name',)
