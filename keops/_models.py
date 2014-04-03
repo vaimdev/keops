@@ -1,9 +1,9 @@
 from django.db import models
 from django.db.models import options
+options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('Admin',)
 import keops.db.base
 import keops.db.fields
 
-options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('Admin',)
 
 
 # Add data dict object to django model admin
