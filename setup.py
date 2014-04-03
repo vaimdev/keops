@@ -7,5 +7,6 @@ setup(name='Keops',
       description='The Django ERP',
       author='Alexandre L. Dias',
       author_email='alexandre@katrid.com',
+      packages=['keops'],
      )
   
