@@ -12,6 +12,8 @@ from .render import render_form
 
 
 class AdminSite(admin.AdminSite):
+    password_change_template = 'keops/registration/password_change_form.html'
+
     def __init__(self, name='admin', app_name='admin'):
         self._registry = {}  # model_class class -> admin_class instance
         self.name = name
@@ -73,11 +75,9 @@ class AdminSite(admin.AdminSite):
         elif 'menulist' in request.GET:
             return self.response_menu_list(request)
 
-        return render(request, 'keops/app.html', {
+        return render(request, 'keops/index.html', {
             'app_menu': Menu.objects.filter(parent=None),
             'menu': Menu.objects.get(pk=menu_id),
-            'user': request.user,
-            'company': request.session['company']
         })
 
     def response_action(self, request):

@@ -5,7 +5,7 @@ var getval = function (val) {
     else return val;
 };
 
-var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ngCookies', 'ui.bootstrap', 'infinite-scroll', 'ui.keops'], function ($routeProvider, $locationProvider, $httpProvider) {
+var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ngCookies', 'ui.bootstrap', 'ui.keops'], function ($routeProvider, $locationProvider, $httpProvider) {
 
     var interceptor = ['$rootScope', '$q', function (scope, $q) {
 

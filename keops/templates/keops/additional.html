@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}font-awesome/css/font-awesome.min.css">
+<!--link rel="stylesheet" type="text/css" href="{% block stylesheet %}{{ STATIC_URL }}keops/css/base.css{% endblock %}" /-->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui-1.10.0.custom.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}js/select2/select2.css">
+<script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+<script src="{{ STATIC_URL }}js/moment+langs.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery-2.0.3.min.js"></script>
+<script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.maskedinput.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.maskMoney.js"></script>
+<script src="{{ STATIC_URL }}js/select2/select2.min.js"></script>
+<script src="{{ STATIC_URL }}js/angular/angular.min.js"></script>
+<script src="{{ STATIC_URL }}js/angular/angular-route.min.js"></script>
+<script src="{{ STATIC_URL }}js/angular/angular-sanitize.min.js"></script>
+<script src="{{ STATIC_URL }}js/angular/angular-animate.min.js"></script>
+<script src="{{ STATIC_URL }}js/angular/angular-cookies.min.js"></script>
+<script src="{{ STATIC_URL }}js/ui-bootstrap-tpls-0.6.0.min.js"></script>
+<script src="{{ STATIC_URL }}js/select2/select2_locale_{{ LANGUAGE_CODE }}.js"></script>
+<script src="{{ STATIC_URL }}keops/js/components.js"></script>
+<script src="{{ STATIC_URL }}keops/js/app.js"></script>
+<script src="{{ STATIC_URL }}js/angular/i18n/angular-locale_{{ LANGUAGE_CODE }}.js"></script>
+<script>
+    moment.lang('{{ LANGUAGE_CODE }}');
+</script>
+
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,300,400,700" rel="stylesheet">
+<link href="{{ STATIC_URL }}css/smartadmin-production.css" media="screen" rel="stylesheet" type="text/css">
+<link href="{{ STATIC_URL }}css/smartadmin-skins.css" media="screen" rel="stylesheet" type="text/css">
+
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="black" name="apple-mobile-web-app-status-bar-style">
+
+<script src="{{ STATIC_URL }}js/notification/SmartNotification.min.js"></script>

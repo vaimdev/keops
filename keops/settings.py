@@ -44,9 +44,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'keops.middleware.threadlocal.ThreadLocalMiddleware',
+    #'keops.middleware.threadlocal.ThreadLocalMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'keops.modules.base.middleware.AuthenticationMiddleware',
+    #'keops.modules.base.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
