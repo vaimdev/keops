@@ -14,3 +14,5 @@ Community modules can be licensed under: AGPL, GPL, LGPL, Apache, MIT, BSD, and 
 To develop commercial modules, the developer must observing and respecting use of community modules licenses.
 
 Enjoy creating powerful professional business apps.
+
+http://www.katrid.com
