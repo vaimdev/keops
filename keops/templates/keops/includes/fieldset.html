@@ -1,0 +1,29 @@
+<fieldset class="module aligned {{ fieldset.classes }}">
+    {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+    {% if fieldset.description %}
+        <div class="description">{{ fieldset.description|safe }}</div>
+    {% endif %}
+    {% for line in fieldset %}
+        <div class="form-row">
+            {% for field in line %}
+                <section>
+                    {% if field.is_checkbox %}
+                        <label class="checkbox">{{ field.field }}<i></i> {{ field.field.label }}</label>
+                    {% else %}
+                        <label class="label" for="{{ field.field.id_for_label }}">{{ field.field.label }}</label>
+                        {% if field.is_readonly %}
+                            <p>{{ field.contents }}</p>
+                        {% else %}
+                            {{ field.field }}
+                        {% endif %}
+                    {% endif %}
+                    {% if field.field.help_text %}
+                    <div class="note">
+                    {{ field.field.help_text|safe }}
+                    </div>
+                    {% endif %}
+                </section>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</fieldset>

@@ -1,0 +1,22 @@
+{% load i18n %}
+<table id="result_list" class="table table-bordered table-striped table-condensed table-hover smart-form has-tickbox"
+  ng-init="list.q = '{{ query }}'">
+<thead>
+<tr>
+  {% for header in result_headers %}
+  <th scope="col" {{ header.class_attrib }} role="columnheader">
+    {{ header.text|capfirst }}
+  </th>
+  {% endfor %}
+</tr>
+</thead>
+<tbody>
+  <tr ng-repeat="item in list.items">
+  {% for header in result_headers %}
+  <td{% if header.field_name != 'action_checkbox' %} class="column-field" ng-click="itemClick('/admin/show/{{ opts }}/form/?pk=' + item.pk)"{% endif %}>
+    {{ header.content }}
+  </td>
+  {% endfor %}
+  </tr>
+</tbody>
+</table>

@@ -1,0 +1,9 @@
+{% extends "keops/base.html" %}
+
+{% block title %}{{ title|capfirst }} | {{ site_title }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'keops:index' %}">{{ site_header }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

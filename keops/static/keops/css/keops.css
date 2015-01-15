@@ -1,0 +1,43 @@
+body, html {
+    height: inherit;
+}
+
+.form-header {
+    margin-bottom: 10px;
+}
+
+.results {
+    background: #ffffff;
+}
+
+.action-checkbox-column {
+    width: 25px;
+}
+
+.smart-form section {
+    margin-bottom: 5px;
+}
+
+.smart-form .note {
+    margin-top: 3px;
+}
+
+.smart-form .label {
+    margin-bottom: 4px;
+}
+
+.smart-form fieldset {
+    padding-top: 15px;
+}
+
+label .required {
+    font-weight: 600;
+}
+
+b, strong {
+    font-weight: 600;
+}
+
+.table .column-field {
+    cursor: pointer;
+}
