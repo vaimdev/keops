@@ -5,6 +5,8 @@ var getval = function (val) {
     else return val;
 };
 
+var adminPrefix = '/admin';
+
 var keopsApp = angular.module('keopsApp', ['ngRoute', 'ngSanitize', 'ngCookies', 'ui.bootstrap', 'ui.keops'], function ($routeProvider, $locationProvider, $httpProvider) {
 
     var interceptor = ['$rootScope', '$q', function (scope, $q) {
@@ -109,23 +111,23 @@ keopsApp.factory('List', function($http, SharedData) {
         if (this.loading || this.loaded) return;
         this.loading = true;
         var params = {
-            model: model,
-            start: this.start,
-            limit: 25
+            p: this.start,
+            l: 25
         }
 
         if (query) params['query'] = query;
 
-        var url = "/db/grid/?model=" + model + '&start=' + this.start;
-        if (this.total === null) { params['total'] = 1; params['limit'] = 100; }
+        var url = adminPrefix + "/db/list/" + model + '/?p=' + this.start;
+        if (this.total === null) { params['t'] = 1; params['p'] = 1; }
         $http({
-            url: '/db/grid/',
+            url: adminPrefix + '/db/list/' + model,
             method: 'GET',
             params: params
         }).success(function(data) {
+            rows = data.items;
             if (this.total == null) this.total = data.total;
-            for (var i=0; i < data.items.length; i++)
-                this.items.push(data.items[i]);
+            for (var i=0; i < rows.length; i++)
+                this.items.push(rows[i]);
             this.start = this.items.length;
             this.loading = false;
             this.loaded = this.items.length == this.total;
@@ -150,6 +152,8 @@ keopsApp.controller('ListController', function($scope, $location, List) {
     $scope.selection = 0;
 
     $scope.itemClick = function(url, search, index) {
+        window.location.href = url;
+        return;
         $scope.list.index = index;
         $location.path(url).search(search);
     };
@@ -185,7 +189,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         this.element = null;
         this.readonly = null;
         this.pk = $location.search()['pk'];
-        this.url = "/db/read/?limit=1&model=";
+        this.url = adminPrefix + "/db/read";
         if (SharedData.list) {
             this.start = SharedData.list.index - 1;
             this.total = SharedData.list.total;
@@ -217,17 +221,18 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         var model = this.model;
 
         this.start++;
-        var url = this.url + model + '&start=' + this.start;
-        if (this.total === null) url += '&total';
+        var url = this.url + 'p=' + this.start;
+        if (this.total === null) url += '&t';
         if (this.pk != null) url += '&pk=' + this.pk;
         $http.get(url).success(function(data) {
             if (this.total === null) this.total = data.total;
             this.item = data.items[0];
+            console.log(this.item);
             if (!this.pk) $location.search('pk', this.item.pk);
             this.pk = null;
             this.loading = false;
             this.loaded = this.start == this.total - 1;
-            this.masterChange();
+            //this.masterChange();
             delete SharedData.list;
         }.bind(this));
     };
@@ -239,13 +244,13 @@ keopsApp.factory('Form', function($http, SharedData, $location){
         var model = this.model;
 
         this.start--;
-        var url = this.url + model + '&start=' + this.start;
+        var url = this.url + 'p=' + this.start;
         $http.get(url).success(function(data) {
             if (this.total === null) this.total = data.total;
             this.item = data.items[0];
             $location.search('pk', this.item.pk);
             this.loading = false;
-            this.masterChange();
+            //this.masterChange();
         }.bind(this));
     };
 
@@ -306,6 +311,7 @@ keopsApp.factory('Form', function($http, SharedData, $location){
 
     Form.prototype.initForm = function (model) {
         this.model = model;
+        this.url += '/' + model + '/?';
         this.nextPage();
     };
 

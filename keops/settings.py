@@ -29,22 +29,22 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'base.user'
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     'keops',
     'django.contrib.sessions',
-    'django.contrib.sites',
+    #'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.messages',
-    'keops.modules.base',
-]
+    'keops.modules.project',
+)
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    #'keops.middleware.threadlocal.ThreadLocalMiddleware',
+    'keops.middleware.ThreadLocalMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     #'keops.modules.base.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -66,7 +66,7 @@ SERIALIZATION_MODULES = {
 }
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
-    "django.core.context_processors.request",
+    'django.core.context_processors.request',
 )
 
 TEMPLATE_LOADERS = (

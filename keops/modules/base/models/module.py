@@ -27,10 +27,6 @@ class ModuleCategory(Element):
 
     objects = ModuleCategoryManager()
 
-    class Meta:
-        class Admin:
-            display_expression = ('name',)
-
 
 class Module(Element):
     STATUS = (
@@ -67,10 +63,8 @@ class Module(Element):
         verbose_name = _('module')
 
         class Admin:
-            field_groups = {
-                'list_fields': ('name', 'app_label', 'module_name', 'short_description'),
-                'search_fields': ('name', 'app_label', 'module_name', 'short_description'),
-            }
+            list_fields = ('name', 'app_label', 'module_name', 'short_description')
+            search_fields = ('name', 'app_label', 'module_name', 'short_description')
 
     def __str__(self):
         return '%s (%s)' % (self.app_label, self.name)

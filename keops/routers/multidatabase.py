@@ -1,7 +1,7 @@
 # Enable keops to work with multi database using DATABASE_ROUTER settings
 # each db have your own installed apps (registered on base.module)
-# by default keops installs all apps defined on BASE_APPS settings
-from keops.middleware.threadlocal import get_db
+# by default keops will install all apps defined on BASE_APPS settings
+from keops.middleware.db import get_db
 
 
 class MultiDatabaseRouter(object):
@@ -35,5 +35,5 @@ class MultiDatabaseRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         return True
     
-    def allow_syncdb(self, db, model):
+    def allow_migrate(self, db, model):
         return model._meta.app_label in self._get_connection_apps(db)

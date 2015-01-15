@@ -2,8 +2,9 @@ from optparse import make_option
 from django.core.management.base import AppCommand
 from django.db import DEFAULT_DB_ALIAS
 
+
 class Command(AppCommand):
-    help = "Install modules for the given app name(s)."
+    help = 'Install modules for the given app name(s).'
 
     option_list = AppCommand.option_list + (
         make_option('--database', action='store', dest='database',
@@ -14,7 +15,6 @@ class Command(AppCommand):
     output_transaction = True
 
     def handle_app(self, app, **options):
-        print('install app')
         from keops.db import scripts
         db = options['database']
         if scripts.install('.'.join(app.__name__.split('.')[:-1]), db):

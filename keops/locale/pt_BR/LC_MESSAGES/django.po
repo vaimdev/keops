@@ -147,3 +147,21 @@ msgstr "Precisa de ajuda?"
 
 msgid "Create an account"
 msgstr "Criar uma conta"
+
+msgid "Find reports and more"
+msgstr "Encontrar relatórios e mais"
+
+msgid "Collapse Menu"
+msgstr "Esconder Menu"
+
+msgid "Available applications"
+msgstr "Aplicações disponíveis"
+
+msgid "Bookmark this page"
+msgstr "Marcar esta página"
+
+msgid "Favorites"
+msgstr "Favoritos"
+
+msgid "actions"
+msgstr "ações"

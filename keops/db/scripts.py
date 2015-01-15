@@ -3,6 +3,7 @@ from importlib import import_module
 from django.db import connections
 from django.db.utils import load_backend
 
+
 def _create_connection(db):
     connection = connections[db]
     db_settings = connection.settings_dict
@@ -12,18 +13,22 @@ def _create_connection(db):
 
     if db_engine == 'sqlite3':
         import sqlite3
+
         return sqlite3.connect(db_settings['NAME'])
     elif 'postgres' in db_engine:
         return backend.psycopg2.connect("host='%s'  dbname='postgres' user='%s' password='%s'" %
-            (db_settings['HOST'], db_settings['USER'], db_settings['PASSWORD']))
+                                        (db_settings['HOST'], db_settings['USER'], db_settings['PASSWORD']))
     elif db_engine == 'pyodbc':
-        return backend.Database.connect("DRIVER={SQL Server Native Client 11.0};DATABASE=master;Server=%s;UID=%s;PWD=%s" % 
+        return backend.Database.connect(
+            "DRIVER={SQL Server Native Client 11.0};DATABASE=master;Server=%s;UID=%s;PWD=%s" %
             (db_settings['HOST'], db_settings['USER'], db_settings['PASSWORD']))
     elif db_engine == 'oracle':
         import cx_Oracle
+
         conn = cx_Oracle.connect('SYSTEM', db_settings['PASSWORD'], 'localhost/master')
         return conn
-    
+
+
 def createdb(db):
     connection = connections[db]
     db_settings = connection.settings_dict
@@ -79,20 +84,25 @@ def dropdb(db):
         conn.autocommit = False
     elif db_engine == 'oracle':
         try:
-            conn.cursor().execute('DROP USER %s CASCADE'% db_settings['USER'])
+            conn.cursor().execute('DROP USER %s CASCADE' % db_settings['USER'])
         except Exception as e:
             print(e)
 
+
 def syncdb(db):
     from django.core.management import call_command
-    call_command('syncdb', database=db, interactive=False)
+
+    call_command('migrate', database=db, interactive=False)
     from django.conf import settings
     from django.utils import translation
+
     translation.activate(settings.LANGUAGE_CODE)
+
 
 def recreatedb(db):
     dropdb(db)
     createdb(db)
+
 
 def runfile(filename, db):
     f = open(filename, encoding='utf-8')
@@ -103,6 +113,7 @@ def runfile(filename, db):
 def install(app_name, db):
     from keops.modules.base import models as base
     from keops.routers.multidatabase import MultiDatabaseRouter
+
     app_list = []
     if not MultiDatabaseRouter._app_cache:
         MultiDatabaseRouter()._get_connection_apps(db)

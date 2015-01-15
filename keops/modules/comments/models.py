@@ -1,15 +1,14 @@
-# Implement enterprise social network
+"""
+Enterprise Social Network
+"""
 import datetime
-from datetime import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from keops.db import models
 
-# TODO: Implement full enterprise social network here
 
-# Comment enterprise social network group
 class Group(models.Model):
     PRIVACY = (
         ('public', _('Public')),
@@ -23,7 +22,6 @@ class Group(models.Model):
     email = models.EmailField()
     privacy = models.CharField(max_length=16, choices=PRIVACY, default='public', null=False)
     groups = models.ManyToManyField('self')
-    # TODO: add image field here
 
     class Meta:
         db_table = 'comments_group'

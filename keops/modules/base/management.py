@@ -22,7 +22,7 @@ def update_models(app, created_models, verbosity=2, db=DEFAULT_DB_ALIAS, **kwarg
     # They all have the same app_label, get the first one.
     app_label = app_models[0]._meta.app_label
 
-    if not router.allow_syncdb(db, ContentType.objects.using(db).get(app_label=app_label, model=app_models[0]._meta.model_name).model_class()):
+    if not router.allow_migrate(db, ContentType.objects.using(db).get(app_label=app_label, model=app_models[0]._meta.model_name).model_class()):
         return
 
     app_models = dict(

@@ -15,8 +15,7 @@ class Translation(models.Model):
     value = models.TextField(_('value'))
 
     class Meta:
-        unique_together = (('content_type', 'name'))
+        unique_together = (('content_type', 'name'),)
         verbose_name = _('translation')
         verbose_name_plural = _('translations')
-
 

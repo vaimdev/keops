@@ -1,5 +1,7 @@
 from django.utils import six
 from django.forms import forms
+from django.shortcuts import render
+
 
 class View(object):
     template_name = 'keops/forms/view.html'
@@ -8,7 +10,6 @@ class View(object):
         return self
     
     def render(self, request, template, context):
-        from django.shortcuts import render
         context['form'] = self
         return render(request, template, context)
 
@@ -24,8 +25,10 @@ class View(object):
         """
         pass
 
+
 class BaseForm(forms.BaseForm, View):
     pass
+
 
 class Form(six.with_metaclass(forms.DeclarativeFieldsMetaclass, BaseForm)):
     pass

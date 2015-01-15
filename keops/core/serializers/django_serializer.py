@@ -12,7 +12,8 @@ def Deserializer(stream_or_string, **options):
     Deserialize a stream or string of Django template data.
     """
     from django.template import Context, Template
-    filepath = os.path.splitext(options.get('filepath'))[0]
+    name = stream_or_string.name
+    filepath = os.path.splitext(name)[0]
     # adjust filepath
     options['filepath'] = filepath
     stream_or_string = Template(stream_or_string.read()).render(Context({}))

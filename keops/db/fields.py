@@ -6,7 +6,8 @@ from .custom import CustomAttrs
 __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey', 'ImageField',
            'VirtualField', 'PropertyField', 'OneToManyField', 'get_model_url']
 
-_custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter', 'default_fields', 'display_fn')
+_custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter', 'default_fields',
+                 'display_fn', 'widget_attrs')
 
 
 class Field(object):
@@ -14,7 +15,7 @@ class Field(object):
     _contribute_to_class = models.Field.contribute_to_class
 
     def __init__(self, *args, **kwargs):
-        # Change default field db null to false
+        # Change default field db null to true
         kwargs.setdefault('null', not (kwargs.get('primary_key', False) or isinstance(self, models.OneToOneField)))
         kwargs.setdefault('blank', kwargs['null'])
         if isinstance(self, models.BooleanField):
@@ -56,6 +57,9 @@ class NullCharField(models.CharField):
     """
     Store null on database char field when value is None.
     """
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('max_length', 64)
+        super(NullCharField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
         return value
@@ -83,11 +87,7 @@ BooleanField = models.NullBooleanField
 
 
 # Change default CharField to NullCharField
-def CharField(verbose_name=None, max_length=100, empty_null=True, *args, **options):
-    if empty_null:
-        return NullCharField(verbose_name=verbose_name, max_length=max_length, *args, **options)
-    else:
-        return models.CharField(verbose_name=verbose_name, max_length=max_length, **options)
+CharField = NullCharField
 
 
 def get_model_url(cls):
@@ -107,7 +107,7 @@ def get_resource_url(field, *args, **kwargs):
     """
     Auto detect resource url from a foreignkey field.
     """
-    if not getattr(field, 'resource_url', None):
+    if not hasattr(field, 'resource_url'):
         field.resource_url = get_model_url(field.rel.to)
     return field.resource_url
 
@@ -119,7 +119,8 @@ class ForeignKey(models.ForeignKey):
     def __init__(self, to, to_field=None, rel_class=models.ManyToOneRel, db_constraint=True, **kwargs):
         # Protect foreign key delete cascade
         kwargs.setdefault('on_delete', models.PROTECT)
-        super(ForeignKey, self).__init__(to=to, to_field=to_field, rel_class=rel_class, **kwargs)
+        kwargs.setdefault('related_name', '+')
+        super(ForeignKey, self).__init__(to=to, to_field=to_field, rel_class=rel_class, db_constraint=db_constraint, **kwargs)
 
 
 class VirtualField(models.Field):
@@ -234,6 +235,5 @@ class OneToManyField(VirtualField):
 class ImageField(models.BinaryField):
     pass
 
-# TODO: add ImageRelField (a foreign key to file model), to performance optimization binary content load
 # TODO: optimize foreignkey queryset
 # The foreignkey field default queryset selects all fields, specifying automatically only needed/representation fields

@@ -18,14 +18,15 @@
 
 <body class="{% block bodyclass %}{{ bodyclass|default:"smart-style-0" }}{% endblock %}">
 
+{% block page %}
 <!-- Container -->
 <header id="header">
     <div id="logo-group">
         <!-- PLACE YOUR LOGO HERE -->
-         <span id="logo"><img alt="SmartAdmin" src="{{ STATIC_URL }}img/logo.png"></span>
+         <span id="logo"><img alt="[COMPANYNAME]" src="{{ STATIC_URL }}img/logo.png"></span>
         <!-- END LOGO PLACEHOLDER -->
 
-         <span class="activity-dropdown" id="activity"> <b class="badge">21</b></span>
+         <span class="activity-dropdown" id="activity"><i class="fa fa-user"></i><b class="badge"> 21</b></span>
 
         <!-- AJAX-DROPDOWN : control this dropdown height, look and feel from the LESS variable file -->
 
@@ -44,15 +45,12 @@
     </div><!-- projects dropdown -->
 
     <div id="project-context">
-        <span class="label">Projects:</span> <span class=
-
-        "popover-trigger-element dropdown-toggle" data-toggle="dropdown"
-
-        id="project-selector">Recent projects</span>
+        <span class="label">{% trans "modules"|capfirst %}:</span>
+        <span class="popover-trigger-element dropdown-toggle" data-toggle="dropdown" id="project-selector">{% trans "available apps"|capfirst %} <i class="fa fa-angle-down"></i></span>
 
         <!-- Suggestion: populate this list with fetch and push technique -->
         <ul class="dropdown-menu">
-            <li>...</li>
+            <li><a>Test</a></li>
         </ul><!-- end dropdown-menu-->
 
     </div><!-- end projects dropdown -->
@@ -63,13 +61,21 @@
         <!-- collapse menu button -->
 
         <div class="btn-header pull-right" id="hide-menu">
-            <span><a href="javascript:void(0);" title=Collapse Menu"></a></span>
+            <span>
+                <a href="javascript:void(0);" title="{{ _("Collapse Menu") }}">
+                    <i class="fa fa-reorder"></i>
+                </a>
+            </span>
         </div><!-- end collapse menu -->
 
         <!-- logout button -->
 
         <div class="btn-header transparent pull-right" id="logout">
-            <span><a data-logout-msg="You can improve your security further after logging out by closing this opened browser" href="login.html" title="Sign Out"></a></span>
+            <span>
+                <a data-logout-msg="You can improve your security further after logging out by closing this opened browser" href="login.html" title="{{ _("Log out") }}">
+                    <i class="fa fa-sign-out"></i>
+                </a>
+            </span>
         </div><!-- end logout button -->
 
         <!-- search mobile button (this is hidden till mobile view port) -->
@@ -79,37 +85,63 @@
 
         <!-- input: search field -->
         <form action="#ajax/search.html" class="header-search pull-right">
-            <input id="search-fld" name="param" placeholder="Find reports and more" type="text"> <a href="javascript:void(0);" id="cancel-search-js" title="Cancel Search"></a>
+            <input id="search-fld" name="param" placeholder="{{ _("Find reports and more") }}" type="text">
+            <button type="submit">
+                <i class="fa fa-search"></i>
+            </button>
 
         </form><!-- end input: search field -->
 
         <!-- fullscreen button -->
+        <div id="fullscreen" class="btn-header transparent pull-right">
+		    <span>
+                <a href="javascript:void(0);" onclick="launchFullscreen(document.documentElement);" title="Full Screen">
+                    <i class="fa fa-fullscreen"></i>
+                </a>
+            </span>
+		</div><!-- end fullscreen button -->
+
         <div class="btn-header transparent pull-right" id="fullscreen">
-            <span><a href="javascript:void(0);" onclick="launchFullscreen(document.documentElement);" title="Full Screen"></a></span>
-        </div><!-- end fullscreen button -->
+            <span>
+                <a href="javascript:void(0);" onclick="launchFullscreen(document.documentElement);" title="{{ _("Bookmark this page") }}">
+                    <i class="fa fa-star-o"></i>
+                </a>
+            </span>
+        </div>
 
         <!-- multiple lang dropdown : find all flags in the image folder -->
         <ul class="header-dropdown-list hidden-xs">
-            <li>...</li>
+            <li class="">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <span>{{ _("Favorites") }}</span> <i class="fa fa-angle-down"></i> </a>
+                <ul class="dropdown-menu pull-right">
+                </ul>
+            </li>
         </ul><!-- end multiple lang -->
 
     </div><!-- end pulled right: nav area -->
 </header><!-- END HEADER -->
 
-<div id="main">
+<div id="main" role="main">
 
     <!-- RIBBON -->
-    <div id="ribbon">
-<span id="refresh" class="btn btn-ribbon" data-title="refresh" rel="tooltip" data-placement="bottom" data-original-title="&lt;i class='text-warning fa fa-warning'&gt;&lt;/i&gt; Warning! This will reset all your widget settings." data-html="true"><i class="fa fa-refresh"></i></span>        <!-- breadcrumb -->
-        <ol class="breadcrumb">
-            <!-- if you are using the AJAX version, the breadcrumb area will be empty -->
-            <li>Blank Page</li>
-        </ol><!-- end breadcrumb -->
+<div id="ribbon">
 
-    </div><!-- END RIBBON -->
+				<span class="ribbon-button-alignment"> <span id="refresh" class="btn btn-ribbon" data-title="refresh" rel="tooltip" data-placement="bottom" data-original-title="<i class='text-warning fa fa-warning'></i> Warning! This will reset all your widget settings." data-html="true"><i class="fa fa-refresh"></i></span> </span>
+
+				<!-- breadcrumb -->
+				<ol class="breadcrumb">
+					<li>Home</li><li>Dashboard</li>
+				</ol>
+				<!-- end breadcrumb -->
+    </div>
+    <!-- END RIBBON -->
+
     <!-- MAIN CONTENT -->
 
-    <div id="content"> [YOUR_CONTENT_HERE]<i class="fa fa-refresh"></i> </div><!-- END MAIN CONTENT -->
+    <div id="content">
+    {% block content %}{% endblock %}
+    </div><!-- END MAIN CONTENT -->
 
 </div><!-- END MAIN PANEL -->
 
@@ -120,31 +152,23 @@
         <span>
         <!-- User image size is adjusted inside CSS, it should stay as it -->
          <a href="javascript:void(0);" id="show-shortcut"><img alt="me"
-        class="online" src="{{ STATIC_URL }}img/avatars/sunny.png">
-        <span>john.doe</span></a></span>
+        class="online" src="{{ STATIC_URL }}img/avatars/male.png">
+        <span>{{ request.user }} <i class="fa fa-angle-down"></i></span></a></span>
     </div>
     <!-- end user info -->
 
     <nav>
         <ul>
-            <li class=""><a href="ajax/dashboard.html" title=
-            "Dashboard"><span class=
-            "menu-item-parent">Dashboard</span></a></li>
-            <li>...</li>
-            <li>
-                <a href="#"><span class=
-                "menu-item-parent">Graphs</span></a>
-                <ul>
-                    <li><a href="ajax/flot.html">...</a></li>
-                    <li>...</li>
-                    <li>...</li>
-                </ul>
+            <li class="">
+                <a href="ajax/dashboard.html" title="[MENUITEM TITLE]">
+                    <span class="menu-item-parent">[MENUITEM]</span>
+                </a>
             </li>
         </ul>
     </nav>
 </aside>
 
+{% endblock %}
 <!-- END Container -->
-
 </body>
 </html>

@@ -3,7 +3,6 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 import django.contrib.auth.signals
-from keops.db import models
 from .element import *
 from .module import *
 from .locale import *
@@ -12,6 +11,7 @@ from .action import *
 from .menu import *
 from .ui import *
 from .module import *
+from keops.db import models
 
 
 class File(models.Model):

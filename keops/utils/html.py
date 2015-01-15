@@ -1,4 +1,5 @@
 
+
 def TAG(tag=None, *args, **kwargs):
     s = '<' + tag
     attrs = kwargs.pop('attrs', None)
@@ -18,17 +19,22 @@ def TAG(tag=None, *args, **kwargs):
         s += '</%s>' % tag
     return s
 
+
 def HTML(*args, **kwargs):
     return TAG('html', *args, **kwargs)
+
 
 def BODY(*args, **kwargs):
     return TAG('body', *args, **kwargs)
 
+
 def SPAN(*args, **kwargs):
     return TAG('span', *args, **kwargs)
 
+
 def HR(*args, **kwargs):
     return TAG('hr', *args, **kwargs)
+
 
 def BUTTON(*args, **kwargs):
     value = kwargs.pop('value', '')
@@ -37,20 +43,26 @@ def BUTTON(*args, **kwargs):
     args.append(value)
     return TAG('button', *args, **kwargs)
 
+
 def BR():
     return '<br/>'
+
 
 def CENTER(*args, **kwargs):
     return TAG('center', *args, **kwargs)
 
+
 def DIV(*args, **kwargs):
     return TAG('div', *args, **kwargs)
+
 
 def FORM(*args, **kwargs):
     return TAG('form', *args, **kwargs)
 
+
 def INPUT(*args, **kwargs):
     return TAG('input', *args, **kwargs)
+
 
 def LABEL(*args, **kwargs):
     value = kwargs.pop('value', '')
@@ -59,11 +71,13 @@ def LABEL(*args, **kwargs):
     args.append(value)
     return TAG('label', *args, **kwargs)
 
+
 def OPTION(*args, **kwargs):
     value = kwargs.pop('value', '')
     args = list(args)
     args.append(value)
     return TAG('option', *args, **kwargs)
+
 
 def SELECT(*args, **kwargs):
     value = kwargs.pop('value', '')
@@ -74,11 +88,13 @@ def SELECT(*args, **kwargs):
         args.append(OPTION(value=key))
     return TAG('select', *args, **kwargs)
 
+
 def SCRIPT(*args, **kwargs):
     value = kwargs.pop('value', '')
     args = list(args)
     args.append(value)
     return TAG('script', *args, **kwargs)
+
 
 def LINK(*args, **kwargs):
     value = kwargs.pop('value', '')
@@ -86,23 +102,30 @@ def LINK(*args, **kwargs):
     args.append(value)
     return TAG('link', *args, **kwargs)
 
+
 def TABLE(*args, **kwargs):
     return TAG('table', *args, **kwargs)
+
 
 def TD(*args, **kwargs):
     return TAG('td', *args, **kwargs)
 
+
 def THEAD(*args, **kwargs):
     return TAG('thead', *args, **kwargs)
+
 
 def TBODY(*args, **kwargs):
     return TAG('tbody', *args, **kwargs)
 
+
 def TH(*args, **kwargs):
     return TAG('th', *args, **kwargs)
 
+
 def TR(*args, **kwargs):
     return TAG('tr', *args, **kwargs)
+
 
 def ToHTML(obj, table=False):
     rows = []

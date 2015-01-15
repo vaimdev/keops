@@ -1,139 +1,106 @@
-<form name="dataForm" ng-controller="FormController" ng-init="form.initForm('{{ opts }}')" ng-submit="submit()">
-  <table style="width: 100%;">
-    <tr>
-      <td class="form-head">
-        <table style="width: 100%; height: 70px">
-          <tr>
-            <td class="form-title">
-                        <span>
-                            <span style="display: inline-block; padding-right: 10px;">
-                              <a style="font-weight: 600;" href="#action/{{ action.pk }}">{{ form.title|capfirst }}</a> / {% verbatim %}{{form.item.__str__}}{% endverbatim %}</span>
-                            <span class="badge">{% verbatim %}{{form.start+1}} / {{form.total}}{% endverbatim %}</span>
-                        </span>
+{% extends "keops/base_site.html" %}
+{% load i18n %}
 
-              <div class="form-help-text">
-                <span>{{ form.help_text }}</span>
-              </div>
-              <table>
-                <tr>
-                  {% block buttons %}
-                    <td>
-                      <button type="button" ng-show="!form.write" class="btn btn-danger" ng-click="form.newItem()"
-                              tooltip="{{ _('Create new record') }}"><span
-                          class="glyphicon glyphicon-file"></span> {{ _('create')|capfirst }}</button>
-                      <button type="button" ng-show="!form.write" class="btn btn-default"
-                              ng-click="form.write = true">{{ _('edit')|capfirst }}</button>
+{% block content %}
+  <div id="content-main" ng-controller="FormController">
+    <div class="row form-header">
+      <div class="col-xs-12 col-sm-6 col-md-7 col-lg-7">
+        <h1 class="page-title txt-color-blueDark">
+          <i class="fa fa-edit fa-fw "></i> {{ title|capfirst }}<span>&nbsp;&gt; Registro #1</span></h1>
+        <div style="margin-top: 10px;">
+          <button class="btn btn-primary">{% trans "create"|capfirst %}</button>
+          <button class="btn btn-default">{% trans "actions"|capfirst %}</button>
+        </div>
+      </div>
+      <div class="col-sm-5 text-right">
+        <div class="input-group">
+          <span class="input-group-addon">
+            <i class="fa fa-search"></i>
+          </span>
+          <input class="form-control" placeholder="{% trans "filter"|capfirst %}" type="text" aria-controls="dt_basic">
+        </div>
+        <div ng-show="!form.write" class="btn-group">
+          <a class="btn btn-default" ng-click="form.prevPage()"><span class="glyphicon glyphicon-chevron-left"></span></a>
+          <a class="btn btn-default" ng-click="form.nextPage()"><span class="glyphicon glyphicon-chevron-right"></span></a>
+        </div>
+        <div class="btn-group" style="margin-top: 5px; margin-bottom: 5px;">
+          <button class="btn btn-default"><i class="fa fa-edit fa-fw "></i></button>
+          <button class="btn btn-default"><i class="fa fa-table fa-fw "></i></button>
+        </div>
+      </div>
+        {% if help_text %}
+        <div class="col-sm-12">
+          <div class="well">
+            <button class="close" data-dismiss="alert">
+                ×
+            </button>
+            {{ help_text }}
+          </div>
+        </div>
+        {% endif %}
+				</div>
+        <div class="jarviswidget jarviswidget-sortable" id="wid-id-1" data-widget-colorbutton="false" data-widget-editbutton="false" data-widget-custombutton="false" role="widget" style="">
+          <header role="heading">
+            <div class="jarviswidget-ctrls" role="menu">
+            <a href="javascript:void(0);" class="button-icon jarviswidget-fullscreen-btn" rel="tooltip" title="" data-placement="bottom" data-original-title="Fullscreen">
+              <i class="fa fa-resize-full "></i>
+            </a>
+            </div>
+            <span class="widget-icon">
+              <i class="fa fa-edit"></i>
+            </span>
+            <h2>{% trans "form"|capfirst %}</h2>
 
-                      <button type="submit" ng-show="form.write" class="btn btn-primary"
-                              tooltip="{{ _('Save record changes') }}"><span
-                          class="glyphicon glyphicon-floppy-disk"></span> {{ _('save')|capfirst }}</button>
-                      <button type="submit" ng-show="form.write" class="btn btn-primary"
-                              tooltip="{{ _('Save changes and create a new record') }}">{{ _('Save + New') }}</button>
-                      <button type="submit" ng-show="form.write" class="btn btn-primary"
-                              tooltip="{{ _('Save changes and edit the created record') }}">{{ _('Save + Edit') }}</button>
-                      <button type="button" ng-show="form.write" class="btn btn-default" ng-click="form.cancel()"
-                              tooltip="{{ _('Cancel changes') }}">{{ _('cancel')|capfirst }}</button>
-                    </td>
-                    <td ng-show="!form.write">
-                      {% for group, actions in action_groups.items %}
-                        <div class="btn-group" style="margin-left: 20px;">
-                          <button class="btn btn-default dropdown-toggle">{{ group }}<span style="margin-left: 8px;"
-                                                                                           class="caret"></span>
-                          </button>
-                          <ul class="dropdown-menu">
-                            {% for action, obj in actions %}
-                              {% if obj.attrs %}
-                                <li {{ obj.attrs|safe }}><a
-                                    style="cursor: pointer;">{{ obj.short_description|safe }}</a></li>
-                              {% else %}
-                                <li><a style="cursor: pointer;"
-                                       ng-click="adminAction('{{ action }}')">{{ obj.short_description|safe }}</a></li>
-                              {% endif %}
-                            {% endfor %}
-                          </ul>
-                        </div>
-                      {% endfor %}
-                    </td>
-                  {% endblock %}
-                  <td ng-show="!form.write">
-                    {% if form.reports %}
-                      <div class="btn-group" style="margin-left: 20px;">
-                        {% with form.reports.0 as first_report %}
-                          <a class="btn btn-default button-label" href="{{ first_report.get_url }}"
-                             target="_blank">{{ _('print')|capfirst }}</a>
-                        {% endwith %}
-                        <button class="btn btn-default dropdown-toggle"><span class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                          {% for report in form.reports %}
-                            <li>{{ report|safe }}</li>
-                          {% endfor %}
-                        </ul>
-                      </div>
-                    {% else %}
-                      <a style="margin-left: 20px;" class="btn btn-default" href="/report/autoreport/?model={{ opts }}"
-                         target="_blank">{{ _('print')|capfirst }}</a>
-                    {% endif %}
-                  </td>
-                </tr>
-              </table>
-            </td>
-            <td style="width: 250px;">
-              <table style="float: right; height: 100%;">
-                <tr>
-                  <td ng-show="!form.write" style="text-align: right; height: 100%;" colspan="3">
-                    <div class="input-group" style="width: 100%;">
-                      <input class="form-control" type="search" placeholder="{{ _("search")|capfirst }}"
-                             ng-model="searchField"
-                             ng-enter="search('{{ action.get_absolute_url }}list', 'query=' + searchField)">
-                                        <span style="cursor: pointer;" class="input-group-btn">
-                                            <button type="button" class="btn btn-primary"
-                                                    ng-click="list.query('{{ opts }}', searchField)"><span
-                                                class="glyphicon glyphicon-search"></span></button>
-                                            </span>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="height: auto;">
-                    <div ng-show="!form.write" class="btn-group">
-                      <a class="btn btn-default" ng-click="form.prevPage()"><i class="icon-chevron-left"></i></a>
-                      <a class="btn btn-default" ng-click="form.nextPage()"><i class="icon-chevron-right"></i></a>
-                    </div>
-                  </td>
-                  <td style="float: right; width: auto; height: auto;">
-                    <div ng-show="!form.write" class="btn-group">
-                      <a class="btn btn-default" href="#{{ action.get_absolute_url }}list/"
-                         title="{{ _("list")|capfirst }}"><i class="icon-reorder"></i></a>
-                      <a class="btn btn-default active" title="{{ _("form")|capfirst }}"><i class="icon-edit"></i></a>
-                    </div>
-                  </td>
-                  <td style="padding-left: 20px;">
-                    <div ng-show="!form.write">
-                      <div class="btn-group nav navbar-nav navbar-right" style="margin-left: 20px;">
-                        <button type="button" class="btn btn-default dropdown-toggle"><i class="icon-cog"></i><span
-                            style="margin-left: 8px;" class="caret"></span></button>
-                        <ul class="dropdown-menu">
-                          <li><a
-                              ng-href="#history/{{ opts }}/{% verbatim %}{{form.item.pk}}{% endverbatim %}">{{ _('History') }}</a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-  <div>
-    <div style="margin: 6px;" ng-repeat="alert in alerts" ng-class="'alert alert-' + alert.type"
-         close="closeAlert($index)">
-      <button class="close" ng-click="closeAlert($index)">&times;</button>
-      <div ng-bind-html="alert.msg" dynamic="html"></div>
+            <span class="jarviswidget-loader">
+              <i class="fa fa-refresh fa-spin"></i>
+            </span>
+          </header>
+
+          <!-- widget div-->
+          <div role="content">
+
+            <!-- widget edit box -->
+            <div class="jarviswidget-editbox">
+              <!-- This area used as dropdown edit box -->
+
+            </div>
+            <!-- end widget edit box -->
+
+            <!-- widget content -->
+            <div class="widget-body no-padding">
+
+
+    <form class="smart-form" {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" ng-init="form.initForm('{{ opts }}')" ng-submit="submit()">
+  {% csrf_token %}
+  {% block form_top %}{% endblock %}
+<div>
+{% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1" />{% endif %}
+{% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}" />{% endif %}
+
+{% block field_sets %}
+{% for fieldset in adminform %}
+  {% include "keops/includes/fieldset.html" %}
+{% endfor %}
+{% endblock %}
+
+{% block after_field_sets %}{% endblock %}
+
+{% block inline_field_sets %}
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
+{% endfor %}
+{% endblock %}
+
+{% block after_related_objects %}{% endblock %}
+          </div>
+          <footer>
+            <button type="submit" class="btn btn-primary">
+              {% trans "save"|capfirst %}
+            </button>
+          </footer>
+        </form>
+      </div>
     </div>
   </div>
-  {{ form_view|safe }}
-</form>
+</div>
+{% endblock %}

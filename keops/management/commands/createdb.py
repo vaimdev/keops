@@ -1,17 +1,20 @@
-
 from optparse import make_option
-
+from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
+
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
+                    default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
     )
-    help = "Create a database."
+    help = 'Create the specified database.'
 
     def handle(self, *args, **options):
         from keops.db import scripts
-        scripts.createdb(options['database'])
-        scripts.syncdb(options['database'])
+        db = options['database']
+        verbosity = options['verbosity']
+        scripts.createdb(db)
+        scripts.syncdb(db)
+        call_command('installapps', database=db, verbosity=verbosity)

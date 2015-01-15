@@ -1,6 +1,8 @@
 import os
 from importlib import import_module
 from django.conf import settings
+from django.apps import apps as django_apps
+from keops.apps import AppConfig
 
 __all__ = ['register_modules', 'adjust_dependencies']
 
@@ -20,36 +22,46 @@ def register_modules(prefix, path):
 
 def get_dependencies(app):
     r = []
-    mod = import_module(app)
-    info = getattr(mod, 'app_info', None)
-    if info and 'dependencies' in info:
-        deps = [d.replace('-', '_') for d in list(info.get('dependencies'))]
-        for dep in deps:
+    if isinstance(app, str):
+        app = AppConfig.create(app)
+    deps = getattr(app, 'dependencies', None)
+    if deps:
+        for dep in app.dependencies:
             r += get_dependencies(dep)
-        return r + deps
+        return r + app.dependencies
     return []
 
 
 def adjust_dependencies(apps):
     # adjust module dependency priority
-
-    for app in apps:
-        deps = get_dependencies(app)
+    apps = list(apps)
+    for entry in apps:
+        deps = get_dependencies(entry)
         if deps:
-            apps.remove(app)
+            apps.remove(entry)
             i = 0
             for dep in deps:
-                dep = dep.replace('-', '_')
                 if not dep in apps:
                     apps.append(dep)
                     i = len(apps) - 1
                     continue
                 i = max(i, apps.index(dep))
             if i == 0:
-                apps.append(app)
+                apps.append(entry)
             else:
-                apps.insert(i + 1, app)
+                apps.insert(i + 1, entry)
+    return apps
 
-# Adjust modules dependencies
-adjust_dependencies(settings.INSTALLED_APPS)
-# TODO: Enable multiple database support
+
+def populate(populate_fn):
+    def inner(*args, **kwargs):
+        if len(args) > 0:
+            installed_apps = args[0]
+        elif 'installed_apps' in kwargs:
+            installed_apps = kwargs.get('installed_apps')
+        kwargs['installed_apps'] = adjust_dependencies(installed_apps)
+        populate_fn(**kwargs)
+    return inner
+
+# Patch django apps populate to adjust module dependency priority
+django_apps.populate = populate(django_apps.populate)

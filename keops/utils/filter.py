@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 
+
 def _get_filter_args(filter):
     if isinstance(filter, (tuple, list)):
         d = {}
@@ -8,6 +9,7 @@ def _get_filter_args(filter):
             d[i[0] + '__exact'] = i[2]
     elif isinstance(filter, dict):
         return filter
+
 
 def _get_query_args(cls, search_fields, value, filter=None):
     op = '__icontains'
@@ -58,6 +60,7 @@ def _get_query_args(cls, search_fields, value, filter=None):
         filter_items.extend(_get_filter_items(cls._meta.get_field(cls._meta.default_fields)))
         d.update({f + op: value for f in filter_items})
         return Q(**d)
+
 
 def search_text(queryset, text, search_fields=None):
     # Search by the search_fields property (Admin)
