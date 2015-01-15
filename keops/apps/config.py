@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class ModuleConfig(AppConfig):
+class Module(AppConfig):
     version = None
     description = ''
     requirements = []

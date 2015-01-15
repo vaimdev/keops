@@ -1,1 +1,1 @@
-from .config import ModuleConfig
+from .config import Module

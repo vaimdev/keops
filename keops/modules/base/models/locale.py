@@ -1,6 +1,4 @@
-
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.contenttypes.models import ContentType
 from keops.db import models
 
 
@@ -23,25 +21,9 @@ class Language(models.Model):
         verbose_name = _('language')
 
 
-class Translation(models.Model):
-    """
-    Translates database field value.
-    """
-    content_type = models.ForeignKey(ContentType)
-    name = models.CharField(_('name'), max_length=64)
-    language = models.ForeignKey(Language, verbose_name=_('language'))
-    source = models.CharField(_('source'), max_length=1024, db_index=True)
-    value = models.TextField(_('value'))
-
-    class Meta:
-        unique_together = (('content_type', 'name'))
-        verbose_name = _('translation')
-        verbose_name_plural = _('translations')
-
-
 class Country(models.Model):
     name = models.CharField(_('name'), max_length=64, unique=True)
-    code = models.CharField(_('country code'), max_length=2, help_text='The ISO country code')
+    code = models.CharField(_('country code'), max_length=2, help_text='The ISO country code', unique=True)
     language = models.ForeignKey(Language, verbose_name=_('language'))
     phone_code = models.CharField(_('phone code'), max_length=10)
 

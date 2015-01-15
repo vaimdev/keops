@@ -1,7 +1,7 @@
-
 from django.utils.translation import ugettext_lazy as _
 from keops.db import models
-1
+
+
 class Config(models.Model):
     """
     Manage general db configuration attributes (ui visible).
@@ -13,6 +13,7 @@ class Config(models.Model):
 
     class Meta:
         verbose_name = _('config')
+
 
 class ConfigParameter(models.Model):
     """

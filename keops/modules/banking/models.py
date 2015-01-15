@@ -2,6 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 from keops.db import models
 from keops.modules.base import models as base
 
+
 class Bank(models.Model):
     code = models.CharField(_('Bank Identifier Code'), max_length=64)
     name = models.CharField(_('name'), max_length=128, help_text=_('Bank name'))
