@@ -5,7 +5,7 @@ from django.contrib.contenttypes import generic
 import django.contrib.auth.signals
 from .element import *
 from .module import *
-from .locale import *
+from .region import *
 from .auth import *
 from .action import *
 from .menu import *

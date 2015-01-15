@@ -25,7 +25,6 @@ class Company(models.Model):
     parent_company = models.ForeignKey('self')
     name = models.CharField(_('name'), max_length=100, null=False)
     logo = models.ImageField('logo')
-    currency = models.ForeignKey('base.currency', verbose_name=_('currency'))
     report_style = models.CharField(_('report style'), max_length=64, page=_('Report Configurations'))
     report_header = models.TextField(_('report header'), page=_('Report Configurations'))
     report_footer = models.TextField(_('report footer'), page=_('Report Configurations'))
@@ -67,8 +66,6 @@ class Contact(models.Model):
     active = models.BooleanField(_('active'), default=True)
     parent = models.ForeignKey('self')
     category = models.ForeignKey(Category, verbose_name=_('Contact Category'))
-    language = models.ForeignKey('base.language')
-    time_zone = models.CharField(_('time zone'), max_length=32)
     comments = models.TextField(_('comments'))
     address = models.CharField(_('address'), max_length=256)
     city = models.CharField(_('city'), max_length=64)
@@ -100,12 +97,17 @@ class Contact(models.Model):
 
 
 class User(auth.AbstractUser):
+    STATUS = (
+        ('created', _('Created')),
+        ('activated', _('Activated')),
+        ('blocked', _('Blocked')),
+    )
     contact = models.ForeignKey(Contact)  # Related contact
     email_signature = models.TextField(_('e-mail signature'))
     document_signature = models.TextField(_('document signature'))
     company = models.ForeignKey('base.company', verbose_name=_('company'), help_text=_('default user company'), related_name='+')
     companies = models.ManyToManyField('base.company', verbose_name=_('allowed companies'), help_text=_('user allowed companies'))
-    status = models.CharField(max_length=16, choices=(('created', _('Created')), ('activated', _('activated'))), visible=False)
+    status = models.CharField(max_length=16, choices=STATUS, visible=False)
 
     raw_password = property(fset=auth.AbstractUser.set_password)
 
@@ -161,7 +163,7 @@ class UserData(models.Model):
     User profile data.
     """
     user = models.ForeignKey(User, null=False)
-    key = models.CharField(max_length=64, db_index=True)
+    key = models.CharField(max_length=256, db_index=True)
     value = models.TextField()
 
     class Meta:
