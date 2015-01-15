@@ -24,13 +24,6 @@ class File(models.Model):
     body = models.BinaryField(null=False)
 
 
-class CompanyModel(models.Model):
-    company = models.ForeignKey(Company, visible=False)
-
-    class Meta:
-        abstract = True
-
-
 class BaseModelManager(ElementManager):
     def get_by_natural_key(self, app_label, model):
         return BaseModel.objects.get(content_type=ContentType.objects.get_by_natural_key(app_label, model))

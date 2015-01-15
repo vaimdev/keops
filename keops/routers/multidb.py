@@ -1,6 +1,3 @@
-# Enable keops to work with multi database using DATABASE_ROUTER settings
-# each db have your own installed apps (registered on base.module)
-# by default keops will install all apps defined on BASE_APPS settings
 from keops.middleware.db import get_db
 
 

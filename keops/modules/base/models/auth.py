@@ -12,15 +12,15 @@ from .element import ElementManager
 Group.add_to_class('module_category', models.ForeignKey('base.modulecategory', verbose_name=_('category')))
 
 
-class CompanyManager(ElementManager):
-    def get_queryset(self):
-        return super(CompanyManager, self).get_queryset().defer('image')  # default defer image
+class CompanyManager(models.Manager):
+    def filter_by_user(self, user, **kwargs):
+        return self.filter(**kwargs)
 
 
-# Company/data context
+# Company/Data Context
 class Company(models.Model):
     """
-    Company configuration model.
+    Company/Data Context configuration model.
     """
     parent_company = models.ForeignKey('self')
     name = models.CharField(_('name'), max_length=100, null=False)
@@ -29,6 +29,7 @@ class Company(models.Model):
     report_style = models.CharField(_('report style'), max_length=64, page=_('Report Configurations'))
     report_header = models.TextField(_('report header'), page=_('Report Configurations'))
     report_footer = models.TextField(_('report footer'), page=_('Report Configurations'))
+    allow_login = models.BooleanField(default=True)
 
     objects = CompanyManager()
 
@@ -166,3 +167,19 @@ class UserData(models.Model):
     class Meta:
         unique_together = (('user', 'key'),)
         db_table = 'auth_user_data'
+
+
+class DataContextManager(models.Manager):
+    def get_queryset(self):
+        # Filter by thread local data context
+        from keops.modules.base.middleware import get_data_context
+        return super(DataContextManager, self).get_queryset().filter(company_id=get_data_context())
+
+
+class CompanyModel(models.Model):
+    company = models.ForeignKey(Company, visible=False)
+
+    objects = DataContextManager()
+
+    class Meta:
+        abstract = True
