@@ -1,19 +1,20 @@
 # Active Data Dictionary for Django base field class
 from bisect import bisect
 from django.db import models
-from .custom import CustomAttrs
 
 __all__ = ['CharField', 'BooleanField', 'DecimalField', 'MoneyField', 'ForeignKey', 'ImageField',
            'VirtualField', 'PropertyField', 'OneToManyField', 'get_model_url']
 
-_custom_attrs = ('mask', 'page', 'visible', 'fieldset', 'mask_re', 'on_change', 'filter', 'default_fields',
-                 'display_fn', 'widget_attrs')
+
+# Additional field attributes
+models.Field.readonly = False
+models.Field.virtual = False
+models.Field.widget_attrs = None
+models.Field.template_name = None
 
 
-class Field(object):
-    _init = models.Field.__init__
-    _contribute_to_class = models.Field.contribute_to_class
-
+# Monkey-patch default django Field class
+class _Field(object):
     def __init__(self, *args, **kwargs):
         # Change default field db null to true
         kwargs.setdefault('null', not (kwargs.get('primary_key', False) or isinstance(self, models.OneToOneField)))
@@ -22,12 +23,8 @@ class Field(object):
             kwargs.pop('null', None)
             kwargs.pop('blank', None)
         # Add custom_attrs to field
-        self.custom_attrs = CustomAttrs(kwargs.pop('custom_attrs', {}))
-        for attr in _custom_attrs:
-            if attr in kwargs:
-                self.custom_attrs[attr] = kwargs.pop(attr)
         self.readonly = kwargs.pop('readonly', False)
-        Field._init(self, *args, **kwargs)
+        models.Field.__init__(self, *args, **kwargs)
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         if not hasattr(cls._meta, 'all_fields'):
@@ -39,27 +36,19 @@ class Field(object):
         # Register server-side on_change field event
         if hasattr(self, 'custom_attrs') and 'on_change' in self.custom_attrs:
             self.custom_attrs.setdefault('widget_attrs', {})['ng_change'] = 'fieldChangeCallback(\'%s\')' % name
-        Field._contribute_to_class(self, cls, name, virtual_only=virtual_only)
+        models.Field.contribute_to_class(self, cls, name, virtual_only=virtual_only)
 
     models.Field.__init__ = __init__
     models.Field.contribute_to_class = contribute_to_class
 
 
-class BasicFieldFilter(object):
-    pass
-
-
-class AdvancedFieldFilter(object):
-    pass
-
-
-class NullCharField(models.CharField):
+class CharField(models.CharField):
     """
     Store null on database char field when value is None.
     """
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('max_length', 64)
-        super(NullCharField, self).__init__(*args, **kwargs)
+        super(CharField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
         return value
@@ -82,12 +71,10 @@ class MoneyField(models.DecimalField):
         super(MoneyField, self).__init__(verbose_name=verbose_name, name=name, max_digits=max_digits,
             decimal_places=decimal_places, **kwargs)
 
+
 # Change default BooleanField to NullBooleanField
-BooleanField = models.NullBooleanField
-
-
-# Change default CharField to NullCharField
-CharField = NullCharField
+class BooleanField(models.NullBooleanField):
+    pass
 
 
 def get_model_url(cls):
@@ -230,10 +217,3 @@ class OneToManyField(VirtualField):
             return getattr(instance, self.related_name, None)
         else:
             return self
-
-
-class ImageField(models.BinaryField):
-    pass
-
-# TODO: optimize foreignkey queryset
-# The foreignkey field default queryset selects all fields, specifying automatically only needed/representation fields
