@@ -7,11 +7,11 @@ class AppConfig(apps.AppConfig):
     description = None
     dependencies = None
     fixtures = None
+    demo_data = None
     installable = False
     sql = None
     version = None
     website = None
-    demo_data = None
 
 
 class SimpleConfig(apps.AppConfig):

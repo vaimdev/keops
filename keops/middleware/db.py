@@ -4,8 +4,7 @@ from django.db import DEFAULT_DB_ALIAS, connections
 from django.utils.functional import SimpleLazyObject
 from threading import local
 
-MULTI_DB = ('keops.middleware.db.PathMiddleware' in settings.MIDDLEWARE_CLASSES) or \
-           ('keops.middleware.db.SubdomainMiddleware' in settings.MIDDLEWARE_CLASSES)
+MULTI_DB = ('keops.middleware.db.PathMiddleware' in settings.MIDDLEWARE_CLASSES)
 
 if MULTI_DB:
     SESSION_DB_KEY = '_keops_db_%s'
@@ -60,8 +59,4 @@ class MultiDatabaseMiddleware(SingleDatabaseMiddleware):
 
 
 class PathMiddleware(MultiDatabaseMiddleware):
-    pass
-
-
-class SubdomainMiddleware(MultiDatabaseMiddleware):
     pass

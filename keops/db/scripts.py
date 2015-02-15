@@ -104,8 +104,8 @@ def recreatedb(db):
     createdb(db)
 
 
-def runfile(filename, db):
-    f = open(filename, encoding='utf-8')
+def runfile(filename, db, encoding='utf-8'):
+    f = open(filename, encoding=encoding)
     conn = connections[db]
     conn.cursor().execute(f.read())
 
